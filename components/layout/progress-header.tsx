@@ -9,7 +9,7 @@ interface ProgressHeaderProps {
 
 export function ProgressHeader({ currentStep, totalSteps, title, description }: ProgressHeaderProps) {
   return (
-    <header className="mb-20">
+    <header className="mb-8">
       <div className="flex items-center gap-4 mb-4">
         <span className="text-[0.6875rem] font-bold uppercase tracking-[0.2em] text-outline">
           Step {currentStep} of {totalSteps}

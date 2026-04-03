@@ -41,7 +41,7 @@ export function SideNav({ steps, currentStepIndex }: SideNavProps) {
           if (window.confirm("Are you sure you want to reset data?")) {
             window.location.href = '/';
           }
-        }} className="mt-auto py-4 border border-white text-white text-xs font-bold hover:bg-white hover:text-black transition-colors uppercase tracking-widest bg-transparent mix-blend-difference invert dark:invert-0 dark:mix-blend-normal rounded-sm">
+        }} className="mt-auto py-4 border border-white text-white text-xs font-bold hover:bg-white hover:text-black transition-colors uppercase tracking-widest bg-transparent mix-blend-difference invert dark:invert-0 dark:mix-blend-normal rounded-full">
         Reset Data
       </button>
     </aside>

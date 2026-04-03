@@ -95,7 +95,7 @@ export default function Step3Page() {
         <Link href="/calculator/step-2" className="text-sm font-bold uppercase tracking-widest text-[#ababab] hover:text-black transition-colors">
           Back
         </Link>
-        <button onClick={handleNext} className="bg-black text-white px-8 py-5 text-sm font-black uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-all duration-300">
+        <button onClick={handleNext} className="bg-black text-white px-4 py-5 text-sm font-black uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-all duration-300 rounded-full">
           Calculate Results
         </button>
       </footer>

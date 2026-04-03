@@ -21,13 +21,13 @@ export default function InstallersPage() {
 
   return (
     <div className="bg-white min-h-screen text-[#1a1c1c] font-inter">
-      <header className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md flex justify-between items-center px-10 py-6 border-b-0">
-        <Link href="/" className="flex items-center gap-6">
-          <Image src="/solar-logo.svg" alt="MySolar-PV Logo" width={140} height={40} className="h-8 w-auto object-contain" />
-          <div className="w-[1px] h-8 bg-neutral-300"></div>
-          <Image src="/ngen-logo.svg" alt="Ngen Logo" width={120} height={40} className="h-8 w-auto object-contain" />
+      <header className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md flex justify-between items-center px-4 md:px-10 py-6 border-b-0">
+        <Link href="/" className="flex items-center gap-3 md:gap-6">
+          <Image src="/solar-logo.svg" alt="MySolar-PV Logo" width={140} height={40} className="h-6 md:h-8 w-auto object-contain" />
+          <div className="w-[1px] h-6 md:h-8 bg-neutral-300"></div>
+          <Image src="/ngen-logo.svg" alt="Ngen Logo" width={120} height={40} className="h-6 md:h-8 w-auto object-contain" />
         </Link>
-        <Link href="/" className="text-[#5e5e5e] hover:text-black transition-colors text-sm font-bold uppercase tracking-widest flex items-center justify-center p-2 md:p-0">
+        <Link href="/" className="text-[#5e5e5e] hover:text-black transition-colors text-sm font-bold uppercase tracking-widest flex items-center justify-end p-0 md:p-0">
           <span className="hidden md:inline">Cancel</span>
           <X className="w-6 h-6 md:hidden" />
         </Link>
@@ -82,8 +82,8 @@ export default function InstallersPage() {
 
             {/* CTA */}
             <div className="pt-8">
-              <button className="w-full md:w-auto px-12 py-5 bg-black text-white font-bold text-lg hover:bg-[#1a1c1c] border border-black transition-all duration-300 group flex items-center justify-center gap-4" type="submit">
-                Generate My Calculator
+              <button className="w-full md:w-auto px-6 py-5 bg-black text-white hover:bg-white hover:text-black font-bold text-lg border border-black transition-all duration-300 group flex items-center justify-center gap-4 rounded-full" type="submit">
+                Generate Calculator
                 <ArrowRight className="w-6 h-6" />
               </button>
             </div>
@@ -131,13 +131,15 @@ export default function InstallersPage() {
         </section>
       </main>
 
-      <footer className="w-full max-w-screen-2xl mx-auto px-10 py-12 flex justify-between items-center text-[0.6875rem] font-bold uppercase tracking-[0.2em] text-[#777777] border-t border-[#c6c6c6]/30">
-        <div>© 2026 MySolar PV</div>
-        <div className="flex gap-8">
-          <Link className="hover:text-black transition-colors" href="#">Privacy</Link>
-          <Link className="hover:text-black transition-colors" href="#">Terms</Link>
-          <Link className="hover:text-black transition-colors" href="#">Support</Link>
+      <footer className="bg-white flex flex-col md:flex-row justify-center items-center gap-6 sm:gap-12 w-full pt-8 pb-8 px-8 border-t border-[#c6c6c6]/50 mt-auto">
+        <div className="text-[0.75rem] font-semibold uppercase tracking-widest text-[#777777]">
+            © 2026 MySolar PV
         </div>
+        <nav className="flex gap-12">
+          <a href="#" className="text-[0.75rem] font-semibold uppercase tracking-widest text-[#777777] hover:text-black transition-colors cursor-pointer">
+              Visit our homepage
+          </a>
+        </nav>
       </footer>
     </div>
   );

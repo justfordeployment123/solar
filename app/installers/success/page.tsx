@@ -22,7 +22,7 @@ export default function InstallersSuccessPage() {
           <p className="text-black font-medium text-lg">https://featurenotyetmade.com/i/energy-solutions-gmbh</p>
         </div>
 
-        <Link href="/calculator/step-1" className="inline-flex items-center justify-center px-12 py-5 bg-black text-white font-bold text-lg hover:bg-white hover:text-black border border-black transition-all duration-300 gap-4">
+        <Link href="/calculator/step-1" className="inline-flex items-center justify-center px-12 py-5 bg-black text-white font-bold text-lg hover:bg-white hover:text-black border border-black transition-all duration-300 gap-4 rounded-full">
           Enter Your Calculator
           <ArrowRight className="w-6 h-6" />
         </Link>

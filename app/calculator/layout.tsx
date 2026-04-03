@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { TopNav } from '@/components/layout/top-nav';
 import { SideNav } from '@/components/layout/side-nav';
@@ -15,6 +15,10 @@ const steps = [
 
 export default function CalculatorLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
   
   let currentIndex = 0;
   if (pathname.includes('/step-1')) currentIndex = 0;

@@ -12,7 +12,7 @@ export function Button({
   className = '', 
   ...props 
 }: ButtonProps) {
-  const baseStyles = "px-6 py-2 font-bold transition-all duration-200 border text-center";
+  const baseStyles = "px-6 py-2 font-bold transition-all duration-200 border text-center rounded-full";
   
   const variants = {
     primary: "bg-black text-white border-black hover:bg-white hover:text-black",

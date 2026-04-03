@@ -64,10 +64,10 @@ export default function Step1Page() {
   if (!mounted) return null; // Prevent hydration errors
 
   return (
-    <div className="px-8 md:px-24 pt-12">
+    <div className="px-8 md:px-24 pt-8">
       <ProgressHeader currentStep={1} totalSteps={3} title="" description="" />
 
-      <header className="mb-20">
+      <header className="mb-12 mt-4 md:mt-8">
         <h1 className="text-5xl md:text-7xl font-black text-black tracking-tighter uppercase leading-[0.85]">
           Your<br />Goals
         </h1>
@@ -102,7 +102,7 @@ export default function Step1Page() {
         <Link href="/" className="text-sm font-bold uppercase tracking-widest text-neutral-400 hover:text-black transition-colors">
           Back
         </Link>
-        <button onClick={handleNext} className="bg-black text-white px-12 py-5 text-sm font-black uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-all duration-300">
+        <button onClick={handleNext} className="bg-black text-white px-12 py-5 text-sm font-black uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-all duration-300 rounded-full">
           Next Step
         </button>
       </footer>
