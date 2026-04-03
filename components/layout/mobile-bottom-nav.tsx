@@ -4,7 +4,7 @@ import Link from 'next/link';
 interface Step {
   id: string;
   title: string;
-  icon: string;
+  icon: React.ElementType;
 }
 
 interface MobileBottomNavProps {
@@ -23,9 +23,7 @@ export function MobileBottomNav({ steps, currentStepIndex }: MobileBottomNavProp
             href={`#${step.id}`}
             className={`flex flex-col items-center gap-1 ${isActive ? 'text-black font-bold' : 'text-neutral-400'}`}
           >
-            <span className="material-symbols-outlined" style={isActive ? { fontVariationSettings: "'FILL' 1" } : {}}>
-              {step.icon}
-            </span>
+            <step.icon className={`w-6 h-6 ${isActive ? 'stroke-[3px]' : 'stroke-2'}`} />
             <span className="text-[10px] uppercase font-bold tracking-tighter">
               {step.title}
             </span>

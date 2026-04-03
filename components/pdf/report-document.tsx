@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
   text: { fontSize: 12, marginBottom: 5 },
   row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 },
   imageContainer: { marginVertical: 15, alignItems: 'center' },
-  chartImage: { width: '100%', height: 'auto', maxHeight: 250 },
+  chartImage: { width: '100%', height: 250, objectFit: 'contain' },
   footer: { position: 'absolute', bottom: 30, left: 30, right: 30, fontSize: 10, textAlign: 'center', color: '#666' }
 });
 

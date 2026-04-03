@@ -2,8 +2,10 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCalculatorStore } from '@/store/calculatorStore';
+import { RotateCcw } from 'lucide-react';
 
 export function TopNav() {
   const router = useRouter();
@@ -14,29 +16,19 @@ export function TopNav() {
     router.push('/');
   };
 
-  const handleSaveProgress = () => {
-    alert("Progress is automatically saved to your browser!");
-  };
-
   return (
-    <nav className="fixed top-0 w-full z-50 bg-white/90 dark:bg-black/90 backdrop-blur-md flex justify-between items-center px-10 py-6 border-b-0 font-inter tracking-tight">
-      <Link href="/" className="text-xl font-bold uppercase tracking-tighter text-black dark:text-white">
-        Battery Storage
+    <nav className="fixed top-0 w-full z-50 bg-black/90 backdrop-blur-md flex justify-between items-center px-10 py-6 border-b-0 font-inter tracking-tight">
+      <Link href="/" className="flex items-center gap-6">
+        <Image src="/solar-logo.svg" alt="MySolar-PV Logo" width={140} height={40} className="h-8 w-auto object-contain brightness-0 invert" />
+        <div className="w-[1px] h-8 bg-neutral-600"></div>
+        <Image src="/ngen-logo.svg" alt="Ngen Logo" width={120} height={40} className="h-8 w-auto object-contain brightness-0 invert" />
       </Link>
-      <div className="hidden md:flex items-center gap-8">
-        <button onClick={handleReset} className="text-neutral-500 hover:text-black transition-colors duration-200">
-          Reset Data
+      <div className="flex items-center">
+        <button onClick={handleReset} className="text-neutral-400 hover:text-white font-bold uppercase tracking-widest text-xs transition-colors duration-200 flex items-center justify-center p-2 md:p-0">
+          <span className="hidden md:inline">Reset Data</span>
+          <RotateCcw className="w-5 h-5 md:hidden" />
         </button>
-        <Link href="#" className="text-neutral-500 hover:text-black transition-colors duration-200">
-          Resources
-        </Link>
-        <Link href="#" className="text-neutral-500 hover:text-black transition-colors duration-200">
-          Support
-        </Link>
       </div>
-      <button onClick={handleSaveProgress} className="bg-black text-white px-6 py-2 text-sm font-bold active:opacity-70 transition-opacity border-black hover:bg-white hover:text-black border">
-        Save Progress
-      </button>
     </nav>
   );
 }

@@ -38,13 +38,15 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
           label={{ value: "Year", position: "insideBottom", offset: -10 }}
         />
         <YAxis
+          width={80}
           yAxisId="left"
-          label={{ value: "Cashflow (€)", angle: -90, position: "insideLeft", offset: 0 }}
+          label={{ value: "Cashflow (€)", angle: -90, position: "insideLeft", offset: -10 }}
         />
         <YAxis
+          width={80}
           yAxisId="right"
           orientation="right"
-          label={{ value: "Cumulative (€)", angle: 90, position: "insideRight", offset: 10 }}
+          label={{ value: "Cumulative (€)", angle: 90, position: "insideRight", offset: -10 }}
         />
         <Tooltip formatter={(value: any) => `€${Number(value).toFixed(2)}`} />
         <Legend wrapperStyle={{ paddingTop: "20px" }} />

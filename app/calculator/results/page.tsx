@@ -72,7 +72,7 @@ export default function ResultsPage() {
       <div className="flex flex-col space-y-4">
         <Link
           href="/calculator/step-2"
-          className="inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-800 transition-colors w-fit"
+          className="inline-flex items-center text-sm font-medium text-[#ababab] hover:text-black transition-colors w-fit uppercase tracking-widest"
         >
           <ArrowLeft className="mr-2 h-4 w-4" />
           Back to System Details
@@ -96,11 +96,12 @@ export default function ResultsPage() {
             step="0.5"
             value={technical.currentBatteryCapacityKwh || 5}
             onChange={handleSliderChange}
-            className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
+            className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-black"
           />
-          <span className="font-mono text-xl font-bold w-full sm:w-24 text-center sm:text-right text-slate-700 bg-slate-50 py-2 rounded-lg border border-slate-100">
-            {technical.currentBatteryCapacityKwh || 0} <span className="text-sm font-normal text-slate-500">kWh</span>
-          </span>
+          <div className="font-mono text-xl font-bold w-full sm:w-32 flex items-center justify-center sm:justify-end text-slate-700 bg-slate-50 py-2 px-3 rounded-lg border border-slate-100 whitespace-nowrap">
+            <span className="w-16 text-right">{(technical.currentBatteryCapacityKwh || 0).toFixed(1)}</span>
+            <span className="text-sm font-normal text-slate-500 ml-1">kWh</span>
+          </div>
         </div>
       </div>
 

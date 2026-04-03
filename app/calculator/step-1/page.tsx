@@ -64,8 +64,8 @@ export default function Step1Page() {
   if (!mounted) return null; // Prevent hydration errors
 
   return (
-    <div className="px-8 md:px-24 py-12">
-      <ProgressHeader currentStep={1} totalSteps={3} title="Goals" description="Define your goals" />
+    <div className="px-8 md:px-24 pt-12">
+      <ProgressHeader currentStep={1} totalSteps={3} title="" description="" />
 
       <header className="mb-20">
         <h1 className="text-5xl md:text-7xl font-black text-black tracking-tighter uppercase leading-[0.85]">
@@ -98,7 +98,7 @@ export default function Step1Page() {
         ))}
       </section>
 
-      <footer className="mt-24 pt-12 flex justify-between items-center border-t border-black">
+      <footer className="mt-12 pt-12 flex justify-between items-center">
         <Link href="/" className="text-sm font-bold uppercase tracking-widest text-neutral-400 hover:text-black transition-colors">
           Back
         </Link>

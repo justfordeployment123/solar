@@ -46,14 +46,9 @@ export default function Step3Page() {
 
   return (
     <div className="px-8 md:px-24 py-12">
-      <ProgressHeader currentStep={3} totalSteps={3} title="Financial Inputs" description="Financial info" />
+      <ProgressHeader currentStep={3} totalSteps={3} title="Financial Inputs" description="Configure the financial parameters of your battery storage system to calculate your potential ROI." />
 
-      <header className="mb-20">
-        <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-black mb-4">Financial Inputs</h1>
-        <p className="text-lg text-neutral-500 max-w-xl leading-relaxed">
-          Configure the financial parameters of your battery storage system to calculate your potential ROI.
-        </p>
-      </header>
+
 
       <div className="mb-24">
         <section>
@@ -100,7 +95,7 @@ export default function Step3Page() {
         <Link href="/calculator/step-2" className="text-sm font-bold uppercase tracking-widest text-[#ababab] hover:text-black transition-colors">
           Back
         </Link>
-        <button onClick={handleNext} className="bg-black text-white px-12 py-5 text-sm font-black uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-all duration-300">
+        <button onClick={handleNext} className="bg-black text-white px-8 py-5 text-sm font-black uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-all duration-300">
           Calculate Results
         </button>
       </footer>
