@@ -19,7 +19,7 @@ export default function InstallersSuccessPage() {
 
         <div className="bg-[#f9f9f9] border border-[#c6c6c6] p-8 mb-12 flex flex-col gap-4 font-mono text-sm max-w-lg mx-auto text-left break-all">
           <p className="text-neutral-500 uppercase tracking-widest font-sans font-bold text-xs">Your Unique Link:</p>
-          <p className="text-black font-medium text-lg">https://batterycalc.app/i/energy-solutions-gmbh</p>
+          <p className="text-black font-medium text-lg">https://featurenotyetmade.com/i/energy-solutions-gmbh</p>
         </div>
 
         <Link href="/calculator/step-1" className="inline-flex items-center justify-center px-12 py-5 bg-black text-white font-bold text-lg hover:bg-white hover:text-black border border-black transition-all duration-300 gap-4">
