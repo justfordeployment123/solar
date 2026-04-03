@@ -8,8 +8,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "BatteryCalc",
-  description: "Battery Storage Calculator",
+  title: "Battery Storage Calculator",
+  description: "Battery Storage Economics Calculator",
 };
 
 export default function RootLayout({
