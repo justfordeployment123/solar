@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>BatteryCalc - Who are you?</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "surface-variant": "#e2e2e2",
+              "background": "#f9f9f9",
+              "on-secondary-fixed-variant": "#3b3b3b",
+              "on-secondary-fixed": "#1b1b1b",
+              "on-secondary": "#ffffff",
+              "tertiary-fixed-dim": "#474747",
+              "on-primary": "#e2e2e2",
+              "on-surface-variant": "#474747",
+              "surface-tint": "#5e5e5e",
+              "surface-container": "#eeeeee",
+              "surface": "#f9f9f9",
+              "inverse-on-surface": "#f0f1f1",
+              "surface-bright": "#f9f9f9",
+              "primary-container": "#3b3b3b",
+              "primary": "#000000",
+              "on-tertiary": "#e2e2e2",
+              "on-primary-container": "#ffffff",
+              "on-tertiary-fixed": "#ffffff",
+              "tertiary": "#3b3b3b",
+              "inverse-surface": "#2f3131",
+              "on-secondary-container": "#1b1b1b",
+              "surface-container-lowest": "#ffffff",
+              "surface-container-high": "#e8e8e8",
+              "on-primary-fixed": "#ffffff",
+              "on-background": "#1a1c1c",
+              "secondary-container": "#d4d4d4",
+              "on-surface": "#1a1c1c",
+              "on-tertiary-container": "#ffffff",
+              "on-primary-fixed-variant": "#e2e2e2",
+              "on-error": "#ffffff",
+              "surface-container-low": "#f3f3f4",
+              "secondary-fixed-dim": "#ababab",
+              "error": "#ba1a1a",
+              "error-container": "#ffdad6",
+              "on-tertiary-fixed-variant": "#e2e2e2",
+              "outline-variant": "#c6c6c6",
+              "surface-dim": "#dadada",
+              "tertiary-fixed": "#5e5e5e",
+              "tertiary-container": "#747474",
+              "secondary-fixed": "#c6c6c6",
+              "secondary": "#5e5e5e",
+              "inverse-primary": "#c6c6c6",
+              "primary-fixed": "#5e5e5e",
+              "outline": "#777777",
+              "surface-container-highest": "#e2e2e2",
+              "primary-fixed-dim": "#474747",
+              "on-error-container": "#410002"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #1a1c1c;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+</head>
+<body class="bg-white min-h-screen flex flex-col items-center">
+<!-- TopNavBar -->
+<header class="bg-white/90 dark:bg-black/90 backdrop-blur-md flex justify-center items-center w-full px-8 py-12 max-w-screen-2xl mx-auto z-50">
+<div class="flex items-center">
+<span class="text-2xl font-semibold tracking-tighter text-black dark:text-white uppercase">BatteryCalc</span>
+</div>
+</header>
+<!-- Main Canvas Content -->
+<main class="flex-grow flex flex-col items-center justify-center w-full max-w-screen-xl px-8 py-20">
+<!-- Hero Section -->
+<div class="w-full text-center mb-24">
+<h1 class="text-[3.5rem] md:text-[5rem] font-semibold leading-none tracking-tighter text-primary mb-4">
+                Who are you?
+            </h1>
+<p class="text-[1rem] font-regular text-outline uppercase tracking-widest">
+                Select your path to continue
+            </p>
+</div>
+<!-- Role Selection Grid -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-12 w-full">
+<!-- Card A -->
+<a class="group block border border-outline-variant p-12 transition-all duration-300 hover:border-primary flex flex-col justify-between aspect-square" href="#">
+<div class="flex flex-col gap-6">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="person">person</span>
+<h3 class="text-2xl font-bold tracking-tight text-primary">I am a private individual.</h3>
+</div>
+<div class="mt-8">
+<span class="text-[0.75rem] font-semibold uppercase tracking-widest group-hover:underline underline-offset-8">Select →</span>
+</div>
+</a>
+<!-- Card B -->
+<a class="group block border border-outline-variant p-12 transition-all duration-300 hover:border-primary flex flex-col justify-between aspect-square" href="#">
+<div class="flex flex-col gap-6">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="solar_power">solar_power</span>
+<h3 class="text-2xl font-bold tracking-tight text-primary">I am an installer selling photovoltaic systems.</h3>
+</div>
+<div class="mt-8">
+<span class="text-[0.75rem] font-semibold uppercase tracking-widest group-hover:underline underline-offset-8">Select →</span>
+</div>
+</a>
+<!-- Card C -->
+<a class="group block border border-outline-variant p-12 transition-all duration-300 hover:border-primary flex flex-col justify-between aspect-square" href="#">
+<div class="flex flex-col gap-6">
+<span class="material-symbols-outlined text-4xl text-primary" data-icon="corporate_fare">corporate_fare</span>
+<h3 class="text-2xl font-bold tracking-tight text-primary">I am a company looking for an energy solution.</h3>
+</div>
+<div class="mt-8">
+<span class="text-[0.75rem] font-semibold uppercase tracking-widest group-hover:underline underline-offset-8">Select →</span>
+</div>
+</a>
+</div>
+<!-- Decorative Aesthetic Divider -->
+<div class="mt-32 w-full flex justify-center">
+<div class="w-12 h-[1px] bg-outline-variant"></div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="bg-white dark:bg-black flex flex-col md:flex-row justify-center items-center gap-12 w-full py-20 px-8">
+<div class="text-[0.75rem] font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400">
+            © 2024 BatteryCalc
+        </div>
+<nav class="flex gap-12">
+<a class="text-[0.75rem] font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer" href="#">
+                Impressum
+            </a>
+<a class="text-[0.75rem] font-semibold uppercase tracking-widest text-zinc-500 dark:text-zinc-400 hover:text-black dark:hover:text-white transition-colors cursor-pointer" href="#">
+                Visit our homepage
+            </a>
+</nav>
+</footer>
+</body></html>

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Installer Registration | BatteryCalc</title>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Design System Config -->
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#000000",
+              "on-tertiary-container": "#ffffff",
+              "outline": "#777777",
+              "error": "#ba1a1a",
+              "on-secondary-fixed": "#1b1b1b",
+              "on-secondary": "#ffffff",
+              "surface-container-low": "#f3f3f4",
+              "on-error-container": "#410002",
+              "on-tertiary-fixed": "#ffffff",
+              "on-primary-fixed": "#ffffff",
+              "surface-bright": "#f9f9f9",
+              "tertiary-fixed": "#5e5e5e",
+              "on-surface-variant": "#474747",
+              "tertiary-fixed-dim": "#474747",
+              "surface-container-high": "#e8e8e8",
+              "on-primary-fixed-variant": "#e2e2e2",
+              "surface-tint": "#5e5e5e",
+              "secondary-fixed": "#c6c6c6",
+              "inverse-primary": "#c6c6c6",
+              "secondary-container": "#d4d4d4",
+              "on-error": "#ffffff",
+              "on-secondary-fixed-variant": "#3b3b3b",
+              "inverse-on-surface": "#f0f1f1",
+              "on-tertiary-fixed-variant": "#e2e2e2",
+              "inverse-surface": "#2f3131",
+              "background": "#f9f9f9",
+              "error-container": "#ffdad6",
+              "surface-container-lowest": "#ffffff",
+              "outline-variant": "#c6c6c6",
+              "primary-fixed-dim": "#474747",
+              "on-primary-container": "#ffffff",
+              "primary-fixed": "#5e5e5e",
+              "on-background": "#1a1c1c",
+              "tertiary": "#3b3b3b",
+              "surface": "#f9f9f9",
+              "surface-dim": "#dadada",
+              "tertiary-container": "#747474",
+              "primary-container": "#3b3b3b",
+              "surface-container-highest": "#e2e2e2",
+              "on-primary": "#e2e2e2",
+              "on-surface": "#1a1c1c",
+              "surface-variant": "#e2e2e2",
+              "on-secondary-container": "#1b1b1b",
+              "surface-container": "#eeeeee",
+              "secondary-fixed-dim": "#ababab",
+              "on-tertiary": "#e2e2e2",
+              "secondary": "#5e5e5e"
+            },
+            fontFamily: {
+              "headline": ["Inter", "sans-serif"],
+              "body": ["Inter", "sans-serif"],
+              "label": ["Inter", "sans-serif"]
+            },
+            borderRadius: {"DEFAULT": "0rem", "lg": "0rem", "xl": "0rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #1a1c1c;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        /* Hide arrows in number input */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="bg-surface-container-lowest min-h-screen flex flex-col items-center">
+<!-- Top Navigation (Contextually Suppressed as per Task Intent) -->
+<header class="w-full max-w-screen-2xl mx-auto px-10 py-12 flex justify-start items-center">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 bg-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-container" data-icon="bolt">bolt</span>
+</div>
+<span class="text-2xl font-extrabold tracking-tighter text-primary">BatteryCalc</span>
+</div>
+</header>
+<main class="w-full max-w-4xl px-10 pb-24 space-y-20">
+<!-- Registration Intent Section -->
+<section class="space-y-12">
+<h1 class="text-[3.5rem] font-semibold leading-[1.1] tracking-tight max-w-2xl">
+                The Installer Manuscript.
+            </h1>
+<div class="space-y-6">
+<p class="text-[0.75rem] font-semibold uppercase tracking-widest text-outline">Intent Confirmation</p>
+<div class="flex flex-col md:flex-row md:items-end gap-12">
+<p class="text-xl font-medium leading-relaxed max-w-md">
+                        I am an installer and would like to use this battery calculator for myself and my company. Yes or No?
+                    </p>
+<div class="flex gap-4">
+<button class="px-8 py-3 bg-primary text-surface-container-lowest font-bold border border-primary hover:bg-surface-container-lowest hover:text-primary transition-colors duration-200">
+                            Yes
+                        </button>
+<button class="px-8 py-3 bg-surface-container-lowest text-primary font-bold border border-primary hover:bg-primary hover:text-surface-container-lowest transition-colors duration-200">
+                            No
+                        </button>
+</div>
+</div>
+</div>
+</section>
+<!-- Form Section -->
+<section class="grid grid-cols-1 md:grid-cols-12 gap-y-16 md:gap-x-20">
+<!-- Form Body -->
+<form class="md:col-span-8 space-y-10">
+<div class="space-y-8">
+<div class="group">
+<label class="block text-[0.75rem] font-bold uppercase tracking-wider text-outline mb-1" for="company_name">Company Name</label>
+<input class="w-full border-0 border-b border-outline-variant bg-transparent py-4 text-lg focus:ring-0 focus:border-primary focus:border-b-2 transition-all placeholder:text-neutral-300" id="company_name" name="company_name" placeholder="e.g. Solar Systems Ltd" type="text"/>
+</div>
+<div class="group">
+<label class="block text-[0.75rem] font-bold uppercase tracking-wider text-outline mb-1" for="address">Address</label>
+<input class="w-full border-0 border-b border-outline-variant bg-transparent py-4 text-lg focus:ring-0 focus:border-primary focus:border-b-2 transition-all placeholder:text-neutral-300" id="address" name="address" placeholder="Full business address" type="text"/>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+<div class="group">
+<label class="block text-[0.75rem] font-bold uppercase tracking-wider text-outline mb-1" for="tel">Telephone Number</label>
+<input class="w-full border-0 border-b border-outline-variant bg-transparent py-4 text-lg focus:ring-0 focus:border-primary focus:border-b-2 transition-all placeholder:text-neutral-300" id="tel" name="tel" placeholder="+44 ..." type="tel"/>
+</div>
+<div class="group">
+<label class="block text-[0.75rem] font-bold uppercase tracking-wider text-outline mb-1" for="mobile">Mobile Number</label>
+<input class="w-full border-0 border-b border-outline-variant bg-transparent py-4 text-lg focus:ring-0 focus:border-primary focus:border-b-2 transition-all placeholder:text-neutral-300" id="mobile" name="mobile" placeholder="+44 ..." type="tel"/>
+</div>
+</div>
+<div class="group">
+<label class="block text-[0.75rem] font-bold uppercase tracking-wider text-outline mb-1" for="email">Email Address</label>
+<input class="w-full border-0 border-b border-outline-variant bg-transparent py-4 text-lg focus:ring-0 focus:border-primary focus:border-b-2 transition-all placeholder:text-neutral-300" id="email" name="email" placeholder="admin@company.com" type="email"/>
+</div>
+</div>
+<!-- File Upload Area -->
+<div class="space-y-4 pt-4">
+<label class="block text-[0.75rem] font-bold uppercase tracking-wider text-outline">Company Logo</label>
+<div class="border border-dashed border-outline-variant p-12 text-center hover:border-primary transition-colors cursor-pointer group">
+<input class="hidden" id="logo-upload" type="file"/>
+<label class="cursor-pointer" for="logo-upload">
+<span class="material-symbols-outlined text-4xl text-outline group-hover:text-primary mb-4" data-icon="cloud_upload">cloud_upload</span>
+<p class="text-sm font-medium">Click to upload or drag and drop</p>
+<p class="text-[0.6875rem] text-outline mt-2 uppercase tracking-tight">SVG, PNG, or JPG (Max 2MB)</p>
+</label>
+</div>
+</div>
+<!-- CTA -->
+<div class="pt-8">
+<button class="w-full md:w-auto px-12 py-5 bg-primary text-white font-bold text-lg hover:bg-surface-container-lowest hover:text-primary border border-primary transition-all duration-300 group flex items-center justify-center gap-4" type="submit">
+                        Generate My Calculator
+                        <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</form>
+<!-- Sidebar / Metadata -->
+<aside class="md:col-span-4 space-y-12">
+<div class="space-y-4">
+<p class="text-[0.75rem] font-bold uppercase tracking-widest text-outline">Visual Preview</p>
+<div class="aspect-square bg-surface-container-low flex items-center justify-center relative border border-outline-variant">
+<div class="absolute inset-0 bg-white/40 flex items-center justify-center">
+<img alt="" class="w-full h-full object-cover mix-blend-multiply opacity-20" data-alt="Close-up of high-quality solar panels reflecting a clear blue sky with modern industrial architectural lines" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCXQmTx6GpMG_ni9aiRgtYkFVUbqtF1tbaJPrPuhJBmPnO9qNYezMP8in-WuoJWVZCv27mxnWNTmFekfEmq3ZeQM-QyWgmpw8u-Qm9ElTjn2TurG1_AIFS-32xzM8Z0CgrHMUwnw22nydqTihBQaq66F0l1PiMip7XRH9OTRelfijXsLOGGE2dyoPfKpA_syzxz5yZ9tPj7djQyA8lc-7KPWM_nDDLLGlD83RX9Iv39UZUjhLykzZzW1IWNZ7k9mDvvJ31lMI6SvaY"/>
+</div>
+<span class="material-symbols-outlined text-outline text-3xl" data-icon="add_a_photo">add_a_photo</span>
+</div>
+<p class="text-[0.6875rem] text-outline leading-relaxed italic">
+                        This logo will appear on the customized calculator interface shared with your clients.
+                    </p>
+</div>
+<div class="space-y-6 pt-8">
+<p class="text-[0.75rem] font-bold uppercase tracking-widest text-outline">Benefits</p>
+<ul class="space-y-6">
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-sm pt-1" data-icon="check">check</span>
+<span class="text-sm font-medium">White-label branding for all PDF exports</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-sm pt-1" data-icon="check">check</span>
+<span class="text-sm font-medium">Custom localized installation costs</span>
+</li>
+<li class="flex items-start gap-3">
+<span class="material-symbols-outlined text-sm pt-1" data-icon="check">check</span>
+<span class="text-sm font-medium">Lead generation dashboard access</span>
+</li>
+</ul>
+</div>
+</aside>
+</section>
+</main>
+<!-- Footer Meta -->
+<footer class="w-full max-w-screen-2xl mx-auto px-10 py-12 flex justify-between items-center text-[0.6875rem] font-bold uppercase tracking-[0.2em] text-outline border-t border-outline-variant/30">
+<div>© 2024 SOLARINSTALL PORTAL</div>
+<div class="flex gap-8">
+<a class="hover:text-primary transition-colors" href="#">Privacy</a>
+<a class="hover:text-primary transition-colors" href="#">Terms</a>
+<a class="hover:text-primary transition-colors" href="#">Support</a>
+</div>
+</footer>
+</body></html>

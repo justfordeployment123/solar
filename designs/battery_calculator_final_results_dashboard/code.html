@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Battery Storage | Final Results Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-surface-variant": "#474747",
+              "outline": "#777777",
+              "secondary-fixed": "#c6c6c6",
+              "tertiary-fixed": "#5e5e5e",
+              "on-tertiary": "#e2e2e2",
+              "on-surface": "#1a1c1c",
+              "on-secondary-fixed-variant": "#3b3b3b",
+              "surface-variant": "#e2e2e2",
+              "on-tertiary-container": "#ffffff",
+              "background": "#f9f9f9",
+              "tertiary": "#3b3b3b",
+              "surface-container-highest": "#e2e2e2",
+              "surface-container": "#eeeeee",
+              "surface-container-lowest": "#ffffff",
+              "primary-fixed-dim": "#474747",
+              "on-tertiary-fixed": "#ffffff",
+              "inverse-surface": "#2f3131",
+              "inverse-primary": "#c6c6c6",
+              "inverse-on-surface": "#f0f1f1",
+              "on-primary": "#e2e2e2",
+              "surface-tint": "#5e5e5e",
+              "surface": "#f9f9f9",
+              "on-primary-fixed": "#ffffff",
+              "on-primary-container": "#ffffff",
+              "primary-container": "#3b3b3b",
+              "outline-variant": "#c6c6c6",
+              "on-secondary": "#ffffff",
+              "surface-bright": "#f9f9f9",
+              "on-secondary-fixed": "#1b1b1b",
+              "tertiary-container": "#747474",
+              "surface-dim": "#dadada",
+              "primary-fixed": "#5e5e5e",
+              "on-background": "#1a1c1c",
+              "surface-container-low": "#f3f3f4",
+              "secondary-fixed-dim": "#ababab",
+              "primary": "#000000",
+              "secondary-container": "#d4d4d4",
+              "tertiary-fixed-dim": "#474747",
+              "on-tertiary-fixed-variant": "#e2e2e2",
+              "surface-container-high": "#e8e8e8",
+              "on-secondary-container": "#1b1b1b",
+              "on-error": "#ffffff",
+              "error-container": "#ffdad6",
+              "error": "#ba1a1a",
+              "on-error-container": "#410002",
+              "secondary": "#5e5e5e",
+              "on-primary-fixed-variant": "#e2e2e2"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #ffffff;
+            color: #000000;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 0px;
+            background: #000000;
+            cursor: pointer;
+            margin-top: -10px;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 2px;
+            background: #c6c6c6;
+        }
+    </style>
+</head>
+<body class="antialiased">
+<!-- TopNavBar -->
+<header class="fixed top-0 w-full z-50 bg-white dark:bg-black border-b border-black dark:border-white">
+<div class="flex justify-between items-center h-16 px-8 w-full max-w-full">
+<div class="text-xl font-bold tracking-tighter text-black dark:text-white">
+                Battery Storage
+            </div>
+<nav class="hidden md:flex items-center gap-x-8">
+<a class="font-inter antialiased uppercase tracking-widest text-[0.75rem] font-semibold text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200 cursor-pointer active:opacity-70" href="#">Status</a>
+<a class="font-inter antialiased uppercase tracking-widest text-[0.75rem] font-semibold text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200 cursor-pointer active:opacity-70" href="#">Resources</a>
+<a class="font-inter antialiased uppercase tracking-widest text-[0.75rem] font-semibold text-neutral-500 dark:text-neutral-400 hover:text-black dark:hover:text-white transition-colors duration-200 cursor-pointer active:opacity-70" href="#">Support</a>
+</nav>
+<div class="flex items-center gap-x-6">
+<span class="material-symbols-outlined cursor-pointer text-black dark:text-white">help_outline</span>
+<span class="material-symbols-outlined cursor-pointer text-black dark:text-white">account_circle</span>
+</div>
+</div>
+</header>
+<!-- SideNavBar -->
+<aside class="fixed left-0 top-16 h-screen w-64 border-r border-black dark:border-white bg-white dark:bg-black hidden lg:flex flex-col py-8 gap-y-6">
+<div class="px-8 mb-4">
+<h2 class="text-lg font-bold text-black dark:text-white">Project Steps</h2>
+<p class="text-xs text-neutral-400 font-medium uppercase tracking-wider">Residential Calculator</p>
+</div>
+<nav class="flex flex-col gap-y-2">
+<a class="font-inter text-sm font-medium flex items-center py-3 text-neutral-400 dark:text-neutral-600 pl-5 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-all scale-100 active:scale-95" href="#">
+<span class="material-symbols-outlined mr-3">analytics</span> Load Profile
+            </a>
+<a class="font-inter text-sm font-medium flex items-center py-3 text-neutral-400 dark:text-neutral-600 pl-5 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-all scale-100 active:scale-95" href="#">
+<span class="material-symbols-outlined mr-3">battery_full</span> Storage Capacity
+            </a>
+<a class="font-inter text-sm font-medium flex items-center py-3 text-neutral-400 dark:text-neutral-600 pl-5 hover:bg-neutral-100 dark:hover:bg-neutral-900 transition-all scale-100 active:scale-95" href="#">
+<span class="material-symbols-outlined mr-3">bolt</span> Inverter Specs
+            </a>
+<a class="font-inter text-sm flex items-center py-3 text-black dark:text-white font-bold border-l-4 border-black dark:border-white pl-4 transition-all scale-100 active:scale-95" href="#">
+<span class="material-symbols-outlined mr-3">summarize</span> Summary
+            </a>
+</nav>
+</aside>
+<!-- Main Canvas -->
+<main class="lg:ml-64 pt-24 pb-20 px-8 max-w-7xl mx-auto">
+<!-- Top Header: Bold Metrics -->
+<section class="grid grid-cols-1 md:grid-cols-2 gap-12 mb-20">
+<div class="border-l-8 border-black pl-8">
+<p class="text-xs font-bold uppercase tracking-[0.2em] text-outline mb-4">Return on Investment (ROI)</p>
+<h1 class="text-7xl md:text-8xl font-extrabold tracking-tighter leading-none">12.4%</h1>
+</div>
+<div class="border-l-8 border-black pl-8">
+<p class="text-xs font-bold uppercase tracking-[0.2em] text-outline mb-4">Payback Period</p>
+<h1 class="text-7xl md:text-8xl font-extrabold tracking-tighter leading-none">8.2 <span class="text-3xl font-medium tracking-tight">Years</span></h1>
+</div>
+</section>
+<!-- Top Middle: Adjustment Slider -->
+<section class="mb-24 py-12 border-y border-outline-variant">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-8">
+<div class="flex-1 max-w-2xl">
+<label class="text-sm font-bold uppercase tracking-widest mb-6 block" for="battery-size">Adjust Battery Size (kWh)</label>
+<input class="w-full h-1 bg-outline-variant appearance-none cursor-pointer accent-black" id="battery-size" max="30" min="5" step="0.5" type="range" value="12.5"/>
+<div class="flex justify-between mt-4 text-[10px] font-bold text-outline uppercase tracking-tighter">
+<span>5 kWh</span>
+<span>30 kWh</span>
+</div>
+</div>
+<div class="text-right">
+<div class="text-5xl font-bold tracking-tighter tabular-nums">12.5 <span class="text-xl font-normal">kWh</span></div>
+<p class="text-[10px] font-medium text-outline uppercase mt-1">Optimal Configuration</p>
+</div>
+</div>
+</section>
+<!-- Main Body Split -->
+<section class="grid grid-cols-1 lg:grid-cols-12 gap-20 mb-32">
+<!-- Left Column: Donut Chart (Minimalist Visualization) -->
+<div class="lg:col-span-5">
+<h3 class="text-xl font-bold mb-12 tracking-tight">Revenue Split by Use Case</h3>
+<div class="relative flex items-center justify-center aspect-square max-w-[320px] mx-auto border border-outline-variant/30 p-8">
+<!-- SVG Donut Representation -->
+<svg class="w-full h-full -rotate-90" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#f3f3f4" stroke-width="8"></circle>
+<!-- Self Consumption 50% -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#000000" stroke-dasharray="125.6 125.6" stroke-dashoffset="0" stroke-width="8"></circle>
+<!-- Peak Shaving 30% -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#777777" stroke-dasharray="75.4 175.8" stroke-dashoffset="-125.6" stroke-width="8"></circle>
+<!-- Grid Balancing 20% -->
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#c6c6c6" stroke-dasharray="50.2 201" stroke-dashoffset="-201" stroke-width="8"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center text-center">
+<span class="text-3xl font-bold tracking-tight">Total</span>
+<span class="text-sm font-medium text-outline uppercase">€18.4k / yr</span>
+</div>
+</div>
+<div class="mt-12 space-y-6">
+<div class="flex items-center justify-between group cursor-default">
+<div class="flex items-center gap-4">
+<span class="w-3 h-3 bg-black"></span>
+<span class="text-sm font-medium">Self-Consumption</span>
+</div>
+<span class="text-sm font-bold">50%</span>
+</div>
+<div class="flex items-center justify-between group cursor-default">
+<div class="flex items-center gap-4">
+<span class="w-3 h-3 bg-outline"></span>
+<span class="text-sm font-medium">Peak Shaving</span>
+</div>
+<span class="text-sm font-bold">30%</span>
+</div>
+<div class="flex items-center justify-between group cursor-default">
+<div class="flex items-center gap-4">
+<span class="w-3 h-3 bg-outline-variant"></span>
+<span class="text-sm font-medium">Grid Balancing</span>
+</div>
+<span class="text-sm font-bold">20%</span>
+</div>
+</div>
+</div>
+<!-- Right Column: Bar Chart (Financial Projection) -->
+<div class="lg:col-span-7">
+<div class="flex justify-between items-end mb-12">
+<h3 class="text-xl font-bold tracking-tight">15-Year Financial Projection</h3>
+<div class="text-[10px] font-bold uppercase tracking-widest text-outline">Cumulative Cash Flow (€)</div>
+</div>
+<div class="flex flex-col h-[400px] justify-between border-b border-black">
+<!-- Bars Simulation -->
+<div class="flex items-end justify-between h-full px-2 gap-2">
+<!-- Negative years -->
+<div class="flex flex-col items-center flex-1">
+<div class="w-full bg-outline-variant/30 h-[20%]"></div>
+<div class="h-[80%]"></div>
+</div>
+<div class="flex flex-col items-center flex-1">
+<div class="w-full bg-outline-variant/30 h-[15%]"></div>
+<div class="h-[80%]"></div>
+</div>
+<div class="flex flex-col items-center flex-1">
+<div class="w-full bg-outline-variant/30 h-[10%]"></div>
+<div class="h-[80%]"></div>
+</div>
+<!-- Payback tipping point -->
+<div class="flex flex-col items-center flex-1">
+<div class="w-full bg-black h-[5%]"></div>
+<div class="h-[80%]"></div>
+</div>
+<!-- Positive years -->
+<div class="flex flex-col items-center flex-1">
+<div class="h-[80%]"></div>
+<div class="w-full bg-black h-[10%]"></div>
+</div>
+<div class="flex flex-col items-center flex-1">
+<div class="h-[80%]"></div>
+<div class="w-full bg-black h-[20%]"></div>
+</div>
+<div class="flex flex-col items-center flex-1">
+<div class="h-[80%]"></div>
+<div class="w-full bg-black h-[32%]"></div>
+</div>
+<div class="flex flex-col items-center flex-1">
+<div class="h-[80%]"></div>
+<div class="w-full bg-black h-[45%]"></div>
+</div>
+<div class="flex flex-col items-center flex-1">
+<div class="h-[80%]"></div>
+<div class="w-full bg-black h-[58%]"></div>
+</div>
+<div class="flex flex-col items-center flex-1">
+<div class="h-[80%]"></div>
+<div class="w-full bg-black h-[75%]"></div>
+</div>
+<div class="flex flex-col items-center flex-1">
+<div class="h-[80%]"></div>
+<div class="w-full bg-black h-[90%]"></div>
+</div>
+<div class="flex flex-col items-center flex-1">
+<div class="h-[80%]"></div>
+<div class="w-full bg-black h-[100%]"></div>
+</div>
+</div>
+</div>
+<div class="flex justify-between mt-4 text-[10px] font-bold text-outline uppercase tracking-tighter">
+<span>Year 1</span>
+<span>Year 8 (Payback)</span>
+<span>Year 15</span>
+</div>
+<div class="mt-16 p-8 bg-surface-container-low">
+<p class="text-xs leading-relaxed text-on-surface-variant max-w-prose">
+                        Projections are based on current electricity tariffs and historical market volatility. The "Digital Manuscript" model assumes a 2.5% annual degradation in battery efficiency and maintenance costs accounted for in year 10.
+                    </p>
+</div>
+</div>
+</section>
+<!-- Bottom Action Area -->
+<section class="flex flex-col md:flex-row gap-6 justify-start border-t border-black pt-12">
+<button class="px-10 py-5 bg-black text-white font-bold text-sm uppercase tracking-[0.2em] hover:bg-white hover:text-black hover:ring-1 hover:ring-black transition-all duration-300">
+                Download Detailed PDF Report
+            </button>
+<button class="px-10 py-5 border border-black text-black font-bold text-sm uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-all duration-300">
+                Request a Personalized Offer
+            </button>
+</section>
+</main>
+<!-- Footer Decoration -->
+<footer class="lg:ml-64 py-12 px-8 text-[10px] font-medium text-outline uppercase tracking-[0.3em] flex justify-between items-center opacity-40">
+<span>© 2024 Battery Storage Systems Ltd.</span>
+<div class="flex gap-8">
+<a class="hover:text-black transition-colors" href="#">Privacy</a>
+<a class="hover:text-black transition-colors" href="#">Terms</a>
+<a class="hover:text-black transition-colors" href="#">Legal</a>
+</div>
+</footer>
+</body></html>

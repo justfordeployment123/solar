@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Battery Storage Calculator - System Details</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #FFFFFF;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            line-height: 1;
+            text-transform: none;
+            letter-spacing: normal;
+            word-wrap: normal;
+            white-space: nowrap;
+            direction: ltr;
+        }
+        /* Custom scrollbar for minimalist look */
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FFFFFF;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #000000;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              colors: {
+                "on-tertiary-fixed": "#ffffff",
+                "on-secondary-fixed-variant": "#3b3b3b",
+                "secondary-container": "#d4d4d4",
+                "tertiary": "#3b3b3b",
+                "primary-fixed-dim": "#474747",
+                "on-tertiary-container": "#ffffff",
+                "on-background": "#1a1c1c",
+                "primary-fixed": "#5e5e5e",
+                "inverse-primary": "#c6c6c6",
+                "background": "#f9f9f9",
+                "surface": "#f9f9f9",
+                "on-error": "#ffffff",
+                "on-primary-fixed-variant": "#e2e2e2",
+                "tertiary-fixed-dim": "#474747",
+                "on-surface-variant": "#474747",
+                "surface-container-low": "#f3f3f4",
+                "on-secondary-container": "#1b1b1b",
+                "tertiary-container": "#747474",
+                "surface-container-high": "#e8e8e8",
+                "outline-variant": "#c6c6c6",
+                "inverse-on-surface": "#f0f1f1",
+                "inverse-surface": "#2f3131",
+                "on-secondary-fixed": "#1b1b1b",
+                "error-container": "#ffdad6",
+                "tertiary-fixed": "#5e5e5e",
+                "surface-container-highest": "#e2e2e2",
+                "secondary": "#5e5e5e",
+                "surface-variant": "#e2e2e2",
+                "surface-bright": "#f9f9f9",
+                "on-tertiary-fixed-variant": "#e2e2e2",
+                "on-surface": "#1a1c1c",
+                "surface-container-lowest": "#ffffff",
+                "on-tertiary": "#e2e2e2",
+                "on-primary-container": "#ffffff",
+                "error": "#ba1a1a",
+                "on-primary-fixed": "#ffffff",
+                "on-primary": "#e2e2e2",
+                "on-secondary": "#ffffff",
+                "secondary-fixed": "#c6c6c6",
+                "primary-container": "#3b3b3b",
+                "surface-dim": "#dadada",
+                "on-error-container": "#410002",
+                "secondary-fixed-dim": "#ababab",
+                "surface-tint": "#5e5e5e",
+                "primary": "#000000",
+                "outline": "#777777",
+                "surface-container": "#eeeeee"
+              },
+              fontFamily: {
+                "headline": ["Inter"],
+                "body": ["Inter"],
+                "label": ["Inter"]
+              },
+              borderRadius: {"DEFAULT": "0rem", "lg": "0rem", "xl": "0rem", "full": "9999px"},
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-white text-on-surface antialiased">
+<!-- TopNavBar -->
+<nav class="fixed top-0 w-full z-50 bg-white/90 dark:bg-black/90 backdrop-blur-md flex justify-between items-center px-10 py-6 border-b-0 font-inter tracking-tight">
+<div class="text-xl font-bold uppercase tracking-tighter text-black dark:text-white">Battery Storage</div>
+<div class="hidden md:flex items-center space-gap-8 gap-8">
+<a class="text-neutral-500 hover:text-black transition-colors duration-200" href="#">Status</a>
+<a class="text-neutral-500 hover:text-black transition-colors duration-200" href="#">Resources</a>
+<a class="text-neutral-500 hover:text-black transition-colors duration-200" href="#">Support</a>
+</div>
+<button class="bg-primary text-white px-6 py-2 text-sm font-bold active:opacity-70 transition-opacity">Save Progress</button>
+</nav>
+<div class="flex min-h-screen pt-[88px]">
+<!-- SideNavBar -->
+<aside class="hidden md:flex flex-col h-[calc(100vh-88px)] w-64 bg-neutral-50 dark:bg-neutral-900 border-r border-neutral-200 dark:border-neutral-800 p-8 sticky top-[88px]">
+<div class="mb-10">
+<h2 class="text-lg font-black text-black dark:text-white uppercase tracking-widest">Calculator</h2>
+<p class="text-xs text-neutral-400 mt-1">Step 2 of 4</p>
+</div>
+<nav class="flex-grow space-y-4">
+<a class="flex items-center gap-3 p-3 text-neutral-400 hover:bg-neutral-200 transition-transform active:translate-x-1" href="#">
+<span class="material-symbols-outlined text-sm">bolt</span>
+<span class="font-inter text-sm">Load Profile</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-black font-bold bg-white border border-black transition-transform active:translate-x-1" href="#">
+<span class="material-symbols-outlined text-sm">battery_full</span>
+<span class="font-inter text-sm">Storage Capacity</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-neutral-400 hover:bg-neutral-200 transition-transform active:translate-x-1" href="#">
+<span class="material-symbols-outlined text-sm">settings_input_component</span>
+<span class="font-inter text-sm">Inverter Specs</span>
+</a>
+<a class="flex items-center gap-3 p-3 text-neutral-400 hover:bg-neutral-200 transition-transform active:translate-x-1" href="#">
+<span class="material-symbols-outlined text-sm">analytics</span>
+<span class="font-inter text-sm">Summary</span>
+</a>
+</nav>
+<button class="mt-auto py-4 border border-black text-black text-xs font-bold hover:bg-black hover:text-white transition-colors">
+                Reset Data
+            </button>
+</aside>
+<!-- Main Content -->
+<main class="flex-grow p-10 md:p-20 bg-white">
+<div class="max-w-5xl">
+<header class="mb-20">
+<h1 class="text-5xl md:text-7xl font-bold tracking-tighter text-black mb-4">System Details</h1>
+<p class="text-lg text-neutral-500 max-w-xl leading-relaxed">
+                        Configure the technical and financial parameters of your battery storage system to calculate your potential ROI.
+                    </p>
+</header>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-16 mb-24">
+<!-- Technical Column -->
+<section>
+<h3 class="text-xs font-bold uppercase tracking-widest text-neutral-400 mb-10">Technical Specifications</h3>
+<div class="space-y-12">
+<div class="group">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-2">Region</label>
+<select class="w-full bg-transparent border-0 border-b border-outline py-3 px-0 focus:ring-0 focus:border-black text-black font-medium appearance-none cursor-pointer">
+<option>North Germany</option>
+<option>Central Germany</option>
+<option>South Germany</option>
+</select>
+</div>
+<div class="group">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-2">Energy Source</label>
+<select class="w-full bg-transparent border-0 border-b border-outline py-3 px-0 focus:ring-0 focus:border-black text-black font-medium appearance-none cursor-pointer">
+<option>PV</option>
+<option>Wind</option>
+<option>Biomass</option>
+</select>
+</div>
+<div class="group">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-2">Battery Capacity (kWh)</label>
+<input class="w-full bg-transparent border-0 border-b border-outline py-3 px-0 focus:ring-0 focus:border-black text-black font-medium" placeholder="10" type="number"/>
+</div>
+</div>
+</section>
+<!-- Financial Column -->
+<section>
+<h3 class="text-xs font-bold uppercase tracking-widest text-neutral-400 mb-10">Financial Metrics</h3>
+<div class="space-y-12">
+<div class="group">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-2">Current Electricity Price (€/kWh)</label>
+<input class="w-full bg-transparent border-0 border-b border-outline py-3 px-0 focus:ring-0 focus:border-black text-black font-medium" placeholder="0.35" step="0.01" type="number"/>
+</div>
+<div class="group">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-2">Annual Electricity Bill (€)</label>
+<input class="w-full bg-transparent border-0 border-b border-outline py-3 px-0 focus:ring-0 focus:border-black text-black font-medium" placeholder="2400" type="number"/>
+</div>
+<div class="group">
+<label class="block text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-2">System Purchase Cost (€)</label>
+<input class="w-full bg-transparent border-0 border-b border-outline py-3 px-0 focus:ring-0 focus:border-black text-black font-medium" placeholder="12500" type="number"/>
+</div>
+</div>
+</section>
+</div>
+<!-- Drag and Drop Area -->
+<div class="mb-24">
+<h3 class="text-xs font-bold uppercase tracking-widest text-neutral-400 mb-6">Consumption Analysis</h3>
+<div class="border-2 border-dashed border-outline-variant hover:border-black transition-colors py-20 flex flex-col items-center justify-center cursor-pointer group">
+<span class="material-symbols-outlined text-4xl mb-4 text-neutral-300 group-hover:text-black transition-colors">cloud_upload</span>
+<p class="text-sm font-bold uppercase tracking-tighter mb-2">Upload Load Profile (CSV)</p>
+<p class="text-xs text-neutral-500 mb-6">Drag and drop or browse files</p>
+<a class="text-xs font-bold border-b border-black pb-0.5 hover:text-neutral-500 hover:border-neutral-500 transition-colors" href="#">Enter manual consumption pattern</a>
+</div>
+</div>
+<!-- Hero Imagery Visual Accent -->
+<div class="mb-24 h-64 overflow-hidden relative grayscale group">
+<img class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" data-alt="industrial solar panel array with storage containers in a modern facility with crisp architectural lines and clean bright lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAvNTeU8A-LbM8BNZgPZWWY7ANJ1-ZWk1o0R8M8A-x_Kye7I42SeEMwYF-ryFX8Pj5NpgilFTwkT3n06CyYZKmqx8j7wjbB8ABDwpAKx6R8kjPm3a9RKdcBz6juGvCINNbvX2wHzGQTGVszF99w9ySTdDpZcmUR7iF5gJs7VfPSWugKy8ZyMdp7YLIMqDc9JM51vVJQfVJg3rvEMhey-jWJ5DGe_RetKhA3cWDuQhfKlA7ez4Bz4pAG_kFCZigG-U54hnXgDodEcpE"/>
+<div class="absolute inset-0 flex items-end p-8 bg-gradient-to-t from-black/20 to-transparent">
+<span class="text-[10px] font-bold uppercase tracking-[0.5em] text-white">Advanced Simulation Environment</span>
+</div>
+</div>
+<!-- Footer Actions -->
+<div class="flex flex-col md:flex-row gap-6">
+<button class="bg-black text-white px-12 py-5 text-sm font-black uppercase tracking-widest hover:bg-white hover:text-black border border-black transition-all">
+                        Calculate Results
+                    </button>
+<button class="bg-white text-black px-12 py-5 text-sm font-black uppercase tracking-widest border border-black hover:bg-neutral-100 transition-all">
+                        Back
+                    </button>
+</div>
+</div>
+</main>
+</div>
+<!-- BottomNavBar for Mobile -->
+<div class="md:hidden fixed bottom-0 left-0 w-full bg-white border-t border-neutral-100 flex justify-around items-center py-4 px-6 z-50">
+<a class="flex flex-col items-center text-neutral-400" href="#">
+<span class="material-symbols-outlined">bolt</span>
+</a>
+<a class="flex flex-col items-center text-black" href="#">
+<span class="material-symbols-outlined">battery_full</span>
+</a>
+<a class="flex flex-col items-center text-neutral-400" href="#">
+<span class="material-symbols-outlined">settings_input_component</span>
+</a>
+<a class="flex flex-col items-center text-neutral-400" href="#">
+<span class="material-symbols-outlined">analytics</span>
+</a>
+</div>
+</body></html>
