@@ -68,7 +68,7 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ results, technic
       )}
 
       {barChartImage && (
-        <View style={styles.section}>
+        <View style={styles.section} wrap={false}>
           <Text style={styles.title}>15-Year Cumulative Cash Flow</Text>
           <View style={styles.imageContainer}>
             <Image src={barChartImage} style={styles.chartImage} />
