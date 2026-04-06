@@ -1,6 +1,9 @@
-import React from 'react';
+"use client";
 
-interface ProgressHeaderProps {
+import React from 'react';
+import { motion } from 'framer-motion';
+
+export interface ProgressHeaderProps {
   currentStep: number;
   totalSteps: number;
   title: string;
@@ -8,20 +11,44 @@ interface ProgressHeaderProps {
 }
 
 export function ProgressHeader({ currentStep, totalSteps, title, description }: ProgressHeaderProps) {
+  const progressPercentage = (currentStep / totalSteps) * 100;
+
   return (
-    <header className="mb-8">
-      <div className="flex items-center gap-4 mb-4">
-        <span className="text-[0.6875rem] font-bold uppercase tracking-[0.2em] text-outline">
+    <motion.header 
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.6, ease: "easeOut" }}
+      className="mb-10"
+    >
+      <div className="flex items-center gap-4 mb-6">
+        <span className="text-xs font-bold uppercase tracking-widest text-primary">
           Step {currentStep} of {totalSteps}
         </span>
-        <div className="h-[1px] flex-1 bg-outline-variant/30"></div>
+        <div className="h-1.5 flex-1 bg-slate-200 rounded-full overflow-hidden relative">
+          <motion.div 
+            className="absolute top-0 left-0 h-full bg-primary"
+            initial={{ width: 0 }}
+            animate={{ width: `${progressPercentage}%` }}
+            transition={{ duration: 0.8, ease: "easeInOut" }}
+          />
+        </div>
       </div>
-      <h1 className="text-5xl md:text-7xl font-semibold tracking-tighter text-black mb-4">
+      <motion.h1 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 mb-4"
+      >
         {title}
-      </h1>
-      <p className="mt-8 text-xl text-neutral-500 max-w-xl leading-relaxed">
+      </motion.h1>
+      <motion.p 
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.4 }}
+        className="text-lg md:text-xl text-slate-500 max-w-2xl leading-relaxed"
+      >
         {description}
-      </p>
-    </header>
+      </motion.p>
+    </motion.header>
   );
 }

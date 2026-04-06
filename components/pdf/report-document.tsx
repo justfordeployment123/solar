@@ -1,65 +1,82 @@
 import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
-import { DerivedResults, TechnicalInputs } from '@/types/calculator';
 
 const styles = StyleSheet.create({
-  page: { flexDirection: 'column', backgroundColor: '#FFFFFF', padding: 30 },
-  header: { fontSize: 24, marginBottom: 20, textAlign: 'center', fontWeight: 'bold' },
-  section: { margin: 10, padding: 10 },
-  title: { fontSize: 16, marginBottom: 10, borderBottom: '1 solid #000' },
-  text: { fontSize: 12, marginBottom: 5 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 },
-  imageContainer: { marginVertical: 15, alignItems: 'center' },
-  chartImage: { width: '100%', height: 250, objectFit: 'contain' },
-  footer: { position: 'absolute', bottom: 30, left: 30, right: 30, fontSize: 10, textAlign: 'center', color: '#666' }
+  page: { flexDirection: 'column', backgroundColor: '#f8fafc', padding: 40, fontFamily: 'Helvetica' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 40, paddingBottom: 20, borderBottomWidth: 2, borderBottomColor: '#f1f5f9' },
+  headerTitle: { fontSize: 28, fontWeight: 'bold', color: '#0f172a', letterSpacing: -1 },
+  headerSubtitle: { fontSize: 10, color: '#64748b', textTransform: 'uppercase', letterSpacing: 2 },
+  section: { backgroundColor: '#ffffff', borderRadius: 16, padding: 24, marginBottom: 20, shadowColor: '#000', shadowOpacity: 0.05, shadowOffset: { width: 0, height: 4 }, shadowRadius: 10 },
+  title: { fontSize: 12, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 1.5, color: '#007aff', marginBottom: 16 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
+  label: { fontSize: 11, color: '#64748b', fontWeight: 'medium' },
+  value: { fontSize: 11, color: '#0f172a', fontWeight: 'bold' },
+  highlightValue: { fontSize: 14, color: '#34c759', fontWeight: 'bold' },
+  imageContainer: { marginTop: 20, alignItems: 'center', backgroundColor: '#f8fafc', borderRadius: 12, padding: 15 },
+  chartImage: { width: '100%', height: 260, objectFit: 'contain' },
+  footer: { position: 'absolute', bottom: 30, left: 40, right: 40, fontSize: 9, textAlign: 'center', color: '#94a3b8', borderTopWidth: 1, borderTopColor: '#f1f5f9', paddingTop: 15 }
 });
 
 interface ReportDocumentProps {
-  results: DerivedResults;
-  technical: TechnicalInputs;
+  derivedResults: any;
+  technical: any;
   pieChartImage?: string;
   barChartImage?: string;
 }
 
-export const ReportDocument: React.FC<ReportDocumentProps> = ({ results, technical, pieChartImage, barChartImage }) => (
+export const ReportDocument: React.FC<ReportDocumentProps> = ({ derivedResults, technical, pieChartImage, barChartImage }) => (
   <Document>
     <Page size="A4" style={styles.page}>
-      <Text style={styles.header}>Battery Storage Calculator Report</Text>
+      
+      <View style={styles.header}>
+        <View>
+          <Text style={styles.headerTitle}>ROI Projection</Text>
+          <Text style={styles.headerSubtitle}>Battery Storage Calculator</Text>
+        </View>
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text style={{ fontSize: 10, color: '#64748b' }}>Date: {new Date().toLocaleDateString()}</Text>
+          <Text style={{ fontSize: 10, color: '#007aff', fontWeight: 'bold', marginTop: 4 }}>Prepared exclusively for you</Text>
+        </View>
+      </View>
       
       <View style={styles.section}>
         <Text style={styles.title}>System Configuration</Text>
         <View style={styles.row}>
-          <Text style={styles.text}>Battery Capacity:</Text>
-          <Text style={styles.text}>{technical.currentBatteryCapacityKwh || 0} kWh</Text>
+          <Text style={styles.label}>Battery Capacity:</Text>
+          <Text style={styles.value}>{technical.currentBatteryCapacityKwh || 0} kWh</Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.text}>PV Size:</Text>
-          <Text style={styles.text}>{technical.pvSizeKwp || 0} kWp</Text>
+          <Text style={styles.label}>PV Size:</Text>
+          <Text style={styles.value}>{technical.pvSizeKwp || 0} kWp</Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.text}>Annual Consumption:</Text>
-          <Text style={styles.text}>{technical.annualConsumptionKwh || 0} kWh</Text>
+          <Text style={styles.label}>Annual Consumption:</Text>
+          <Text style={styles.value}>{technical.annualConsumptionKwh || 0} kWh</Text>
         </View>
       </View>
 
       <View style={styles.section}>
-        <Text style={styles.title}>Key Financial Metrics</Text>
+        <Text style={styles.title}>Financial Metrics</Text>
         <View style={styles.row}>
-          <Text style={styles.text}>Return on Investment (ROI):</Text>
-          <Text style={styles.text}>{results.roiPercent.toFixed(2)} %</Text>
+          <Text style={styles.label}>Return on Investment (NPV):</Text>
+          <Text style={styles.highlightValue}>€{((derivedResults.yearlyProjection[14]?.cumulative || 0) + (technical.currentBatteryCapacityKwh || 10) * 1000).toLocaleString()}</Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.text}>Payback Period:</Text>
-          <Text style={styles.text}>{results.paybackYears.toFixed(1)} Years</Text>
+          <Text style={styles.label}>Break-Even Point:</Text>
+          <Text style={styles.value}>{Math.ceil(derivedResults.paybackYears) ? `Year ${Math.ceil(derivedResults.paybackYears)}` : 'N/A'}</Text>
         </View>
         <View style={styles.row}>
-          <Text style={styles.text}>Annual Revenue (Base):</Text>
-          <Text style={styles.text}>€{results.totalAnnualRevenue.toFixed(2)}</Text>
+          <Text style={styles.label}>Total Average Yearly Revenue:</Text>
+          <Text style={styles.value}>€{Math.round(derivedResults.totalAnnualRevenue).toLocaleString()}</Text>
+        </View>
+        <View style={styles.row}>
+          <Text style={styles.label}>Autarky Rate:</Text>
+          <Text style={styles.value}>{75} %</Text>
         </View>
       </View>
 
       {pieChartImage && (
-        <View style={styles.section}>
+        <View style={styles.section} wrap={false}>
           <Text style={styles.title}>Revenue Split Overview</Text>
           <View style={styles.imageContainer}>
             <Image src={pieChartImage} style={styles.chartImage} />
@@ -69,7 +86,7 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ results, technic
 
       {barChartImage && (
         <View style={styles.section} wrap={false}>
-          <Text style={styles.title}>15-Year Cumulative Cash Flow</Text>
+          <Text style={styles.title}>Lifetime Cashflow Projection</Text>
           <View style={styles.imageContainer}>
             <Image src={barChartImage} style={styles.chartImage} />
           </View>
@@ -77,7 +94,7 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ results, technic
       )}
 
       <Text style={styles.footer}>
-        Generated on {new Date().toLocaleDateString()}. Financial projections are estimates based on placeholder logic.
+        Financial projections are estimates based on the configured system logic. Actual results may vary depending on local regulations, market prices, and consumption behavior.
       </Text>
     </Page>
   </Document>

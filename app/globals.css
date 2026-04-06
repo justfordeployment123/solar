@@ -1,69 +1,46 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-surface-variant: #e2e2e2;
-  --color-background: #f9f9f9;
-  --color-on-secondary-fixed-variant: #3b3b3b;
-  --color-on-secondary-fixed: #1b1b1b;
+  --color-surface-variant: #f3f4f6;
+  --color-background: #f0fdf4; /* Very Light Green */
+  --color-surface: #ffffff;
+  --color-primary: #10b981; /* Ngen Green */
+  --color-on-primary: #ffffff;
+  --color-secondary: #0ea5e9; /* Sky Blue */
   --color-on-secondary: #ffffff;
-  --color-tertiary-fixed-dim: #474747;
-  --color-on-primary: #e2e2e2;
-  --color-on-surface-variant: #474747;
-  --color-surface-tint: #5e5e5e;
-  --color-surface-container: #eeeeee;
-  --color-surface: #f9f9f9;
-  --color-inverse-on-surface: #f0f1f1;
-  --color-surface-bright: #f9f9f9;
-  --color-primary-container: #3b3b3b;
-  --color-primary: #000000;
-  --color-on-tertiary: #e2e2e2;
-  --color-on-primary-container: #ffffff;
-  --color-on-tertiary-fixed: #ffffff;
-  --color-tertiary: #3b3b3b;
-  --color-inverse-surface: #2f3131;
-  --color-on-secondary-container: #1b1b1b;
-  --color-surface-container-lowest: #ffffff;
-  --color-surface-container-high: #e8e8e8;
-  --color-on-primary-fixed: #ffffff;
-  --color-on-background: #1a1c1c;
-  --color-secondary-container: #d4d4d4;
-  --color-on-surface: #1a1c1c;
-  --color-on-tertiary-container: #ffffff;
-  --color-on-primary-fixed-variant: #e2e2e2;
+  --color-tertiary: #64748b; /* Ngen Gray */
+  --color-surface-container: #ffffff;
+  --color-surface-container-high: #dcfce7;
+  --color-surface-container-highest: #e2e8f0;
+  --color-outline: #e2e8f0;
+  --color-outline-variant: #cbd5e1;
+  
+  --color-on-surface: #0f172a;
+  --color-on-background: #0f172a;
+  
+  --color-error: #ff3b30;
+  --color-error-container: #ffe5e5;
   --color-on-error: #ffffff;
-  --color-surface-container-low: #f3f3f4;
-  --color-secondary-fixed-dim: #ababab;
-  --color-error: #ba1a1a;
-  --color-error-container: #ffdad6;
-  --color-on-tertiary-fixed-variant: #e2e2e2;
-  --color-outline-variant: #c6c6c6;
-  --color-surface-dim: #dadada;
-  --color-tertiary-fixed: #5e5e5e;
-  --color-tertiary-container: #747474;
-  --color-secondary-fixed: #c6c6c6;
-  --color-secondary: #5e5e5e;
-  --color-inverse-primary: #c6c6c6;
-  --color-primary-fixed: #5e5e5e;
-  --color-outline: #777777;
-  --color-surface-container-highest: #e2e2e2;
-  --color-primary-fixed-dim: #474747;
-  --color-on-error-container: #410002;
-
-  --font-headline: var(--font-inter);
-  --font-body: var(--font-inter);
-  --font-label: var(--font-inter);
+  
   --font-sans: var(--font-inter);
 
-  --radius: 0px;
-  --radius-lg: 0px;
-  --radius-xl: 0px;
+  --radius-sm: 8px;
+  --radius: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
   --radius-full: 9999px;
+  
+  --shadow-apple: 0 4px 24px rgba(0,0,0,0.06);
+  --shadow-apple-hover: 0 10px 40px rgba(0,0,0,0.1);
+  --shadow-apple-glass: 0 8px 32px rgba(0,0,0,0.08);
 }
 
 body {
   font-family: var(--font-inter), sans-serif;
-  background-color: #ffffff;
-  color: #1a1c1c;
+  background-color: var(--color-background);
+  color: var(--color-on-background);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 *:focus, *:focus-visible {
@@ -73,3 +50,23 @@ body {
 * {
   -webkit-tap-highlight-color: transparent;
 }
+
+/* Glassmorphism Classes */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: var(--shadow-apple-glass);
+}
+
+.glass-dark {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: var(--shadow-apple-glass);
+}
+
+/* Gradients */
+.text-gradient { color: var(--color-primary); }

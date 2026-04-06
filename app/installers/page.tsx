@@ -1,9 +1,12 @@
-'use client';
+"use client";
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { UploadCloud, ArrowRight, Image as ImageIcon, Camera, Check, X } from 'lucide-react';
+import { UploadCloud, ArrowRight, Image as ImageIcon, Check, X, Building2 } from 'lucide-react';
 import { useState } from 'react';
+import { motion } from 'framer-motion';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 export default function InstallersPage() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
@@ -20,125 +23,129 @@ export default function InstallersPage() {
   };
 
   return (
-    <div className="bg-white min-h-screen text-[#1a1c1c] font-inter">
-      <header className="fixed top-0 w-full z-50 bg-white/90 backdrop-blur-md flex justify-between items-center px-4 md:px-10 py-6 border-b-0">
-        <Link href="/" className="flex items-center gap-3 md:gap-6">
-          <Image src="/solar-logo.svg" alt="MySolar-PV Logo" width={140} height={40} className="h-6 md:h-8 w-auto object-contain" />
-          <div className="w-[1px] h-6 md:h-8 bg-neutral-300"></div>
-          <Image src="/ngen-logo.svg" alt="Ngen Logo" width={120} height={40} className="h-6 md:h-8 w-auto object-contain" />
-        </Link>
-        <Link href="/" className="text-[#5e5e5e] hover:text-black transition-colors text-sm font-bold uppercase tracking-widest flex items-center justify-end p-0 md:p-0">
-          <span className="hidden md:inline">Cancel</span>
-          <X className="w-6 h-6 md:hidden" />
-        </Link>
+    <div className="bg-slate-50 min-h-screen text-slate-900 font-sans relative overflow-hidden flex flex-col">
+      {/* Background aesthetic blobs */}
+      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/10 blur-[150px] pointer-events-none" />
+      <div className="absolute center right-[-10%] w-[40%] h-[50%] rounded-full bg-tertiary/10 blur-[150px] pointer-events-none" />
+
+      <header className="fixed top-0 w-full z-50 glass border-b border-white/50 px-6 md:px-12 py-4">
+        <div className="max-w-7xl mx-auto flex justify-between items-center">
+          <Link href="/" className="flex items-center gap-4">
+            <Image priority src="/solar-logo.svg" alt="MySolar-PV Logo" width={120} height={32} className="h-6 md:h-8 w-auto object-contain opacity-80 hover:scale-105 transition-transform" />
+            <div className="w-[1px] h-6 bg-slate-300"></div>
+            <Image priority src="/ngen-logo.svg" alt="Ngen Logo" width={100} height={32} className="h-6 md:h-8 w-auto object-contain opacity-80 hover:scale-105 transition-transform" />
+          </Link>
+          <Link href="/" className="group flex items-center justify-center gap-2 px-4 py-2 rounded-full hover:bg-slate-100 transition-colors duration-200 text-slate-500 hover:text-slate-800">
+            <span className="hidden md:inline font-bold uppercase tracking-widest text-[10px]">Cancel</span>
+            <X className="w-4 h-4 group-hover:scale-110 transition-transform" />
+          </Link>
+        </div>
       </header>
 
-      <main className="pt-40 max-w-screen-lg mx-auto px-8 pb-32">
-        <header className="mb-24">
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tighter text-black mb-6">Partner Registration</h1>
-          <p className="text-xl text-[#777777] max-w-2xl leading-relaxed">
-            Create your white-labeled instance of the battery storage calculator. Enter your company details below to generate a customized tool for your clients.
-          </p>
-        </header>
+      <main className="pt-32 pb-24 md:pt-40 max-w-6xl mx-auto px-6 md:px-12 w-full relative z-10 flex-grow">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
+          <header className="mb-16 md:mb-24 text-center md:text-left">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-primary to-slate-900">
+              Partner Portal
+            </h1>
+            <p className="text-lg md:text-xl text-slate-500 max-w-2xl leading-relaxed mx-auto md:mx-0">
+              Create your white-labeled instance of the battery storage calculator. Generate a customized tool to capture high-quality leads.
+            </p>
+          </header>
 
-        <section className="grid grid-cols-1 md:grid-cols-12 gap-24">
-          {/* Form Area */}
-          <form className="md:col-span-8 flex flex-col gap-12" action="/installers/success">
-            {/* Input Group: Company Name */}
-            <div className="space-y-4">
-              <label className="block text-[0.75rem] font-bold uppercase tracking-wider text-[#777777] mb-1" htmlFor="companyName">Company Name</label>
-              <input className="w-full border-0 border-b border-[#c6c6c6] bg-transparent py-4 text-lg focus:ring-0 focus:border-black focus:border-b-2 transition-all placeholder:text-[#d4d4d4]" id="companyName" name="companyName" placeholder="Energy Solutions GmbH" type="text" required />
-            </div>
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
+            <form className="lg:col-span-8 flex flex-col gap-10" action="/installers/success">
+              <div className="glass shadow-apple rounded-[2rem] p-8 md:p-10 border border-white">
+                <h3 className="text-xs font-extrabold uppercase tracking-widest text-primary mb-8 flex items-center gap-2">
+                  <div className="w-2 h-2 rounded-full bg-primary" /> Company Details
+                </h3>
+                
+                <div className="space-y-8">
+                  <Input label="Company Name" id="companyName" name="companyName" placeholder="Energy Solutions GmbH" required />
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <Input label="Telephone Number" id="tel" name="tel" placeholder="+44 ..." type="tel" />
+                    <Input label="Mobile Number" id="mobile" name="mobile" placeholder="+44 ..." type="tel" />
+                  </div>
 
-            {/* Input Group: Contact Numbers */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              <div className="group">
-                <label className="block text-[0.75rem] font-bold uppercase tracking-wider text-[#777777] mb-1" htmlFor="tel">Telephone Number</label>
-                <input className="w-full border-0 border-b border-[#c6c6c6] bg-transparent py-4 text-lg focus:ring-0 focus:border-black focus:border-b-2 transition-all placeholder:text-[#d4d4d4]" id="tel" name="tel" placeholder="+44 ..." type="tel"/>
+                  <Input label="Email Address" id="email" name="email" placeholder="admin@company.com" type="email" required />
+                  
+                  <div className="pt-4">
+                    <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 ml-1 mb-2 block">
+                      Company Logo
+                    </label>
+                    <label htmlFor="logo-upload" className="flex flex-col items-center justify-center p-10 border-2 border-dashed border-slate-300 rounded-2xl bg-slate-50/50 hover:bg-primary/5 hover:border-primary/30 transition-all cursor-pointer group">
+                      <input className="hidden" id="logo-upload" type="file" accept="image/*" onChange={handleLogoUpload} />
+                      <div className="w-16 h-16 rounded-full bg-white shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
+                        <UploadCloud className="w-8 h-8 text-primary" />
+                      </div>
+                      <p className="text-sm font-bold text-slate-800">Click to upload or drag and drop</p>
+                      <p className="text-xs text-slate-500 mt-2 font-medium">SVG, PNG, or JPG (Max 2MB)</p>
+                    </label>
+                  </div>
+                </div>
               </div>
-              <div className="group">
-                <label className="block text-[0.75rem] font-bold uppercase tracking-wider text-[#777777] mb-1" htmlFor="mobile">Mobile Number</label>
-                <input className="w-full border-0 border-b border-[#c6c6c6] bg-transparent py-4 text-lg focus:ring-0 focus:border-black focus:border-b-2 transition-all placeholder:text-[#d4d4d4]" id="mobile" name="mobile" placeholder="+44 ..." type="tel"/>
+
+              <div className="flex justify-end">
+                <Button variant="primary" type="submit" className="gap-3 shadow-apple-hover text-base uppercase tracking-widest bg-gradient-to-r from-primary to-tertiary text-white w-full md:w-auto py-4 px-10 border-transparent hover:opacity-95">
+                  Generate Calculator <ArrowRight className="w-5 h-5" />
+                </Button>
               </div>
-            </div>
+            </form>
 
-            <div className="group">
-              <label className="block text-[0.75rem] font-bold uppercase tracking-wider text-[#777777] mb-1" htmlFor="email">Email Address</label>
-              <input className="w-full border-0 border-b border-[#c6c6c6] bg-transparent py-4 text-lg focus:ring-0 focus:border-black focus:border-b-2 transition-all placeholder:text-[#d4d4d4]" id="email" name="email" placeholder="admin@company.com" type="email" required />
-            </div>
-
-            {/* File Upload Area */}
-            <div className="space-y-4 pt-4">
-              <label className="block text-[0.75rem] font-bold uppercase tracking-wider text-[#777777]">Company Logo</label>
-              <div className="border border-dashed border-[#c6c6c6] p-12 text-center hover:border-black transition-colors cursor-pointer group">
-                <input className="hidden" id="logo-upload" type="file" accept="image/*" onChange={handleLogoUpload} />
-                <label className="cursor-pointer" htmlFor="logo-upload">
-                  <UploadCloud className="w-9 h-9 text-[#777777] group-hover:text-black mb-4 mx-auto" />
-                  <p className="text-sm font-medium">Click to upload or drag and drop</p>
-                  <p className="text-[0.6875rem] text-[#777777] mt-2 uppercase tracking-tight">SVG, PNG, or JPG (Max 2MB)</p>
-                </label>
-              </div>
-            </div>
-
-            {/* CTA */}
-            <div className="pt-8">
-              <button className="w-full md:w-auto px-6 py-5 bg-black text-white hover:bg-white hover:text-black font-bold text-lg border border-black transition-all duration-300 group flex items-center justify-center gap-4 rounded-full" type="submit">
-                Generate Calculator
-                <ArrowRight className="w-6 h-6" />
-              </button>
-            </div>
-          </form>
-
-          {/* Sidebar / Metadata */}
-          <aside className="md:col-span-4 space-y-12">
-            <div className="space-y-4">
-              <p className="text-[0.75rem] font-bold uppercase tracking-widest text-[#777777]">Visual Preview</p>
-              <div className="aspect-square bg-[#f3f3f4] flex items-center justify-center relative border border-[#c6c6c6] overflow-hidden">
-                {logoPreview ? (
-                  <Image src={logoPreview} alt="Logo Preview" layout="fill" objectFit="contain" className="p-8" />
-                ) : (
-                  <>
-                    <div className="absolute inset-0 bg-white/40 flex items-center justify-center">
-                      <ImageIcon className="w-16 h-16 text-[#c6c6c6]" />
+            <aside className="lg:col-span-4 space-y-8">
+              <div className="glass shadow-apple rounded-3xl p-8 border border-white">
+                <div className="text-xs font-extrabold uppercase tracking-widest text-[#10b981] mb-6 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#10b981]" /> Visual Preview
+                </div>
+                <div className="aspect-square bg-slate-50 rounded-2xl flex items-center justify-center relative border border-slate-200 overflow-hidden mb-6 shadow-inner">
+                  {logoPreview ? (
+                    <Image src={logoPreview} alt="Logo Preview" fill style={{ objectFit: 'contain' }} className="p-8" />
+                  ) : (
+                    <div className="flex flex-col items-center text-slate-400 gap-3">
+                      <Building2 className="w-12 h-12 opacity-50" />
+                      <span className="text-xs font-semibold uppercase tracking-widest">Setup Needed</span>
                     </div>
-                    <Camera className="w-8 h-8 text-[#777777] z-10 relative" />
-                  </>
-                )}
+                  )}
+                </div>
+                <p className="text-sm text-slate-500 leading-relaxed font-medium">
+                  This logo will appear proudly on the custom interface shared with your clients.
+                </p>
               </div>
-              <p className="text-[0.6875rem] text-[#777777] leading-relaxed italic">
-                This logo will appear on the customized calculator interface shared with your clients.
-              </p>
-            </div>
 
-            <div className="space-y-6 pt-8">
-              <p className="text-[0.75rem] font-bold uppercase tracking-widest text-[#777777]">Benefits</p>
-              <ul className="space-y-6">
-                <li className="flex items-start gap-3">
-                  <Check className="w-4 h-4 pt-1" />
-                  <span className="text-sm font-medium">White-label branding for all PDF exports</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Check className="w-4 h-4 pt-1" />
-                  <span className="text-sm font-medium">Custom localized installation costs</span>
-                </li>
-                <li className="flex items-start gap-3">
-                  <Check className="w-4 h-4 pt-1" />
-                  <span className="text-sm font-medium">Lead generation dashboard access</span>
-                </li>
-              </ul>
-            </div>
-          </aside>
-        </section>
+              <div className="glass shadow-sm rounded-3xl p-8 border border-white">
+                <div className="text-xs font-extrabold uppercase tracking-widest text-[#10b981] mb-6 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#10b981]" /> Partner Benefits
+                </div>
+                <ul className="space-y-4">
+                  {[
+                    "White-label branding for all exports",
+                    "Custom localized installation costs",
+                    "Lead generation dashboard access",
+                    "Priority support and onboarding"
+                  ].map((benefit, i) => (
+                    <li key={i} className="flex items-start gap-3 text-sm font-medium text-slate-700">
+                      <div className="mt-0.5 p-1 rounded-full bg-green-100 text-green-600">
+                        <Check className="w-3 h-3 stroke-[3]" />
+                      </div>
+                      {benefit}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </aside>
+          </div>
+        </motion.div>
       </main>
 
-      <footer className="bg-white flex flex-col md:flex-row justify-center items-center gap-6 sm:gap-12 w-full pt-8 pb-8 px-8 border-t border-[#c6c6c6]/50 mt-auto">
-        <div className="text-[0.75rem] font-semibold uppercase tracking-widest text-[#777777]">
-            © 2026 MySolar PV
+      <footer className="glass border-t border-white/50 w-full py-8 mt-auto flex flex-col md:flex-row items-center justify-between px-6 md:px-12 relative z-10">
+        <div className="text-xs font-bold uppercase tracking-widest text-slate-400">
+          © 2026 MySolar PV
         </div>
-        <nav className="flex gap-12">
-          <a href="#" className="text-[0.75rem] font-semibold uppercase tracking-widest text-[#777777] hover:text-black transition-colors cursor-pointer">
-              Visit our homepage
-          </a>
+        <nav className="flex gap-8 mt-4 md:mt-0">
+          <Link href="/" className="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-primary transition-colors">
+            Visit Homepage
+          </Link>
         </nav>
       </footer>
     </div>

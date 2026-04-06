@@ -1,31 +1,55 @@
-import React from 'react';
+"use client";
 
-interface SelectOption {
+import React from 'react';
+import { motion } from 'framer-motion';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+export interface SelectOption {
   value: string;
   label: string;
 }
 
-interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
+export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectElement>, "ref"> {
   label: string;
   options: SelectOption[];
 }
 
-export function Select({ label, options, className = '', ...props }: SelectProps) {
-  return (
-    <div className={`group ${className}`}>
-      <label className="block text-[10px] font-bold uppercase tracking-widest text-neutral-500 mb-2">
-        {label}
-      </label>
-      <select 
-        className="w-full bg-transparent border-0 border-b border-outline py-3 px-0 focus:ring-0 focus:border-black text-black font-medium appearance-none cursor-pointer"
-        {...props}
+export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
+  ({ label, options, className, ...props }, ref) => {
+    return (
+      <motion.div 
+        initial={{ opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        className={cn("group flex flex-col gap-1.5", className)}
       >
-        {options.map((option) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </select>
-    </div>
-  );
-}
+        <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 ml-1">
+          {label}
+        </label>
+        <div className="relative">
+          <select 
+            ref={ref}
+            className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 pr-10 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-slate-800 font-medium transition-all shadow-sm hover:shadow-md appearance-none cursor-pointer"
+            {...props}
+          >
+            {options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+            </svg>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+);
+Select.displayName = "Select";

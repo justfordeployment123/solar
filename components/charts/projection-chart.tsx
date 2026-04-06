@@ -1,66 +1,127 @@
 "use client";
 
-import {
-  ComposedChart,
-  Line,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend,
-  ResponsiveContainer,
-} from "recharts";
+import ReactECharts from 'echarts-for-react';
 import { YearlyCashflow } from "@/types/calculator";
+import { useMemo } from 'react';
+import { graphic } from 'echarts';
 
 interface ProjectionChartProps {
   data: YearlyCashflow[];
 }
 
 export function ProjectionChart({ data }: ProjectionChartProps) {
+  const option = useMemo(() => {
+    if (!data || data.length === 0) return {};
+
+    const years = data.map(d => `Year ${d.year}`);
+    const cashflows = data.map(d => d.cashflow);
+    const cumulatives = data.map(d => d.cumulative);
+
+    return {
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: { type: 'cross', label: { backgroundColor: '#6a7985' } },
+        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+        borderColor: '#e2e8f0',
+        textStyle: { color: '#0f172a' },
+        borderRadius: 16,
+        padding: [16, 20],
+        extraCssText: 'box-shadow: 0 8px 32px rgba(0,0,0,0.08); backdrop-filter: blur(12px);',
+        formatter: function (params: any) {
+          let str = `<div style="font-weight: bold; margin-bottom: 8px;">${params[0].name}</div>`;
+          params.forEach((param: any) => {
+            str += `
+              <div style="display: flex; justify-content: space-between; gap: 24px; margin-bottom: 4px;">
+                <span style="color: #64748b;">
+                  <span style="display:inline-block;margin-right:4px;border-radius:50%;width:10px;height:10px;background-color:${param.color};"></span>
+                  ${param.seriesName}
+                </span>
+                <span style="font-weight: 600;">€${param.value.toFixed(2)}</span>
+              </div>
+            `;
+          });
+          return str;
+        }
+      },
+      legend: {
+        data: ['Annual Cashflow', 'Cumulative Cashflow'],
+        bottom: 0,
+        textStyle: { color: '#64748b', fontFamily: 'var(--font-inter)' },
+        itemGap: 24
+      },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '12%',
+        top: '8%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        data: years,
+        axisLine: { show: false },
+        axisTick: { show: false },
+        axisLabel: { color: '#94a3b8', margin: 16, fontFamily: 'var(--font-inter)' }
+      },
+      yAxis: [
+        {
+          type: 'value',
+          name: 'Annual (€)',
+          position: 'left',
+          splitLine: { lineStyle: { type: 'dashed', color: '#f1f5f9' } },
+          axisLabel: { color: '#94a3b8', formatter: '€{value}' }
+        },
+        {
+          type: 'value',
+          name: 'Cumulative (€)',
+          position: 'right',
+          splitLine: { show: false },
+          axisLabel: { color: '#94a3b8', formatter: '€{value}' }
+        }
+      ],
+      series: [
+        {
+          name: 'Annual Cashflow',
+          type: 'bar',
+          data: cashflows,
+          itemStyle: {
+            color: new graphic.LinearGradient(0, 0, 0, 1, [
+              { offset: 0, color: '#34C759' }, // Apple Green
+              { offset: 1, color: '#34C75944' }
+            ]),
+            borderRadius: [6, 6, 0, 0]
+          },
+          barMaxWidth: 30,
+          animationEasing: 'elasticOut',
+          animationDelay: function (idx: number) { return idx * 100; }
+        },
+        {
+          name: 'Cumulative Cashflow',
+          type: 'line',
+          yAxisIndex: 1,
+          data: cumulatives,
+          smooth: true,
+          symbolSize: 8,
+          symbol: 'circle',
+          itemStyle: { color: '#10b981', borderWidth: 3, borderColor: '#ffffff' }, // Apple Blue
+          lineStyle: { width: 4, shadowColor: 'rgba(16, 185, 129, 0.4)', shadowBlur: 14, shadowOffsetY: 6 },
+          z: 10,
+          animationEasing: 'elasticOut',
+          animationDelay: function (idx: number) { return idx * 100 + 400; }
+        }
+      ]
+    };
+  }, [data]);
+
   if (!data || data.length === 0) {
-    return (
-      <div className="flex items-center justify-center h-full text-muted-foreground">
-        No projection data available
-      </div>
-    );
+    return <div className="flex items-center justify-center h-[350px] text-slate-400 font-medium">No projection data available</div>;
   }
 
   return (
-    <ResponsiveContainer width="100%" height={300}>
-      <ComposedChart
-        data={data}
-        margin={{ top: 20, right: 20, bottom: 20, left: 20 }}
-      >
-        <CartesianGrid strokeDasharray="3 3" vertical={false} />
-        <XAxis
-          dataKey="year"
-          label={{ value: "Year", position: "insideBottom", offset: -10 }}
-        />
-        <YAxis
-          width={80}
-          yAxisId="left"
-          label={{ value: "Cashflow (€)", angle: -90, position: "insideLeft", offset: -10 }}
-        />
-        <YAxis
-          width={80}
-          yAxisId="right"
-          orientation="right"
-          label={{ value: "Cumulative (€)", angle: 90, position: "insideRight", offset: -10 }}
-        />
-        <Tooltip formatter={(value: any) => `€${Number(value).toFixed(2)}`} />
-        <Legend wrapperStyle={{ paddingTop: "20px" }} />
-        <Bar yAxisId="left" dataKey="cashflow" fill="#82ca9d" name="Annual Cashflow" radius={[4, 4, 0, 0]} />
-        <Line
-          yAxisId="right"
-          type="monotone"
-          dataKey="cumulative"
-          stroke="#8884d8"
-          name="Cumulative Cashflow"
-          strokeWidth={2}
-          dot={false}
-        />
-      </ComposedChart>
-    </ResponsiveContainer>
+    <ReactECharts 
+      option={option} 
+      style={{ height: '400px', width: '100%' }} 
+      className="transition-all duration-500"
+    />
   );
 }

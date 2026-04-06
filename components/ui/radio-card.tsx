@@ -1,34 +1,67 @@
-import React from 'react';
+"use client";
 
-interface Option {
+import React from 'react';
+import { motion } from 'framer-motion';
+import { clsx, type ClassValue } from 'clsx';
+import { twMerge } from 'tailwind-merge';
+import { Check } from 'lucide-react';
+
+function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
+}
+
+export interface Option {
   id: string;
   title: string;
   description: string;
   disclaimer?: string;
 }
 
-interface RadioCardProps {
+export interface RadioCardProps {
   option: Option;
   checked: boolean;
   onChange: (id: string) => void;
   className?: string;
 }
 
-export function RadioCard({ option, checked, onChange, className = '' }: RadioCardProps) {
+export function RadioCard({ option, checked, onChange, className }: RadioCardProps) {
   return (
-    <label 
-      className={`group flex items-start justify-between cursor-pointer border-b border-outline-variant/30 pb-8 transition-colors hover:border-black ${className}`}
+    <motion.label 
+      whileHover={{ y: -2, scale: 1.01 }}
+      whileTap={{ scale: 0.98 }}
+      className={cn(
+        "group relative flex flex-col sm:flex-row items-start sm:items-center justify-between cursor-pointer rounded-2xl p-6 transition-all duration-300",
+        checked 
+          ? "bg-white border-2 border-primary shadow-apple-hover ring-4 ring-primary/10"
+          : "bg-white/60 backdrop-blur-md border-2 border-slate-200 shadow-sm hover:shadow-apple hover:border-slate-300",
+        className
+      )}
     >
-      <div className="flex-1 pr-10">
-        <span className="block text-xl font-bold text-black mb-2">{option.title}</span>
-        <p className={`text-sm text-neutral-500 ${option.disclaimer ? 'mb-3' : ''}`}>
+      <div className="flex-1 pr-6 order-2 sm:order-1 mt-4 sm:mt-0">
+        <span className={cn(
+          "block text-xl font-bold mb-2 transition-colors",
+          checked ? "text-primary" : "text-slate-800"
+        )}>
+          {option.title}
+        </span>
+        <p className={cn(
+          "text-sm transition-colors",
+          checked ? "text-slate-600" : "text-slate-500",
+          option.disclaimer ? "mb-3" : ""
+        )}>
           {option.description}
         </p>
         {option.disclaimer && (
-          <p className="text-xs italic text-neutral-400">Note: {option.disclaimer}</p>
+          <p className="text-xs italic text-slate-400">Note: {option.disclaimer}</p>
         )}
       </div>
-      <div className="relative inline-flex items-center h-6 w-12 border border-black bg-white group-active:scale-95 transition-transform shrink-0">
+      
+      <div className="relative order-1 sm:order-2 flex items-center justify-center w-8 h-8 rounded-full border-2 transition-colors shrink-0" 
+        style={{
+          borderColor: checked ? 'var(--color-primary)' : '#cbd5e1',
+          backgroundColor: checked ? 'var(--color-primary)' : 'transparent',
+        }}
+      >
         <input 
           type="radio" 
           name="goal" 
@@ -36,9 +69,15 @@ export function RadioCard({ option, checked, onChange, className = '' }: RadioCa
           checked={checked} 
           onChange={() => onChange(option.id)}
         />
-        <div className={`w-full h-full absolute transition-colors ${checked ? 'bg-black' : ''}`}></div>
-        <div className={`absolute left-1 top-1 w-4 h-4 transition-transform ${checked ? 'bg-white translate-x-6' : 'bg-black'}`}></div>
+        <motion.div
+           initial={false}
+           animate={{ scale: checked ? 1 : 0, opacity: checked ? 1 : 0 }}
+           transition={{ type: "spring", stiffness: 300, damping: 20 }}
+           className="text-white"
+        >
+          <Check size={16} strokeWidth={3} />
+        </motion.div>
       </div>
-    </label>
+    </motion.label>
   );
 }

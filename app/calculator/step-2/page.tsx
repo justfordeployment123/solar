@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -6,8 +6,23 @@ import Link from 'next/link';
 import { ProgressHeader } from '@/components/layout/progress-header';
 import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
+import { Button } from '@/components/ui/button';
 import { useCalculatorStore } from '@/store/calculatorStore';
-import { UploadCloud } from 'lucide-react';
+import { UploadCloud, ArrowLeft, ChevronRight } from 'lucide-react';
+import { motion } from 'framer-motion';
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  show: {
+    opacity: 1,
+    transition: { staggerChildren: 0.05 }
+  }
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 15 },
+  show: { opacity: 1, y: 0 }
+};
 
 export default function Step2Page() {
   const router = useRouter();
@@ -39,95 +54,123 @@ export default function Step2Page() {
     setTechnicalInputs({ [field]: value });
   };
 
-  if (!mounted || !stepCompletion.step1) return null; // Hydration and route guard
+  if (!mounted || !stepCompletion.step1) return null;
 
   return (
-    <div className="px-8 md:px-24 py-12">
+    <div className="px-6 lg:px-12 pt-8 max-w-5xl mx-auto flex flex-col min-h-full">
       <ProgressHeader currentStep={2} totalSteps={3} title="System Details" description="Configure the technical parameters of your solar and battery storage system." />
 
-
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-24 gap-y-16 mb-24">
-        {/* Technical Column */}
-        <section>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-[#ababab] mb-10">Technical Specifications</h3>
-          <div className="space-y-12">
-            <Select 
-              label="Region" 
-              options={[
-                { value: '', label: 'Select a region' },
-                { value: 'North', label: 'North Germany' },
-                { value: 'Central', label: 'Central Germany' },
-                { value: 'South', label: 'South Germany' },
-              ]}
-              value={technical.region || ''}
-              onChange={(e) => setTechnicalInputs({ region: e.target.value as any })}
-            />
-            <Input 
-              label="PV Size (kWp)" 
-              type="number" 
-              placeholder="10" 
-              value={technical.pvSizeKwp ?? ''}
-              onChange={handleInputChange('pvSizeKwp')}
-            />
-            <Input 
-              label="Annual Consumption (kWh)" 
-              type="number" 
-              placeholder="5000" 
-              value={technical.annualConsumptionKwh ?? ''}
-              onChange={handleInputChange('annualConsumptionKwh')}
-            />
-            <Input 
-              label="Current Battery Capacity (kWh)" 
-              type="number" 
-              placeholder="0" 
-              value={technical.currentBatteryCapacityKwh ?? ''}
-              onChange={handleInputChange('currentBatteryCapacityKwh')}
-            />
-            <Input 
-              label="Inverter Power (kW)" 
-              type="number" 
-              placeholder="8" 
-              value={technical.inverterPowerKw ?? ''}
-              onChange={handleInputChange('inverterPowerKw')}
-            />
-            <Input 
-              label="Grid Connection Limit (kW)" 
-              type="number" 
-              placeholder="30" 
-              value={technical.gridConnectionLimitKw ?? ''}
-              onChange={handleInputChange('gridConnectionLimitKw')}
-            />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 my-8 flex-grow">
+        <motion.section 
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          className="flex flex-col gap-6"
+        >
+          <motion.h3 variants={itemVariants} className="text-xs font-extrabold uppercase tracking-widest text-primary mb-2 flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-primary" /> Technical Specs
+          </motion.h3>
+          <div className="space-y-6">
+            <motion.div variants={itemVariants}>
+              <Select 
+                label="Region" 
+                options={[
+                  { value: '', label: 'Select a region' },
+                  { value: 'North', label: 'North Germany' },
+                  { value: 'Central', label: 'Central Germany' },
+                  { value: 'South', label: 'South Germany' },
+                ]}
+                value={technical.region || ''}
+                onChange={(e) => setTechnicalInputs({ region: e.target.value as any })}
+              />
+            </motion.div>
+            <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4">
+              <Input 
+                label="PV Size (kWp)" 
+                type="number" 
+                placeholder="10" 
+                value={technical.pvSizeKwp ?? ''}
+                onChange={handleInputChange('pvSizeKwp')}
+              />
+              <Input 
+                label="Annual Consumption (kWh)" 
+                type="number" 
+                placeholder="5000" 
+                value={technical.annualConsumptionKwh ?? ''}
+                onChange={handleInputChange('annualConsumptionKwh')}
+              />
+            </motion.div>
+            <motion.div variants={itemVariants}>
+              <Input 
+                label="Current Battery Capacity (kWh)" 
+                type="number" 
+                placeholder="0" 
+                value={technical.currentBatteryCapacityKwh ?? ''}
+                onChange={handleInputChange('currentBatteryCapacityKwh')}
+              />
+            </motion.div>
+            <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4">
+              <Input 
+                label="Inverter Power (kW)" 
+                type="number" 
+                placeholder="8" 
+                value={technical.inverterPowerKw ?? ''}
+                onChange={handleInputChange('inverterPowerKw')}
+              />
+              <Input 
+                label="Grid Limit (kW)" 
+                type="number" 
+                placeholder="30" 
+                value={technical.gridConnectionLimitKw ?? ''}
+                onChange={handleInputChange('gridConnectionLimitKw')}
+              />
+            </motion.div>
           </div>
-        </section>
+        </motion.section>
 
-        {/* Load Profile Column */}
-        <section>
-          <h3 className="text-xs font-bold uppercase tracking-widest text-[#ababab] mb-10">Load Profile</h3>
-          <label htmlFor="csv-upload" className="border border-dashed border-[#c6c6c6] bg-transparent p-12 text-center flex flex-col items-center justify-center gap-4 hover:border-black transition-colors cursor-pointer group block w-full">
+        <motion.section 
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="flex flex-col gap-6"
+        >
+          <h3 className="text-xs font-extrabold uppercase tracking-widest text-[#5856d6] mb-2 flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-[#5856d6]" /> Smart Data
+          </h3>
+          <motion.label 
+            whileHover={{ scale: 1.01 }}
+            whileTap={{ scale: 0.99 }}
+            htmlFor="csv-upload" 
+            className="flex-grow min-h-[300px] rounded-3xl border-2 border-dashed border-slate-300 bg-white/50 backdrop-blur-sm p-12 text-center flex flex-col items-center justify-center gap-6 hover:border-primary hover:bg-white transition-all cursor-pointer group shadow-sm hover:shadow-apple-glass"
+          >
             <input type="file" accept=".csv" id="csv-upload" className="hidden" />
-            <div className="w-16 h-16 rounded-full bg-[#f9f9f9] flex items-center justify-center border border-[#c6c6c6] group-hover:border-black transition-colors">
-              <UploadCloud className="w-6 h-6 text-[#a1a1aa] group-hover:text-black transition-colors" />
+            <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center border-2 border-slate-100 group-hover:border-primary/20 group-hover:bg-primary/5 transition-colors relative overflow-hidden">
+               <motion.div 
+                 animate={{ y: [0, -5, 0] }}
+                 transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
+               >
+                 <UploadCloud className="w-8 h-8 text-slate-400 group-hover:text-primary transition-colors" />
+               </motion.div>
             </div>
             <div>
-              <p className="text-sm font-bold text-black mb-1">Upload Load Profile CSV</p>
-              <p className="text-[10px] uppercase tracking-widest text-[#ababab]">Drag & Drop or Click</p>
+              <p className="text-lg font-bold text-slate-800 mb-1">Upload Load Profile</p>
+              <p className="text-xs uppercase tracking-widest text-slate-400 font-semibold mb-2">.CSV File</p>
             </div>
-            <p className="text-xs text-neutral-500 mt-4 leading-relaxed max-w-xs">
+            <p className="text-sm text-slate-500 max-w-[250px] leading-relaxed">
               Upload your historical 15-minute interval smart meter data to get maximum precision out of your projections.
             </p>
-          </label>
-        </section>
+          </motion.label>
+        </motion.section>
 
       </div>
 
-      <footer className="mt-6 pt-0 flex justify-between items-center">
-        <Link href="/calculator/step-1" className="text-sm font-bold uppercase tracking-widest text-[#ababab] hover:text-black transition-colors">
-          Back
+      <footer className="mt-8 mb-12 flex justify-between items-center py-6 border-t border-slate-200 w-full mt-auto">
+        <Link href="/calculator/step-1" className="text-sm font-bold uppercase tracking-widest text-slate-400 hover:text-primary transition-colors flex items-center gap-2 group">
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back
         </Link>
-        <button onClick={handleNext} className="bg-black text-white px-12 py-5 text-sm font-black uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-all duration-300 rounded-full">
-          Next Step
-        </button>
+        <Button variant="primary" onClick={handleNext} className="gap-2 pr-4 shadow-apple text-base uppercase tracking-widest bg-black text-white hover:bg-primary border-transparent">
+          Next Step <ChevronRight className="w-5 h-5" />
+        </Button>
       </footer>
     </div>
   );
