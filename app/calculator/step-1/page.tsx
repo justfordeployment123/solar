@@ -11,7 +11,7 @@ import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 import { ChevronRight, ArrowLeft } from 'lucide-react';
 
-const GOAL_OPTIONS: { id: Goal; title: string; description: string; disclaimer?: string }[] = [
+const GOAL_OPTIONS: { id: Goal & string; title: string; description: string; disclaimer?: string }[] = [
   { id: 'Self-Consumption', title: 'Self-Consumption', description: 'Prioritize using solar energy locally to reduce dependence on external suppliers.' },
   { id: 'Peak Shaving', title: 'Peak Shaving', description: 'Reduce power demand charges by discharging the battery during peak load periods.' },
   { id: 'Grid Services (VPP/Balancing)', title: 'Grid Balancing (PRL/SRL)', description: 'Provide frequency control reserves to the national grid operator.' },
@@ -31,7 +31,7 @@ const containerVariants = {
 
 const itemVariants = {
   hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: "spring", stiffness: 300, damping: 24 } }
+  show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } }
 };
 
 export default function Step1Page() {

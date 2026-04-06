@@ -35,7 +35,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         className={cn(baseStyles, variants[variant], fullWidth ? "w-full" : "", className)}
         {...props}
       >
-        <span className="relative z-10 flex items-center gap-2">{children}</span>
+        <span className="relative z-10 flex items-center gap-2">{children as React.ReactNode}</span>
         {variant === 'primary' && (
           <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out z-0 rounded-full" />
         )}

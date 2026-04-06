@@ -22,7 +22,7 @@ export default function InstallersSuccessPage() {
         <motion.div 
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
-          transition={{ type: "spring", stiffness: 200, damping: 20 }}
+          transition={{ type: "spring" as const, stiffness: 200, damping: 20 }}
           className="relative mb-12"
         >
           <div className="absolute -inset-4 bg-green-500/20 rounded-full blur-xl" />
