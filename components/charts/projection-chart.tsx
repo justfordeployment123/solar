@@ -20,10 +20,10 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
     return {
       tooltip: {
         trigger: 'axis',
-        axisPointer: { type: 'cross', label: { backgroundColor: '#6a7985' } },
+        axisPointer: { type: 'cross', label: { backgroundColor: '#565656' } },
         backgroundColor: 'rgba(255, 255, 255, 0.95)',
-        borderColor: '#e2e8f0',
-        textStyle: { color: '#0f172a' },
+        borderColor: '#dfdfdf',
+        textStyle: { color: '#363636' },
         borderRadius: 16,
         padding: [16, 20],
         extraCssText: 'box-shadow: 0 8px 32px rgba(0,0,0,0.08); backdrop-filter: blur(12px);',
@@ -32,7 +32,7 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
           params.forEach((param: any) => {
             str += `
               <div style="display: flex; justify-content: space-between; gap: 24px; margin-bottom: 4px;">
-                <span style="color: #64748b;">
+                <span style="color: #565656;">
                   <span style="display:inline-block;margin-right:4px;border-radius:50%;width:10px;height:10px;background-color:${param.color};"></span>
                   ${param.seriesName}
                 </span>
@@ -46,7 +46,7 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
       legend: {
         data: ['Annual Cashflow', 'Cumulative Cashflow'],
         bottom: 0,
-        textStyle: { color: '#64748b', fontFamily: 'var(--font-inter)' },
+        textStyle: { color: '#565656', fontFamily: 'var(--font-opensans)' },
         itemGap: 24
       },
       grid: {
@@ -61,22 +61,22 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
         data: years,
         axisLine: { show: false },
         axisTick: { show: false },
-        axisLabel: { color: '#94a3b8', margin: 16, fontFamily: 'var(--font-inter)' }
+        axisLabel: { color: '#565656', margin: 16, fontFamily: 'var(--font-opensans)' }
       },
       yAxis: [
         {
           type: 'value',
           name: 'Annual (€)',
           position: 'left',
-          splitLine: { lineStyle: { type: 'dashed', color: '#f1f5f9' } },
-          axisLabel: { color: '#94a3b8', formatter: '€{value}' }
+          splitLine: { lineStyle: { type: 'dashed', color: '#dfdfdf' } },
+          axisLabel: { color: '#565656', formatter: '€{value}' }
         },
         {
           type: 'value',
           name: 'Cumulative (€)',
           position: 'right',
           splitLine: { show: false },
-          axisLabel: { color: '#94a3b8', formatter: '€{value}' }
+          axisLabel: { color: '#565656', formatter: '€{value}' }
         }
       ],
       series: [
@@ -86,8 +86,8 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
           data: cashflows,
           itemStyle: {
             color: new graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: '#34C759' }, // Apple Green
-              { offset: 1, color: '#34C75944' }
+              { offset: 0, color: '#dfdfdf' }, // Apple Green
+              { offset: 1, color: '#dfdfdf44' }
             ]),
             borderRadius: [6, 6, 0, 0]
           },
@@ -103,8 +103,8 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
           smooth: true,
           symbolSize: 8,
           symbol: 'circle',
-          itemStyle: { color: '#10b981', borderWidth: 3, borderColor: '#ffffff' }, // Apple Blue
-          lineStyle: { width: 4, shadowColor: 'rgba(16, 185, 129, 0.4)', shadowBlur: 14, shadowOffsetY: 6 },
+          itemStyle: { color: '#e12029', borderWidth: 3, borderColor: '#ffffff' }, // Apple Blue
+          lineStyle: { width: 4, shadowColor: 'rgba(225, 32, 41, 0.4)', shadowBlur: 14, shadowOffsetY: 6 },
           z: 10,
           animationEasing: 'elasticOut',
           animationDelay: function (idx: number) { return idx * 100 + 400; }
@@ -114,7 +114,7 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
   }, [data]);
 
   if (!data || data.length === 0) {
-    return <div className="flex items-center justify-center h-[350px] text-slate-400 font-medium">No projection data available</div>;
+    return <div className="flex items-center justify-center h-[350px] text-[#565656] font-medium">No projection data available</div>;
   }
 
   return (

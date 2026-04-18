@@ -106,11 +106,11 @@ export default function Step1Page() {
         ))}
       </motion.section>
 
-      <footer className="mt-12 pb-12 flex justify-between items-center py-6 border-t border-slate-200 w-full mt-auto">
-        <Link href="/" className="text-sm font-bold uppercase tracking-widest text-slate-400 hover:text-primary transition-colors flex items-center gap-2 group">
+      <footer className="mt-12 pb-12 flex justify-between items-center py-6 border-t border-[#dfdfdf] w-full mt-auto">
+        <Link href="/" className="text-sm font-bold uppercase tracking-widest text-[#565656] hover:text-primary transition-colors flex items-center gap-2 group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back
         </Link>
-        <Button variant="primary" onClick={handleNext} className="gap-2 pr-4 shadow-apple text-base uppercase tracking-widest bg-black text-white hover:bg-primary border-transparent">
+        <Button variant="primary" onClick={handleNext} className="gap-2 pr-4 shadow-apple text-base uppercase tracking-widest bg-[#363636] text-white hover:bg-primary border-transparent">
           Next Step <ChevronRight className="w-5 h-5" />
         </Button>
       </footer>

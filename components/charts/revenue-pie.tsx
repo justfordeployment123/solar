@@ -8,7 +8,7 @@ interface RevenuePieProps {
   data: RevenueStreams;
 }
 
-const COLORS = ["#10b981", "#059669", "#047857", "#0f766e", "#64748b", "#94a3b8"];
+const COLORS = ["#e12029", "#363636", "#565656", "#dfdfdf", "#868686", "#1d1d1d"];
 
 export function RevenuePie({ data }: RevenuePieProps) {
   const chartData = [
@@ -26,8 +26,8 @@ export function RevenuePie({ data }: RevenuePieProps) {
         trigger: 'item',
         formatter: '{b}: €{c} ({d}%)',
         backgroundColor: 'rgba(255, 255, 255, 0.9)',
-        borderColor: '#e2e8f0',
-        textStyle: { color: '#0f172a' },
+        borderColor: '#dfdfdf',
+        textStyle: { color: '#363636' },
         borderRadius: 16,
         padding: [12, 16],
         extraCssText: 'box-shadow: 0 4px 24px rgba(0,0,0,0.06); backdrop-filter: blur(8px);'
@@ -38,8 +38,8 @@ export function RevenuePie({ data }: RevenuePieProps) {
         itemWidth: 12,
         itemHeight: 12,
         textStyle: {
-          color: '#64748b',
-          fontFamily: 'var(--font-inter)'
+          color: '#565656',
+          fontFamily: 'var(--font-opensans)'
         }
       },
       series: [
@@ -63,7 +63,7 @@ export function RevenuePie({ data }: RevenuePieProps) {
               show: true,
               fontSize: 20,
               fontWeight: 'bold',
-              color: '#0f172a'
+              color: '#363636'
             },
             itemStyle: {
               shadowBlur: 10,
@@ -86,7 +86,7 @@ export function RevenuePie({ data }: RevenuePieProps) {
   }, [chartData]);
 
   if (chartData.length === 0) {
-    return <div className="flex items-center justify-center h-full text-slate-400 font-medium">No revenue data available</div>;
+    return <div className="flex items-center justify-center h-full text-[#565656] font-medium">No revenue data available</div>;
   }
 
   return (

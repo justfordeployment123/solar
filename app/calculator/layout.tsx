@@ -27,7 +27,7 @@ export default function CalculatorLayout({ children }: { children: React.ReactNo
   else if (pathname.includes('/step-3') || pathname.includes('/results')) currentIndex = 2;
 
   return (
-    <div className="min-h-screen w-full bg-slate-50 flex flex-col font-sans transition-colors duration-500 relative overflow-hidden">
+    <div className="min-h-screen w-full bg-[#ffffff] flex flex-col font-sans transition-colors duration-500 relative overflow-hidden">
       {/* Background aesthetic blobs */}
       <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/10 blur-[120px] pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] rounded-full bg-secondary/10 blur-[120px] pointer-events-none" />

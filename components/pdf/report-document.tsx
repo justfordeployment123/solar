@@ -2,19 +2,19 @@ import React from 'react';
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
 
 const styles = StyleSheet.create({
-  page: { flexDirection: 'column', backgroundColor: '#f8fafc', padding: 40, fontFamily: 'Helvetica' },
-  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 40, paddingBottom: 20, borderBottomWidth: 2, borderBottomColor: '#f1f5f9' },
-  headerTitle: { fontSize: 28, fontWeight: 'bold', color: '#0f172a', letterSpacing: -1 },
-  headerSubtitle: { fontSize: 10, color: '#64748b', textTransform: 'uppercase', letterSpacing: 2 },
+  page: { flexDirection: 'column', backgroundColor: '#ffffff', padding: 40, fontFamily: 'Helvetica' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 40, paddingBottom: 20, borderBottomWidth: 2, borderBottomColor: '#dfdfdf' },
+  headerTitle: { fontSize: 28, fontWeight: 'bold', color: '#363636', letterSpacing: -1 },
+  headerSubtitle: { fontSize: 10, color: '#565656', textTransform: 'uppercase', letterSpacing: 2 },
   section: { backgroundColor: '#ffffff', borderRadius: 16, padding: 24, marginBottom: 20, shadowColor: '#000', shadowOpacity: 0.05, shadowOffset: { width: 0, height: 4 }, shadowRadius: 10 },
-  title: { fontSize: 12, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 1.5, color: '#007aff', marginBottom: 16 },
-  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#f1f5f9' },
-  label: { fontSize: 11, color: '#64748b', fontWeight: 'medium' },
-  value: { fontSize: 11, color: '#0f172a', fontWeight: 'bold' },
-  highlightValue: { fontSize: 14, color: '#34c759', fontWeight: 'bold' },
-  imageContainer: { marginTop: 20, alignItems: 'center', backgroundColor: '#f8fafc', borderRadius: 12, padding: 15 },
+  title: { fontSize: 12, fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: 1.5, color: '#565656', marginBottom: 16 },
+  row: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#dfdfdf' },
+  label: { fontSize: 11, color: '#565656', fontWeight: 'medium' },
+  value: { fontSize: 11, color: '#363636', fontWeight: 'bold' },
+  highlightValue: { fontSize: 14, color: '#dfdfdf', fontWeight: 'bold' },
+  imageContainer: { marginTop: 20, alignItems: 'center', backgroundColor: '#ffffff', borderRadius: 12, padding: 15 },
   chartImage: { width: '100%', height: 260, objectFit: 'contain' },
-  footer: { position: 'absolute', bottom: 30, left: 40, right: 40, fontSize: 9, textAlign: 'center', color: '#94a3b8', borderTopWidth: 1, borderTopColor: '#f1f5f9', paddingTop: 15 }
+  footer: { position: 'absolute', bottom: 30, left: 40, right: 40, fontSize: 9, textAlign: 'center', color: '#565656', borderTopWidth: 1, borderTopColor: '#dfdfdf', paddingTop: 15 }
 });
 
 interface ReportDocumentProps {
@@ -34,8 +34,8 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ derivedResults, 
           <Text style={styles.headerSubtitle}>Battery Storage Calculator</Text>
         </View>
         <View style={{ alignItems: 'flex-end' }}>
-          <Text style={{ fontSize: 10, color: '#64748b' }}>Date: {new Date().toLocaleDateString()}</Text>
-          <Text style={{ fontSize: 10, color: '#007aff', fontWeight: 'bold', marginTop: 4 }}>Prepared exclusively for you</Text>
+          <Text style={{ fontSize: 10, color: '#565656' }}>Date: {new Date().toLocaleDateString()}</Text>
+          <Text style={{ fontSize: 10, color: '#565656', fontWeight: 'bold', marginTop: 4 }}>Prepared exclusively for you</Text>
         </View>
       </View>
       

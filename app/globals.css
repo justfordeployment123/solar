@@ -1,28 +1,28 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-surface-variant: #f3f4f6;
-  --color-background: #f0fdf4; /* Very Light Green */
+  --color-surface-variant: #ffffff;
+  --color-background: #ffffff; /* Very Light Green */
   --color-surface: #ffffff;
-  --color-primary: #10b981; /* Ngen Green */
+  --color-primary: #e12029; /* Ngen Green */
   --color-on-primary: #ffffff;
-  --color-secondary: #0ea5e9; /* Sky Blue */
+  --color-secondary: #565656; /* Sky Blue */
   --color-on-secondary: #ffffff;
-  --color-tertiary: #64748b; /* Ngen Gray */
+  --color-tertiary: #565656; /* Ngen Gray */
   --color-surface-container: #ffffff;
-  --color-surface-container-high: #dcfce7;
-  --color-surface-container-highest: #e2e8f0;
-  --color-outline: #e2e8f0;
-  --color-outline-variant: #cbd5e1;
+  --color-surface-container-high: #dfdfdf;
+  --color-surface-container-highest: #dfdfdf;
+  --color-outline: #dfdfdf;
+  --color-outline-variant: #565656;
   
-  --color-on-surface: #0f172a;
-  --color-on-background: #0f172a;
+  --color-on-surface: #363636;
+  --color-on-background: #363636;
   
   --color-error: #ff3b30;
   --color-error-container: #ffe5e5;
   --color-on-error: #ffffff;
   
-  --font-sans: var(--font-inter);
+  --font-sans: var(--font-opensans);
 
   --radius-sm: 8px;
   --radius: 12px;
@@ -36,7 +36,7 @@
 }
 
 body {
-  font-family: var(--font-inter), sans-serif;
+  font-family: var(--font-opensans), sans-serif;
   background-color: var(--color-background);
   color: var(--color-on-background);
   -webkit-font-smoothing: antialiased;
@@ -61,7 +61,7 @@ body {
 }
 
 .glass-dark {
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(54, 54, 54, 0.6);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.1);

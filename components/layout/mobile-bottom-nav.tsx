@@ -31,13 +31,13 @@ export function MobileBottomNav({ steps, currentStepIndex }: MobileBottomNavProp
               {isActive && (
                 <motion.div 
                   layoutId="mobile-active-bg"
-                  className="absolute inset-0 bg-white shadow-sm rounded-2xl -z-10 border border-slate-100"
+                  className="absolute inset-0 bg-white shadow-sm rounded-2xl -z-10 border border-[#ffffff]"
                   transition={{ type: "spring", stiffness: 300, damping: 25 }}
                 />
               )}
               <motion.div 
                 animate={{ 
-                  color: isActive ? 'var(--color-primary)' : '#94a3b8',
+                  color: isActive ? 'var(--color-primary)' : '#565656',
                   scale: isActive ? 1.1 : 1
                 }}
                 className="mb-1"
@@ -45,7 +45,7 @@ export function MobileBottomNav({ steps, currentStepIndex }: MobileBottomNavProp
                 <StepIcon strokeWidth={isActive ? 2.5 : 2} size={22} />
               </motion.div>
               <span className={`text-[10px] font-bold tracking-tight transition-colors ${
-                isActive ? 'text-primary' : 'text-slate-400'
+                isActive ? 'text-primary' : 'text-[#565656]'
               }`}>
                 {step.title}
               </span>

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Open_Sans } from "next/font/google";
 import "./globals.css";
 
-const inter = Inter({
-  variable: "--font-inter",
+const openSans = Open_Sans({
+  variable: "--font-openSans",
   subsets: ["latin"],
 });
 
@@ -20,7 +20,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} h-full antialiased light`}
+      className={`${openSans.variable} h-full antialiased light`}
     >
       <body className="bg-white min-h-screen flex flex-col">
         {children}

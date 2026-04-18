@@ -134,29 +134,29 @@ export default function Step2Page() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="flex flex-col gap-6"
         >
-          <h3 className="text-xs font-extrabold uppercase tracking-widest text-[#5856d6] mb-2 flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#5856d6]" /> Smart Data
+          <h3 className="text-xs font-extrabold uppercase tracking-widest text-[#e12029] mb-2 flex items-center gap-2">
+            <div className="w-2 h-2 rounded-full bg-[#e12029]" /> Smart Data
           </h3>
           <motion.label 
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.99 }}
             htmlFor="csv-upload" 
-            className="flex-grow min-h-[300px] rounded-3xl border-2 border-dashed border-slate-300 bg-white/50 backdrop-blur-sm p-12 text-center flex flex-col items-center justify-center gap-6 hover:border-primary hover:bg-white transition-all cursor-pointer group shadow-sm hover:shadow-apple-glass"
+            className="flex-grow min-h-[300px] rounded-3xl border-2 border-dashed border-[#dfdfdf] bg-white/50 backdrop-blur-sm p-12 text-center flex flex-col items-center justify-center gap-6 hover:border-primary hover:bg-white transition-all cursor-pointer group shadow-sm hover:shadow-apple-glass"
           >
             <input type="file" accept=".csv" id="csv-upload" className="hidden" />
-            <div className="w-20 h-20 rounded-full bg-slate-50 flex items-center justify-center border-2 border-slate-100 group-hover:border-primary/20 group-hover:bg-primary/5 transition-colors relative overflow-hidden">
+            <div className="w-20 h-20 rounded-full bg-[#ffffff] flex items-center justify-center border-2 border-[#ffffff] group-hover:border-primary/20 group-hover:bg-primary/5 transition-colors relative overflow-hidden">
                <motion.div 
                  animate={{ y: [0, -5, 0] }}
                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
                >
-                 <UploadCloud className="w-8 h-8 text-slate-400 group-hover:text-primary transition-colors" />
+                 <UploadCloud className="w-8 h-8 text-[#565656] group-hover:text-primary transition-colors" />
                </motion.div>
             </div>
             <div>
-              <p className="text-lg font-bold text-slate-800 mb-1">Upload Load Profile</p>
-              <p className="text-xs uppercase tracking-widest text-slate-400 font-semibold mb-2">.CSV File</p>
+              <p className="text-lg font-bold text-[#363636] mb-1">Upload Load Profile</p>
+              <p className="text-xs uppercase tracking-widest text-[#565656] font-semibold mb-2">.CSV File</p>
             </div>
-            <p className="text-sm text-slate-500 max-w-[250px] leading-relaxed">
+            <p className="text-sm text-[#565656] max-w-[250px] leading-relaxed">
               Upload your historical 15-minute interval smart meter data to get maximum precision out of your projections.
             </p>
           </motion.label>
@@ -164,11 +164,11 @@ export default function Step2Page() {
 
       </div>
 
-      <footer className="mt-8 mb-12 flex justify-between items-center py-6 border-t border-slate-200 w-full mt-auto">
-        <Link href="/calculator/step-1" className="text-sm font-bold uppercase tracking-widest text-slate-400 hover:text-primary transition-colors flex items-center gap-2 group">
+      <footer className="mt-8 mb-12 flex justify-between items-center py-6 border-t border-[#dfdfdf] w-full mt-auto">
+        <Link href="/calculator/step-1" className="text-sm font-bold uppercase tracking-widest text-[#565656] hover:text-primary transition-colors flex items-center gap-2 group">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back
         </Link>
-        <Button variant="primary" onClick={handleNext} className="gap-2 pr-4 shadow-apple text-base uppercase tracking-widest bg-black text-white hover:bg-primary border-transparent">
+        <Button variant="primary" onClick={handleNext} className="gap-2 pr-4 shadow-apple text-base uppercase tracking-widest bg-[#363636] text-white hover:bg-primary border-transparent">
           Next Step <ChevronRight className="w-5 h-5" />
         </Button>
       </footer>

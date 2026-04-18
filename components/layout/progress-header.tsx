@@ -24,7 +24,7 @@ export function ProgressHeader({ currentStep, totalSteps, title, description }: 
         <span className="text-xs font-bold uppercase tracking-widest text-primary">
           Step {currentStep} of {totalSteps}
         </span>
-        <div className="h-1.5 flex-1 bg-slate-200 rounded-full overflow-hidden relative">
+        <div className="h-1.5 flex-1 bg-[#dfdfdf] rounded-full overflow-hidden relative">
           <motion.div 
             className="absolute top-0 left-0 h-full bg-primary"
             initial={{ width: 0 }}
@@ -37,7 +37,7 @@ export function ProgressHeader({ currentStep, totalSteps, title, description }: 
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, delay: 0.2 }}
-        className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 mb-4"
+        className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-[#363636] mb-4"
       >
         {title}
       </motion.h1>
@@ -45,7 +45,7 @@ export function ProgressHeader({ currentStep, totalSteps, title, description }: 
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.6, delay: 0.4 }}
-        className="text-lg md:text-xl text-slate-500 max-w-2xl leading-relaxed"
+        className="text-lg md:text-xl text-[#565656] max-w-2xl leading-relaxed"
       >
         {description}
       </motion.p>

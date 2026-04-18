@@ -33,32 +33,32 @@ export function RadioCard({ option, checked, onChange, className }: RadioCardPro
         "group relative flex flex-col sm:flex-row items-start sm:items-center justify-between cursor-pointer rounded-2xl p-6 transition-all duration-300",
         checked 
           ? "bg-white border-2 border-primary shadow-apple-hover ring-4 ring-primary/10"
-          : "bg-white/60 backdrop-blur-md border-2 border-slate-200 shadow-sm hover:shadow-apple hover:border-slate-300",
+          : "bg-white/60 backdrop-blur-md border-2 border-[#dfdfdf] shadow-sm hover:shadow-apple hover:border-[#dfdfdf]",
         className
       )}
     >
       <div className="flex-1 pr-6 order-2 sm:order-1 mt-4 sm:mt-0">
         <span className={cn(
           "block text-xl font-bold mb-2 transition-colors",
-          checked ? "text-primary" : "text-slate-800"
+          checked ? "text-primary" : "text-[#363636]"
         )}>
           {option.title}
         </span>
         <p className={cn(
           "text-sm transition-colors",
-          checked ? "text-slate-600" : "text-slate-500",
+          checked ? "text-[#565656]" : "text-[#565656]",
           option.disclaimer ? "mb-3" : ""
         )}>
           {option.description}
         </p>
         {option.disclaimer && (
-          <p className="text-xs italic text-slate-400">Note: {option.disclaimer}</p>
+          <p className="text-xs italic text-[#565656]">Note: {option.disclaimer}</p>
         )}
       </div>
       
       <div className="relative order-1 sm:order-2 flex items-center justify-center w-8 h-8 rounded-full border-2 transition-colors shrink-0" 
         style={{
-          borderColor: checked ? 'var(--color-primary)' : '#cbd5e1',
+          borderColor: checked ? 'var(--color-primary)' : '#565656',
           backgroundColor: checked ? 'var(--color-primary)' : 'transparent',
         }}
       >

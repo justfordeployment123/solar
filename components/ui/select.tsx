@@ -27,13 +27,13 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         animate={{ opacity: 1, y: 0 }}
         className={cn("group flex flex-col gap-1.5", className)}
       >
-        <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 ml-1">
+        <label className="text-xs font-semibold uppercase tracking-wider text-[#565656] ml-1">
           {label}
         </label>
         <div className="relative">
           <select 
             ref={ref}
-            className="w-full bg-white border border-slate-200 rounded-xl py-3 px-4 pr-10 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-slate-800 font-medium transition-all shadow-sm hover:shadow-md appearance-none cursor-pointer"
+            className="w-full bg-white border border-[#dfdfdf] rounded-xl py-3 px-4 pr-10 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-[#363636] font-medium transition-all shadow-sm hover:shadow-md appearance-none cursor-pointer"
             {...props}
           >
             {options.map((option) => (
@@ -42,7 +42,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
               </option>
             ))}
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-slate-500">
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#565656]">
             <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
               <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
             </svg>

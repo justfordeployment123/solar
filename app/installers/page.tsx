@@ -45,7 +45,7 @@ export default function InstallersPage() {
       <main className="pt-32 pb-24 md:pt-40 max-w-6xl mx-auto px-6 md:px-12 w-full relative z-10 flex-grow">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
           <header className="mb-16 md:mb-24 text-center md:text-left">
-            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight text-slate-900 mb-6 bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-primary to-slate-900">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight text-[#e12029] mb-6">
               Partner Portal
             </h1>
             <p className="text-lg md:text-xl text-slate-500 max-w-2xl leading-relaxed mx-auto md:mx-0">
@@ -87,7 +87,7 @@ export default function InstallersPage() {
               </div>
 
               <div className="flex justify-end">
-                <Button variant="primary" type="submit" className="gap-3 shadow-apple-hover text-base uppercase tracking-widest bg-gradient-to-r from-primary to-tertiary text-white w-full md:w-auto py-4 px-10 border-transparent hover:opacity-95">
+                <Button variant="primary" type="submit" className="gap-3 shadow-apple-hover text-base uppercase tracking-widest bg-[#e12029] text-white w-full md:w-auto py-4 px-10 border-transparent hover:opacity-95">
                   Generate Calculator <ArrowRight className="w-5 h-5" />
                 </Button>
               </div>
@@ -95,8 +95,8 @@ export default function InstallersPage() {
 
             <aside className="lg:col-span-4 space-y-8">
               <div className="glass shadow-apple rounded-3xl p-8 border border-white">
-                <div className="text-xs font-extrabold uppercase tracking-widest text-[#10b981] mb-6 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#10b981]" /> Visual Preview
+                <div className="text-xs font-extrabold uppercase tracking-widest text-[#e12029] mb-6 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#e12029]" /> Visual Preview
                 </div>
                 <div className="aspect-square bg-slate-50 rounded-2xl flex items-center justify-center relative border border-slate-200 overflow-hidden mb-6 shadow-inner">
                   {logoPreview ? (
@@ -114,8 +114,8 @@ export default function InstallersPage() {
               </div>
 
               <div className="glass shadow-sm rounded-3xl p-8 border border-white">
-                <div className="text-xs font-extrabold uppercase tracking-widest text-[#10b981] mb-6 flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#10b981]" /> Partner Benefits
+                <div className="text-xs font-extrabold uppercase tracking-widest text-[#e12029] mb-6 flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-[#e12029]" /> Partner Benefits
                 </div>
                 <ul className="space-y-4">
                   {[
@@ -140,7 +140,7 @@ export default function InstallersPage() {
 
       <footer className="glass border-t border-white/50 w-full py-8 mt-auto flex flex-col md:flex-row items-center justify-between px-6 md:px-12 relative z-10">
         <div className="text-xs font-bold uppercase tracking-widest text-slate-400">
-          © 2026 MySolar PV
+          © 2026 Solar PV
         </div>
         <nav className="flex gap-8 mt-4 md:mt-0">
           <Link href="/" className="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-primary transition-colors">
