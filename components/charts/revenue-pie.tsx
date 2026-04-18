@@ -30,7 +30,7 @@ export function RevenuePie({ data }: RevenuePieProps) {
         textStyle: { color: '#363636' },
         borderRadius: 16,
         padding: [12, 16],
-        extraCssText: 'box-shadow: 0 4px 24px rgba(0,0,0,0.06); backdrop-filter: blur(8px);'
+        extraCssText: 'box-: 0 4px 24px rgba(0,0,0,0.06); backdrop-filter: blur(8px);'
       },
       legend: {
         bottom: '0%',
@@ -94,7 +94,7 @@ export function RevenuePie({ data }: RevenuePieProps) {
       option={option} 
       style={{ height: '350px', width: '100%' }} 
       opts={{ renderer: 'svg' }}
-      className="transition-all duration-300"
+      className=" "
     />
   );
 }

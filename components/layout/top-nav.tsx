@@ -6,7 +6,6 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCalculatorStore } from '@/store/calculatorStore';
 import { RotateCcw } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 export function TopNav() {
   const router = useRouter();
@@ -27,13 +26,10 @@ export function TopNav() {
   };
 
   return (
-    <motion.nav 
-      initial={{ y: -100 }}
-      animate={{ y: 0 }}
-      transition={{ type: "spring", stiffness: 100, damping: 20 }}
-      className={`fixed top-0 z-50 flex justify-between items-center px-6 md:px-8 transition-all duration-300 ${
+    <nav 
+         className={`fixed top-0 z-50 flex justify-between items-center px-6 md:px-8   ${
         isScrolled 
-          ? 'glass shadow-apple max-w-5xl mx-auto left-4 right-4 top-4 rounded-3xl py-3 border border-[#dfdfdf]/50' 
+          ? 'glass  max-w-5xl mx-auto left-4 right-4 top-4  py-3 border border-[#dfdfdf]/50' 
           : 'w-full py-6 left-0 right-0 bg-transparent'
       }`}
     >
@@ -44,7 +40,7 @@ export function TopNav() {
           alt="MySolar-PV Logo" 
           width={120} 
           height={32} 
-          className="h-6 md:h-8 w-auto object-contain transition-all hover:scale-105 opacity-80" 
+          className="h-6 md:h-8 w-auto object-contain   opacity-80" 
         />
         <div className="w-[1px] h-6 bg-[#dfdfdf]"></div>
         <Image 
@@ -52,19 +48,19 @@ export function TopNav() {
           alt="Ngen Logo" 
           width={100} 
           height={32} 
-          className="h-6 md:h-8 w-auto object-contain transition-all hover:scale-105 opacity-80" 
+          className="h-6 md:h-8 w-auto object-contain   opacity-80" 
         />
       </Link>
       
       <div className="flex items-center justify-end">
         <button 
           onClick={handleReset} 
-          className="group flex items-center justify-center gap-2 px-4 py-2 rounded-full hover:bg-[#ffffff] transition-colors duration-200 text-[#565656] hover:text-[#e12029]"
+          className="group flex items-center justify-center gap-2 px-4 py-2  hover:bg-[#ffffff]   text-[#565656] hover:text-[#e12029]"
         >
-          <RotateCcw className="w-4 h-4 transition-transform group-hover:-rotate-90" />
+          <RotateCcw className="w-4 h-4  group-hover:-rotate-90" />
           <span className="hidden md:inline font-bold uppercase tracking-widest text-[10px]">Reset</span>
         </button>
       </div>
-    </motion.nav>
+    </nav>
   );
 }

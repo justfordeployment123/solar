@@ -30,9 +30,9 @@
   --radius-xl: 24px;
   --radius-full: 9999px;
   
-  --shadow-apple: 0 4px 24px rgba(0,0,0,0.06);
-  --shadow-apple-hover: 0 10px 40px rgba(0,0,0,0.1);
-  --shadow-apple-glass: 0 8px 32px rgba(0,0,0,0.08);
+  --: 0 4px 24px rgba(0,0,0,0.06);
+  --: 0 10px 40px rgba(0,0,0,0.1);
+  --: 0 8px 32px rgba(0,0,0,0.08);
 }
 
 body {
@@ -57,7 +57,7 @@ body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: var(--shadow-apple-glass);
+  box-: var(--);
 }
 
 .glass-dark {
@@ -65,7 +65,7 @@ body {
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: var(--shadow-apple-glass);
+  box-: var(--);
 }
 
 /* Gradients */

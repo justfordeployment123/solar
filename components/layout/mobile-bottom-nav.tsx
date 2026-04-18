@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 
 interface Step {
   id: string;
@@ -18,7 +17,7 @@ interface MobileBottomNavProps {
 export function MobileBottomNav({ steps, currentStepIndex }: MobileBottomNavProps) {
   return (
     <div className="lg:hidden fixed bottom-6 left-6 right-6 z-50 pointer-events-none">
-      <div className="glass shadow-apple-hover rounded-[2rem] px-4 py-3 flex justify-between items-center pointer-events-auto border border-white/50 bg-white/70">
+      <div className="glass  ] px-4 py-3 flex justify-between items-center pointer-events-auto border border-white/50 bg-white/70">
         {steps.map((step, index) => {
           const isActive = index === currentStepIndex;
           const StepIcon = step.icon;
@@ -26,25 +25,20 @@ export function MobileBottomNav({ steps, currentStepIndex }: MobileBottomNavProp
             <Link 
               key={step.id} 
               href={`#${step.id}`}
-              className="relative flex flex-col items-center justify-center p-2 rounded-2xl flex-1"
+              className="relative flex flex-col items-center justify-center p-2  flex-1"
             >
               {isActive && (
-                <motion.div 
-                  layoutId="mobile-active-bg"
-                  className="absolute inset-0 bg-white shadow-sm rounded-2xl -z-10 border border-[#ffffff]"
-                  transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                />
+                <div 
+                  
+                  className="absolute inset-0 bg-white   -z-10 border border-[#ffffff]"
+                   />
               )}
-              <motion.div 
-                animate={{ 
-                  color: isActive ? 'var(--color-primary)' : '#565656',
-                  scale: isActive ? 1.1 : 1
-                }}
-                className="mb-1"
+              <div 
+                 className="mb-1"
               >
                 <StepIcon strokeWidth={isActive ? 2.5 : 2} size={22} />
-              </motion.div>
-              <span className={`text-[10px] font-bold tracking-tight transition-colors ${
+              </div>
+              <span className={`text-[10px] font-bold tracking-tight  ${
                 isActive ? 'text-primary' : 'text-[#565656]'
               }`}>
                 {step.title}

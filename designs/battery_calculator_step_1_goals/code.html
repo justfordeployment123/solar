@@ -86,10 +86,10 @@
 <div class="text-xl font-bold uppercase tracking-tighter text-black">Battery Storage</div>
 <div class="hidden md:flex gap-10">
 <a class="text-black font-bold border-b-2 border-black pb-1 font-inter tracking-tight" href="#">Status</a>
-<a class="text-neutral-500 hover:text-black transition-colors duration-200 font-inter tracking-tight" href="#">Resources</a>
-<a class="text-neutral-500 hover:text-black transition-colors duration-200 font-inter tracking-tight" href="#">Support</a>
+<a class="text-neutral-500 hover:text-black   font-inter tracking-tight" href="#">Resources</a>
+<a class="text-neutral-500 hover:text-black   font-inter tracking-tight" href="#">Support</a>
 </div>
-<button class="bg-black text-white px-6 py-2 font-bold hover:bg-white hover:text-black border border-black transition-all duration-200">
+<button class="bg-black text-white px-6 py-2 font-bold hover:bg-white hover:text-black border border-black  ">
             Save Progress
         </button>
 </nav>
@@ -101,24 +101,24 @@
 <p class="text-xs text-neutral-500 uppercase tracking-widest mt-1">Step 1 of 4</p>
 </div>
 <nav class="flex flex-col gap-4 flex-1">
-<a class="flex items-center gap-3 p-3 text-black font-bold bg-white border border-black transition-transform duration-200 translate-x-1" href="#">
+<a class="flex items-center gap-3 p-3 text-black font-bold bg-white border border-black   translate-x-1" href="#">
 <span class="material-symbols-outlined" data-icon="bolt">bolt</span>
 <span class="text-sm">Load Profile</span>
 </a>
-<a class="flex items-center gap-3 p-3 text-neutral-400 hover:bg-neutral-200 transition-colors" href="#">
+<a class="flex items-center gap-3 p-3 text-neutral-400 hover:bg-neutral-200 " href="#">
 <span class="material-symbols-outlined" data-icon="battery_full">battery_full</span>
 <span class="text-sm">Storage Capacity</span>
 </a>
-<a class="flex items-center gap-3 p-3 text-neutral-400 hover:bg-neutral-200 transition-colors" href="#">
+<a class="flex items-center gap-3 p-3 text-neutral-400 hover:bg-neutral-200 " href="#">
 <span class="material-symbols-outlined" data-icon="settings_input_component">settings_input_component</span>
 <span class="text-sm">Inverter Specs</span>
 </a>
-<a class="flex items-center gap-3 p-3 text-neutral-400 hover:bg-neutral-200 transition-colors" href="#">
+<a class="flex items-center gap-3 p-3 text-neutral-400 hover:bg-neutral-200 " href="#">
 <span class="material-symbols-outlined" data-icon="analytics">analytics</span>
 <span class="text-sm">Summary</span>
 </a>
 </nav>
-<button class="mt-auto pt-8 text-neutral-500 text-xs font-bold uppercase tracking-widest hover:text-black transition-colors text-left">
+<button class="mt-auto pt-8 text-neutral-500 text-xs font-bold uppercase tracking-widest hover:text-black  text-left">
                 Reset Data
             </button>
 </aside>
@@ -139,73 +139,73 @@
 <!-- Questionnaire Section -->
 <section class="space-y-12">
 <!-- Option 1 -->
-<label class="group flex items-start justify-between cursor-pointer border-b border-outline-variant/30 pb-8 transition-colors hover:border-primary">
+<label class="group flex items-start justify-between cursor-pointer border-b border-outline-variant/30 pb-8  hover:border-primary">
 <div class="flex-1 pr-10">
 <span class="block text-xl font-bold text-black mb-2">Self-Consumption</span>
 <p class="text-sm text-neutral-500">Prioritize using solar energy locally to reduce dependence on external suppliers.</p>
 </div>
-<div class="relative inline-flex items-center h-6 w-12 border border-black bg-white group-active:scale-95 transition-transform">
+<div class="relative inline-flex items-center h-6 w-12 border border-black bg-white group-active:scale-95 ">
 <input checked="" class="sr-only peer" type="checkbox"/>
-<div class="peer-checked:bg-black w-full h-full absolute transition-colors"></div>
-<div class="absolute left-1 top-1 bg-black w-4 h-4 transition-transform peer-checked:translate-x-6 peer-checked:bg-white"></div>
+<div class="peer-checked:bg-black w-full h-full absolute "></div>
+<div class="absolute left-1 top-1 bg-black w-4 h-4  peer-checked:translate-x-6 peer-checked:bg-white"></div>
 </div>
 </label>
 <!-- Option 2 -->
-<label class="group flex items-start justify-between cursor-pointer border-b border-outline-variant/30 pb-8 transition-colors hover:border-primary">
+<label class="group flex items-start justify-between cursor-pointer border-b border-outline-variant/30 pb-8  hover:border-primary">
 <div class="flex-1 pr-10">
 <span class="block text-xl font-bold text-black mb-2">Peak Shaving</span>
 <p class="text-sm text-neutral-500">Reduce power demand charges by discharging the battery during peak load periods.</p>
 </div>
-<div class="relative inline-flex items-center h-6 w-12 border border-black bg-white group-active:scale-95 transition-transform">
+<div class="relative inline-flex items-center h-6 w-12 border border-black bg-white group-active:scale-95 ">
 <input class="sr-only peer" type="checkbox"/>
-<div class="peer-checked:bg-black w-full h-full absolute transition-colors"></div>
-<div class="absolute left-1 top-1 bg-black w-4 h-4 transition-transform peer-checked:translate-x-6 peer-checked:bg-white"></div>
+<div class="peer-checked:bg-black w-full h-full absolute "></div>
+<div class="absolute left-1 top-1 bg-black w-4 h-4  peer-checked:translate-x-6 peer-checked:bg-white"></div>
 </div>
 </label>
 <!-- Option 3: With Disclaimer -->
-<label class="group flex items-start justify-between cursor-pointer border-b border-outline-variant/30 pb-8 transition-colors hover:border-primary">
+<label class="group flex items-start justify-between cursor-pointer border-b border-outline-variant/30 pb-8  hover:border-primary">
 <div class="flex-1 pr-10">
 <span class="block text-xl font-bold text-black mb-2">Grid Balancing (PRL/SRL)</span>
 <p class="text-sm text-neutral-500 mb-3">Provide frequency control reserves to the national grid operator.</p>
 <p class="text-xs italic text-neutral-400">Note: This revenue stream requires a generously dimensioned battery capacity.</p>
 </div>
-<div class="relative inline-flex items-center h-6 w-12 border border-black bg-white group-active:scale-95 transition-transform">
+<div class="relative inline-flex items-center h-6 w-12 border border-black bg-white group-active:scale-95 ">
 <input class="sr-only peer" type="checkbox"/>
-<div class="peer-checked:bg-black w-full h-full absolute transition-colors"></div>
-<div class="absolute left-1 top-1 bg-black w-4 h-4 transition-transform peer-checked:translate-x-6 peer-checked:bg-white"></div>
+<div class="peer-checked:bg-black w-full h-full absolute "></div>
+<div class="absolute left-1 top-1 bg-black w-4 h-4  peer-checked:translate-x-6 peer-checked:bg-white"></div>
 </div>
 </label>
 <!-- Option 4 -->
-<label class="group flex items-start justify-between cursor-pointer border-b border-outline-variant/30 pb-8 transition-colors hover:border-primary">
+<label class="group flex items-start justify-between cursor-pointer border-b border-outline-variant/30 pb-8  hover:border-primary">
 <div class="flex-1 pr-10">
 <span class="block text-xl font-bold text-black mb-2">Energy Trading (EPEX Arbitrage)</span>
 <p class="text-sm text-neutral-500">Buy energy when prices are low and sell when they are high on the spot market.</p>
 </div>
-<div class="relative inline-flex items-center h-6 w-12 border border-black bg-white group-active:scale-95 transition-transform">
+<div class="relative inline-flex items-center h-6 w-12 border border-black bg-white group-active:scale-95 ">
 <input class="sr-only peer" type="checkbox"/>
-<div class="peer-checked:bg-black w-full h-full absolute transition-colors"></div>
-<div class="absolute left-1 top-1 bg-black w-4 h-4 transition-transform peer-checked:translate-x-6 peer-checked:bg-white"></div>
+<div class="peer-checked:bg-black w-full h-full absolute "></div>
+<div class="absolute left-1 top-1 bg-black w-4 h-4  peer-checked:translate-x-6 peer-checked:bg-white"></div>
 </div>
 </label>
 <!-- Option 5 -->
-<label class="group flex items-start justify-between cursor-pointer border-b border-outline-variant/30 pb-8 transition-colors hover:border-primary">
+<label class="group flex items-start justify-between cursor-pointer border-b border-outline-variant/30 pb-8  hover:border-primary">
 <div class="flex-1 pr-10">
 <span class="block text-xl font-bold text-black mb-2">Join Virtual Power Plant (VPP)</span>
 <p class="text-sm text-neutral-500">Connect your asset to a decentralized pool of energy storage systems for collective market participation.</p>
 </div>
-<div class="relative inline-flex items-center h-6 w-12 border border-black bg-white group-active:scale-95 transition-transform">
+<div class="relative inline-flex items-center h-6 w-12 border border-black bg-white group-active:scale-95 ">
 <input class="sr-only peer" type="checkbox"/>
-<div class="peer-checked:bg-black w-full h-full absolute transition-colors"></div>
-<div class="absolute left-1 top-1 bg-black w-4 h-4 transition-transform peer-checked:translate-x-6 peer-checked:bg-white"></div>
+<div class="peer-checked:bg-black w-full h-full absolute "></div>
+<div class="absolute left-1 top-1 bg-black w-4 h-4  peer-checked:translate-x-6 peer-checked:bg-white"></div>
 </div>
 </label>
 </section>
 <!-- Navigation Footer -->
 <footer class="mt-24 pt-12 flex justify-between items-center border-t border-black">
-<button class="text-sm font-bold uppercase tracking-widest text-neutral-400 hover:text-black transition-colors">
+<button class="text-sm font-bold uppercase tracking-widest text-neutral-400 hover:text-black ">
                         Back
                     </button>
-<button class="bg-black text-white px-12 py-5 text-sm font-black uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black transition-all duration-300">
+<button class="bg-black text-white px-12 py-5 text-sm font-black uppercase tracking-[0.2em] border border-black hover:bg-white hover:text-black  ">
                         Next Step
                     </button>
 </footer>

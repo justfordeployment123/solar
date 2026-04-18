@@ -9,7 +9,6 @@ import { toPng } from "html-to-image";
 import { ReportDocument } from "@/components/pdf/report-document";
 import Link from "next/link";
 import { ArrowLeft, Download, Battery, Zap, Euro, TrendingUp } from "lucide-react";
-import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -34,17 +33,17 @@ const itemVariants = {
 
 function MetricCard({ title, value, subtitle, icon: Icon, color }: any) {
   return (
-    <motion.div variants={itemVariants} className="glass shadow-apple rounded-3xl p-6 relative overflow-hidden group hover:shadow-apple-hover transition-all">
-      <div className={`absolute top-0 right-0 w-32 h-32 rounded-full -mr-16 -mt-16 opacity-10 transition-transform group-hover:scale-150`} style={{ backgroundColor: color }} />
+    <div  className="glass   p-6 relative overflow-hidden group hover: ">
+      <div className={`absolute top-0 right-0 w-32 h-32  -mr-16 -mt-16 opacity-10  `} style={{ backgroundColor: color }} />
       <div className="flex justify-between items-start mb-4 relative z-10">
         <h3 className="text-sm font-bold uppercase tracking-widest text-[#565656]">{title}</h3>
-        <div className="p-2.5 rounded-xl text-white shadow-sm" style={{ backgroundColor: color }}>
+        <div className="p-2.5  text-white " style={{ backgroundColor: color }}>
           <Icon size={20} strokeWidth={2.5} />
         </div>
       </div>
       <p className="text-3xl md:text-4xl font-black text-[#363636] tracking-tight relative z-10 mb-1">{value}</p>
       <p className="text-sm font-semibold" style={{ color }}>{subtitle}</p>
-    </motion.div>
+    </div>
   );
 }
 
@@ -88,13 +87,11 @@ export default function ResultsPage() {
   if (!derivedResults) {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] px-8 text-center space-y-8">
-        <motion.div 
-          initial={{ scale: 0 }}
-          animate={{ scale: 1 }}
-          className="w-24 h-24 bg-[#ffffff] rounded-full flex items-center justify-center mb-4 text-[#e12029] shadow-sm"
+        <div 
+            className="w-24 h-24 bg-[#ffffff]  flex items-center justify-center mb-4 text-[#e12029] "
         >
           <Battery size={48} strokeWidth={1.5} />
-        </motion.div>
+        </div>
         <div className="space-y-4 max-w-md">
           <h2 className="text-4xl font-black tracking-tight text-[#363636]">Data Unavailable</h2>
           <p className="text-base text-[#565656] leading-relaxed">
@@ -110,13 +107,13 @@ export default function ResultsPage() {
 
   return (
     <div className="container mx-auto px-6 py-8 sm:px-8 space-y-12">
-      <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+      <div   className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <Link
             href="/calculator/step-3"
-            className="inline-flex items-center text-xs font-bold text-[#565656] hover:text-primary transition-colors uppercase tracking-widest mb-6 group"
+            className="inline-flex items-center text-xs font-bold text-[#565656] hover:text-primary  uppercase tracking-widest mb-6 group"
           >
-            <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
+            <ArrowLeft className="mr-2 h-4 w-4  " />
             Back to Finances
           </Link>
           <h1 className="text-4xl md:text-5xl font-black tracking-tight text-[#363636]">Your ROI Projection</h1>
@@ -125,9 +122,9 @@ export default function ResultsPage() {
           </p>
         </div>
         
-        <div className="glass p-6 rounded-3xl min-w-[280px] shadow-sm">
+        <div className="glass p-6  min-w-[280px] ">
           <label className="text-xs font-bold uppercase tracking-widest text-[#e12029] mb-2 block flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#e12029]" /> Battery Size Simulator
+            <div className="w-2 h-2  bg-[#e12029]" /> Battery Size Simulator
           </label>
           <div className="flex items-center gap-4">
             <input
@@ -137,16 +134,16 @@ export default function ResultsPage() {
               step="1"
               value={technical.currentBatteryCapacityKwh || 0}
               onChange={handleSliderChange}
-              className="w-full h-2 bg-[#dfdfdf] rounded-lg appearance-none cursor-pointer accent-primary"
+              className="w-full h-2 bg-[#dfdfdf]  appearance-none cursor-pointer accent-primary"
             />
             <span className="font-black text-xl text-[#363636] tabular-nums w-16 text-right">
               {technical.currentBatteryCapacityKwh || 0} <span className="text-sm font-medium text-[#565656]">kWh</span>
             </span>
           </div>
         </div>
-      </motion.div>
+      </div>
 
-      <motion.div variants={containerVariants} initial="hidden" animate="show" className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard 
           title="Net Present Value" 
           value={`€${((derivedResults.yearlyProjection[14]?.cumulative || 0) + (technical.currentBatteryCapacityKwh || 10) * 1000).toLocaleString()}`} 
@@ -175,26 +172,20 @@ export default function ResultsPage() {
           icon={Battery}
           color="#e12029"
         />
-      </motion.div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }} 
-          animate={{ opacity: 1, x: 0 }} 
-          transition={{ delay: 0.3 }}
-          className="lg:col-span-2 glass shadow-apple rounded-[2.5rem] p-8 border border-white"
+        <div 
+             className="lg:col-span-2 glass  ] p-8 border border-white"
         >
           <h2 className="text-xl font-extrabold text-[#363636] mb-8">Lifetime Cashflow Projection</h2>
-          <div ref={barRef} className="bg-white/50 rounded-2xl p-4">
+          <div ref={barRef} className="bg-white/50  p-4">
             <ProjectionChart data={derivedResults.yearlyProjection} />
           </div>
-        </motion.div>
+        </div>
 
-        <motion.div 
-          initial={{ opacity: 0, x: 20 }} 
-          animate={{ opacity: 1, x: 0 }} 
-          transition={{ delay: 0.4 }}
-          className="glass shadow-apple rounded-[2.5rem] p-8 border border-white flex flex-col"
+        <div 
+             className="glass  ] p-8 border border-white flex flex-col"
         >
           <h2 className="text-xl font-extrabold text-[#363636] mb-8">Revenue Breakdown</h2>
           <div ref={pieRef} className="flex-grow flex items-center justify-center -mt-4">
@@ -213,7 +204,7 @@ export default function ResultsPage() {
             </Button>
             
             {isClient && pieChartImage && barChartImage && (
-              <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+              <div   >
                 <PDFDownloadLink
                   document={
                     <ReportDocument
@@ -232,21 +223,19 @@ export default function ResultsPage() {
                     </Button>
                   )}
                 </PDFDownloadLink>
-              </motion.div>
+              </div>
             )}
           </div>
-        </motion.div>
+        </div>
       </div>
       
       <div className="pb-16 flex justify-center mt-12">
         <Link href="/installers" className="inline-block">
-          <motion.div 
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            className="bg-[#e12029] text-white px-10 py-5 rounded-full font-black text-lg uppercase tracking-widest shadow-apple-hover cursor-pointer"
+          <div 
+              className="bg-[#e12029] text-white px-10 py-5  font-black text-lg uppercase tracking-widest  cursor-pointer"
           >
             Find a Certified Installer
-          </motion.div>
+          </div>
         </Link>
       </div>
     </div>

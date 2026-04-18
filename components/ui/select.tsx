@@ -1,7 +1,6 @@
 "use client";
 
 import React from 'react';
-import { motion } from 'framer-motion';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -22,10 +21,8 @@ export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectE
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, options, className, ...props }, ref) => {
     return (
-      <motion.div 
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className={cn("group flex flex-col gap-1.5", className)}
+      <div 
+          className={cn("group flex flex-col gap-1.5", className)}
       >
         <label className="text-xs font-semibold uppercase tracking-wider text-[#565656] ml-1">
           {label}
@@ -33,7 +30,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
         <div className="relative">
           <select 
             ref={ref}
-            className="w-full bg-white border border-[#dfdfdf] rounded-xl py-3 px-4 pr-10 outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-[#363636] font-medium transition-all shadow-sm hover:shadow-md appearance-none cursor-pointer"
+            className="w-full bg-white border border-[#dfdfdf]  py-3 px-4 pr-10 outline-none focus:border-primary text-[#363636] font-medium   hover: appearance-none cursor-pointer"
             {...props}
           >
             {options.map((option) => (
@@ -48,7 +45,7 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
             </svg>
           </div>
         </div>
-      </motion.div>
+      </div>
     );
   }
 );

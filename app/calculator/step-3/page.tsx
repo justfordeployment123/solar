@@ -8,7 +8,6 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useCalculatorStore } from '@/store/calculatorStore';
 import { ArrowLeft, ChevronRight, Calculator } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -63,18 +62,15 @@ export default function Step3Page() {
     <div className="px-6 lg:px-12 pt-8 max-w-4xl mx-auto flex flex-col min-h-full">
       <ProgressHeader currentStep={3} totalSteps={3} title="Financial Inputs" description="Configure the financial parameters of your battery storage system to calculate your potential ROI." />
 
-      <motion.div 
-        variants={containerVariants}
-        initial="hidden"
-        animate="show"
-        className="my-8 flex-grow"
+      <div 
+         className="my-8 flex-grow"
       >
-        <section className="bg-white/80 backdrop-blur-xl border border-[#ffffff] shadow-apple rounded-3xl p-8 lg:p-12 mb-12">
-          <motion.h3 variants={itemVariants} className="text-xs font-extrabold uppercase tracking-widest text-[#e12029] mb-8 flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#e12029]" /> Financial Metrics
-          </motion.h3>
+        <section className="bg-white/80 backdrop-blur-xl border border-[#ffffff]   p-8 lg:p-12 mb-12">
+          <h3  className="text-xs font-extrabold uppercase tracking-widest text-[#e12029] mb-8 flex items-center gap-2">
+            <div className="w-2 h-2  bg-[#e12029]" /> Financial Metrics
+          </h3>
           <div className="space-y-8 max-w-md">
-            <motion.div variants={itemVariants}>
+            <div  >
               <Input 
                 label="Current Electricity Price (€/kWh)" 
                 type="number" 
@@ -83,8 +79,8 @@ export default function Step3Page() {
                 value={financial.currentElectricityPriceCentsKwh ?? ''}
                 onChange={handleInputChange('currentElectricityPriceCentsKwh')}
               />
-            </motion.div>
-            <motion.div variants={itemVariants}>
+            </div>
+            <div  >
               <Input 
                 label="Annual Electricity Bill (€)" 
                 type="number" 
@@ -92,8 +88,8 @@ export default function Step3Page() {
                 value={financial.yearlyElectricityBillEur ?? ''}
                 onChange={handleInputChange('yearlyElectricityBillEur')}
               />
-            </motion.div>
-            <motion.div variants={itemVariants}>
+            </div>
+            <div  >
               <Input 
                 label="Target Budget (€)" 
                 type="number" 
@@ -101,9 +97,9 @@ export default function Step3Page() {
                 value={financial.targetBudgetEur ?? ''}
                 onChange={handleInputChange('targetBudgetEur')}
               />
-            </motion.div>
+            </div>
             
-            <motion.label variants={itemVariants} className="flex items-center space-x-4 cursor-pointer mt-8 p-4 rounded-2xl hover:bg-[#ffffff] transition-colors border border-transparent hover:border-[#ffffff] group">
+            <label  className="flex items-center space-x-4 cursor-pointer mt-8 p-4  hover:bg-[#ffffff]  border border-transparent hover:border-[#ffffff] group">
               <div className="relative flex items-center justify-center">
                 <input 
                   type="checkbox"
@@ -111,33 +107,31 @@ export default function Step3Page() {
                   checked={financial.vppParticipationEnabled}
                   onChange={handleInputChange('vppParticipationEnabled')}
                 />
-                <div className="w-6 h-6 border-2 border-[#dfdfdf] rounded-lg peer-checked:bg-primary peer-checked:border-primary transition-colors flex items-center justify-center text-white">
-                  <motion.svg 
-                    initial={false}
-                    animate={{ scale: financial.vppParticipationEnabled ? 1 : 0, opacity: financial.vppParticipationEnabled ? 1 : 0 }}
-                    className="w-4 h-4" 
+                <div className="w-6 h-6 border-2 border-[#dfdfdf] peer-checked:bg-primary peer-checked:border-primary flex items-center justify-center text-white">
+                  <svg 
+                    className={`w-4 h-4 ${financial.vppParticipationEnabled ? 'opacity-100' : 'opacity-0'}`}
                     fill="none" 
                     viewBox="0 0 24 24" 
                     stroke="currentColor" 
                     strokeWidth={3}
                   >
                     <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                  </motion.svg>
+                  </svg>
                 </div>
               </div>
-              <span className="text-sm font-bold text-[#363636] uppercase tracking-widest group-hover:text-primary transition-colors">
+              <span className="text-sm font-bold text-[#363636] uppercase tracking-widest group-hover:text-primary ">
                 Enable VPP Participation
               </span>
-            </motion.label>
+            </label>
           </div>
         </section>
-      </motion.div>
+      </div>
 
       <footer className="mt-8 mb-12 flex justify-between items-center py-6 border-t border-[#dfdfdf] w-full mt-auto">
-        <Link href="/calculator/step-2" className="text-sm font-bold uppercase tracking-widest text-[#565656] hover:text-primary transition-colors flex items-center gap-2 group">
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back
+        <Link href="/calculator/step-2" className="text-sm font-bold uppercase tracking-widest text-[#565656] hover:text-primary  flex items-center gap-2 group">
+          <ArrowLeft className="w-4 h-4  " /> Back
         </Link>
-        <Button variant="primary" onClick={handleNext} className="gap-2 pr-6 pl-5 shadow-apple-hover text-base uppercase tracking-widest bg-[#e12029] text-white border-transparent hover:opacity-90">
+        <Button variant="primary" onClick={handleNext} className="gap-2 pr-6 pl-5  text-base uppercase tracking-widest bg-[#e12029] text-white border-transparent hover:opacity-90">
           <Calculator className="w-5 h-5 mr-1" /> Calculate Results
         </Button>
       </footer>

@@ -9,7 +9,6 @@ import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { useCalculatorStore } from '@/store/calculatorStore';
 import { UploadCloud, ArrowLeft, ChevronRight } from 'lucide-react';
-import { motion } from 'framer-motion';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -61,17 +60,14 @@ export default function Step2Page() {
       <ProgressHeader currentStep={2} totalSteps={3} title="System Details" description="Configure the technical parameters of your solar and battery storage system." />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-24 my-8 flex-grow">
-        <motion.section 
-          variants={containerVariants}
-          initial="hidden"
-          animate="show"
-          className="flex flex-col gap-6"
+        <section 
+           className="flex flex-col gap-6"
         >
-          <motion.h3 variants={itemVariants} className="text-xs font-extrabold uppercase tracking-widest text-primary mb-2 flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-primary" /> Technical Specs
-          </motion.h3>
+          <h3  className="text-xs font-extrabold uppercase tracking-widest text-primary mb-2 flex items-center gap-2">
+            <div className="w-2 h-2  bg-primary" /> Technical Specs
+          </h3>
           <div className="space-y-6">
-            <motion.div variants={itemVariants}>
+            <div  >
               <Select 
                 label="Region" 
                 options={[
@@ -83,8 +79,8 @@ export default function Step2Page() {
                 value={technical.region || ''}
                 onChange={(e) => setTechnicalInputs({ region: e.target.value as any })}
               />
-            </motion.div>
-            <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4">
+            </div>
+            <div  className="grid grid-cols-2 gap-4">
               <Input 
                 label="PV Size (kWp)" 
                 type="number" 
@@ -99,8 +95,8 @@ export default function Step2Page() {
                 value={technical.annualConsumptionKwh ?? ''}
                 onChange={handleInputChange('annualConsumptionKwh')}
               />
-            </motion.div>
-            <motion.div variants={itemVariants}>
+            </div>
+            <div  >
               <Input 
                 label="Current Battery Capacity (kWh)" 
                 type="number" 
@@ -108,8 +104,8 @@ export default function Step2Page() {
                 value={technical.currentBatteryCapacityKwh ?? ''}
                 onChange={handleInputChange('currentBatteryCapacityKwh')}
               />
-            </motion.div>
-            <motion.div variants={itemVariants} className="grid grid-cols-2 gap-4">
+            </div>
+            <div  className="grid grid-cols-2 gap-4">
               <Input 
                 label="Inverter Power (kW)" 
                 type="number" 
@@ -124,33 +120,26 @@ export default function Step2Page() {
                 value={technical.gridConnectionLimitKw ?? ''}
                 onChange={handleInputChange('gridConnectionLimitKw')}
               />
-            </motion.div>
+            </div>
           </div>
-        </motion.section>
+        </section>
 
-        <motion.section 
-          initial={{ opacity: 0, x: 20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="flex flex-col gap-6"
+        <section 
+             className="flex flex-col gap-6"
         >
           <h3 className="text-xs font-extrabold uppercase tracking-widest text-[#e12029] mb-2 flex items-center gap-2">
-            <div className="w-2 h-2 rounded-full bg-[#e12029]" /> Smart Data
+            <div className="w-2 h-2  bg-[#e12029]" /> Smart Data
           </h3>
-          <motion.label 
-            whileHover={{ scale: 1.01 }}
-            whileTap={{ scale: 0.99 }}
-            htmlFor="csv-upload" 
-            className="flex-grow min-h-[300px] rounded-3xl border-2 border-dashed border-[#dfdfdf] bg-white/50 backdrop-blur-sm p-12 text-center flex flex-col items-center justify-center gap-6 hover:border-primary hover:bg-white transition-all cursor-pointer group shadow-sm hover:shadow-apple-glass"
+          <label 
+              htmlFor="csv-upload" 
+            className="flex-grow min-h-[300px]  border-2 border-dashed border-[#dfdfdf] bg-white/50 backdrop-blur-sm p-12 text-center flex flex-col items-center justify-center gap-6 hover:border-primary hover:bg-white  cursor-pointer group  hover:"
           >
             <input type="file" accept=".csv" id="csv-upload" className="hidden" />
-            <div className="w-20 h-20 rounded-full bg-[#ffffff] flex items-center justify-center border-2 border-[#ffffff] group-hover:border-primary/20 group-hover:bg-primary/5 transition-colors relative overflow-hidden">
-               <motion.div 
-                 animate={{ y: [0, -5, 0] }}
-                 transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-               >
-                 <UploadCloud className="w-8 h-8 text-[#565656] group-hover:text-primary transition-colors" />
-               </motion.div>
+            <div className="w-20 h-20  bg-[#ffffff] flex items-center justify-center border-2 border-[#ffffff] group-hover:border-primary/20 group-hover:bg-primary/5  relative overflow-hidden">
+               <div 
+                   >
+                 <UploadCloud className="w-8 h-8 text-[#565656] group-hover:text-primary " />
+               </div>
             </div>
             <div>
               <p className="text-lg font-bold text-[#363636] mb-1">Upload Load Profile</p>
@@ -159,16 +148,16 @@ export default function Step2Page() {
             <p className="text-sm text-[#565656] max-w-[250px] leading-relaxed">
               Upload your historical 15-minute interval smart meter data to get maximum precision out of your projections.
             </p>
-          </motion.label>
-        </motion.section>
+          </label>
+        </section>
 
       </div>
 
       <footer className="mt-8 mb-12 flex justify-between items-center py-6 border-t border-[#dfdfdf] w-full mt-auto">
-        <Link href="/calculator/step-1" className="text-sm font-bold uppercase tracking-widest text-[#565656] hover:text-primary transition-colors flex items-center gap-2 group">
-          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Back
+        <Link href="/calculator/step-1" className="text-sm font-bold uppercase tracking-widest text-[#565656] hover:text-primary  flex items-center gap-2 group">
+          <ArrowLeft className="w-4 h-4  " /> Back
         </Link>
-        <Button variant="primary" onClick={handleNext} className="gap-2 pr-4 shadow-apple text-base uppercase tracking-widest bg-[#363636] text-white hover:bg-primary border-transparent">
+        <Button variant="primary" onClick={handleNext} className="gap-2 pr-4  text-base uppercase tracking-widest bg-[#363636] text-white hover:bg-primary border-transparent">
           Next Step <ChevronRight className="w-5 h-5" />
         </Button>
       </footer>

@@ -2,7 +2,6 @@
 
 import React from 'react';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
 import { RotateCcw } from 'lucide-react';
 
 interface Step {
@@ -21,29 +20,21 @@ export function SideNav({ steps, currentStepIndex }: SideNavProps) {
   return (
     <aside className="hidden lg:flex flex-col h-[calc(100vh-88px)] w-72 bg-white border-r border-[#dfdfdf] p-8 sticky top-[88px] overflow-y-auto">
       <div className="mb-10">
-        <motion.div 
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="text-xs font-bold text-primary uppercase tracking-widest mb-2"
+        <div 
+            className="text-xs font-bold text-primary uppercase tracking-widest mb-2"
         >
           Calculator
-        </motion.div>
-        <motion.h2 
-          initial={{ opacity: 0, x: -20 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: 0.1 }}
-          className="text-2xl font-black text-[#363636] tracking-tight"
+        </div>
+        <h2 
+             className="text-2xl font-black text-[#363636] tracking-tight"
         >
           Steps Overview
-        </motion.h2>
-        <motion.p 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-          className="text-sm text-[#565656] mt-2 font-medium"
+        </h2>
+        <p 
+             className="text-sm text-[#565656] mt-2 font-medium"
         >
           Step {currentStepIndex + 1} of {steps.length}
-        </motion.p>
+        </p>
       </div>
 
       <nav className="flex flex-col gap-2 flex-grow">
@@ -55,24 +46,23 @@ export function SideNav({ steps, currentStepIndex }: SideNavProps) {
             <Link 
               key={step.id} 
               href={`#${step.id}`}
-              className={`relative flex items-center gap-4 p-4 rounded-2xl transition-all duration-300 group ${
+              className={`relative flex items-center gap-4 p-4    group ${
                 isActive 
-                  ? 'text-primary bg-primary/5 font-bold shadow-sm' 
+                  ? 'text-primary bg-primary/5 font-bold ' 
                   : isPast 
                     ? 'text-[#565656] hover:bg-[#ffffff]' 
                     : 'text-[#565656] hover:bg-[#ffffff]'
               }`}
             >
               {isActive && (
-                <motion.div 
-                  layoutId="active-indicator"
-                  className="absolute inset-0 bg-white rounded-2xl border border-primary/20 shadow-apple-hover -z-10"
-                  transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                />
+                <div 
+                  
+                  className="absolute inset-0 bg-white  border border-primary/20  -z-10"
+                   />
               )}
               
-              <div className={`flex items-center justify-center w-8 h-8 rounded-full transition-colors ${
-                isActive ? 'bg-primary text-white shadow-md' : isPast ? 'bg-[#dfdfdf] text-[#565656]' : 'bg-[#ffffff] text-[#565656]'
+              <div className={`flex items-center justify-center w-8 h-8   ${
+                isActive ? 'bg-primary text-white ' : isPast ? 'bg-[#dfdfdf] text-[#565656]' : 'bg-[#ffffff] text-[#565656]'
               }`}>
                 <step.icon className="w-4 h-4" />
               </div>
@@ -82,19 +72,17 @@ export function SideNav({ steps, currentStepIndex }: SideNavProps) {
         })}
       </nav>
 
-      <motion.button 
-        whileHover={{ scale: 1.02 }}
-        whileTap={{ scale: 0.98 }}
-        onClick={() => {
+      <button 
+          onClick={() => {
           if (window.confirm("Are you sure you want to reset data?")) {
             window.location.href = '/';
           }
         }} 
-        className="mt-8 flex items-center justify-center gap-2 py-4 border-2 border-[#dfdfdf] text-[#565656] text-xs font-bold hover:bg-[#ffffff] transition-colors uppercase tracking-widest rounded-2xl group"
+        className="mt-8 flex items-center justify-center gap-2 py-4 border-2 border-[#dfdfdf] text-[#565656] text-xs font-bold hover:bg-[#ffffff]  uppercase tracking-widest  group"
       >
-        <RotateCcw className="w-4 h-4 group-hover:-rotate-90 transition-transform" />
+        <RotateCcw className="w-4 h-4 group-hover:-rotate-90 " />
         Reset Data
-      </motion.button>
+      </button>
     </aside>
   );
 }

@@ -26,7 +26,7 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
         textStyle: { color: '#363636' },
         borderRadius: 16,
         padding: [16, 20],
-        extraCssText: 'box-shadow: 0 8px 32px rgba(0,0,0,0.08); backdrop-filter: blur(12px);',
+        extraCssText: 'box-: 0 8px 32px rgba(0,0,0,0.08); backdrop-filter: blur(12px);',
         formatter: function (params: any) {
           let str = `<div style="font-weight: bold; margin-bottom: 8px;">${params[0].name}</div>`;
           params.forEach((param: any) => {
@@ -121,7 +121,7 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
     <ReactECharts 
       option={option} 
       style={{ height: '400px', width: '100%' }} 
-      className="transition-all duration-500"
+      className=" "
     />
   );
 }
