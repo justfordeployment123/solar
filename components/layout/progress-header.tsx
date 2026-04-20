@@ -23,7 +23,7 @@ export function ProgressHeader({ currentStep, totalSteps, title, description }: 
         <div className="h-1.5 flex-1 bg-[#dfdfdf]  overflow-hidden relative">
           <div 
             className="absolute top-0 left-0 h-full bg-primary"
-             animate={{ width: `${progressPercentage}%` }}
+             style={{ width: `${progressPercentage}%` }}
              />
         </div>
       </div>
