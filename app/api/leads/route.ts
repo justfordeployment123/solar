@@ -6,9 +6,9 @@ import { Resend } from 'resend';
 const resend = new Resend(process.env.RESEND_API_KEY || 're_mock_key');
 
 const leadSchema = z.object({
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
-  email: z.string().email('Invalid email address'),
+  firstName: z.string().min(1, 'Vorname ist erforderlich'),
+  lastName: z.string().min(1, 'Nachname ist erforderlich'),
+  email: z.string().email('Ungültige E-Mail-Adresse'),
   phone: z.string().optional(),
   persona: z.string().optional(),
   calculationSnapshot: z.any().optional(),
@@ -29,13 +29,13 @@ export async function POST(request: Request) {
     // Honeypot spam protection
     if (data.honeypot) {
       // Return 200 early to fool bots
-      return NextResponse.json({ success: true, message: 'Lead submitted successfully' }, { status: 200 });
+      return NextResponse.json({ success: true, message: 'Anfrage erfolgreich gesendet' }, { status: 200 });
     }
 
     const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
     if (supabaseUrl === 'your_supabase_url' || supabaseUrl.includes('mock.supabase')) {
       console.log('Mocking db insert for lead');
-      return NextResponse.json({ success: true, message: 'Mock Lead submitted successfully' }, { status: 200 });
+      return NextResponse.json({ success: true, message: 'Mock-Anfrage erfolgreich gesendet' }, { status: 200 });
     }
     const supabase = createServerSupabaseClient();
 
@@ -57,12 +57,12 @@ export async function POST(request: Request) {
     if (process.env.RESEND_API_KEY) {
       try {
         await resend.emails.send({
-          from: 'Battery Calculator <onboarding@resend.dev>',
+          from: 'Batterie-Rechner <onboarding@resend.dev>',
           to: [data.email],
-          subject: 'Your Battery Storage Calculation Results',
-          html: `<p>Hi ${data.firstName},</p>
-                 <p>Thank you for using our Battery Storage Calculator! We have received your request and will follow up with you shortly regarding you calculation.</p>
-                 <p>Best regards,<br/>SolarPV</p>`,
+          subject: 'Ihre Ergebnisse der Batteriespeicher-Berechnung',
+          html: `<p>Hallo ${data.firstName},</p>
+                 <p>vielen Dank für die Nutzung unseres Batteriespeicher-Rechners! Wir haben Ihre Anfrage erhalten und werden uns in Kürze bezüglich Ihrer Berechnung bei Ihnen melden.</p>
+                 <p>Mit freundlichen Grüßen,<br/>SolarPV</p>`,
         });
       } catch (emailError) {
         console.error('Resend error:', emailError);
@@ -72,9 +72,9 @@ export async function POST(request: Request) {
       console.log('No RESEND_API_KEY found. Mock email sent to', data.email);
     }
 
-    return NextResponse.json({ success: true, message: 'Lead submitted successfully' });
+    return NextResponse.json({ success: true, message: 'Anfrage erfolgreich gesendet' });
   } catch (error) {
     console.error('Server error in /api/leads:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Interner Serverfehler' }, { status: 500 });
   }
 }

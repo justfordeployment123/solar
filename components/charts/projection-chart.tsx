@@ -13,7 +13,7 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
   const option = useMemo(() => {
     if (!data || data.length === 0) return {};
 
-    const years = data.map(d => `Year ${d.year}`);
+    const years = data.map(d => `Jahr ${d.year}`);
     const cashflows = data.map(d => d.cashflow);
     const cumulatives = data.map(d => d.cumulative);
 
@@ -44,7 +44,7 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
         }
       },
       legend: {
-        data: ['Annual Cashflow', 'Cumulative Cashflow'],
+        data: ['Jährlicher Cashflow', 'Kumulierter Cashflow'],
         bottom: 0,
         textStyle: { color: '#565656', fontFamily: 'var(--font-opensans)' },
         itemGap: 24
@@ -66,14 +66,14 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
       yAxis: [
         {
           type: 'value',
-          name: 'Annual (€)',
+          name: 'Jährlich (€)',
           position: 'left',
           splitLine: { lineStyle: { type: 'dashed', color: '#dfdfdf' } },
           axisLabel: { color: '#565656', formatter: '€{value}' }
         },
         {
           type: 'value',
-          name: 'Cumulative (€)',
+          name: 'Kumuliert (€)',
           position: 'right',
           splitLine: { show: false },
           axisLabel: { color: '#565656', formatter: '€{value}' }
@@ -81,7 +81,7 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
       ],
       series: [
         {
-          name: 'Annual Cashflow',
+          name: 'Jährlicher Cashflow',
           type: 'bar',
           data: cashflows,
           itemStyle: {
@@ -96,7 +96,7 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
           animationDelay: function (idx: number) { return idx * 100; }
         },
         {
-          name: 'Cumulative Cashflow',
+          name: 'Kumulierter Cashflow',
           type: 'line',
           yAxisIndex: 1,
           data: cumulatives,
@@ -114,7 +114,7 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
   }, [data]);
 
   if (!data || data.length === 0) {
-    return <div className="flex items-center justify-center h-[350px] text-[#565656] font-medium">No projection data available</div>;
+    return <div className="flex items-center justify-center h-[350px] text-[#565656] font-medium">Keine Prognosedaten verfügbar</div>;
   }
 
   return (

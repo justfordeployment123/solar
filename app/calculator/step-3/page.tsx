@@ -60,19 +60,19 @@ export default function Step3Page() {
 
   return (
     <div className="px-6 lg:px-12 pt-8 max-w-4xl mx-auto flex flex-col min-h-full">
-      <ProgressHeader currentStep={3} totalSteps={3} title="Financial Inputs" description="Configure the financial parameters of your battery storage system to calculate your potential ROI." />
+      <ProgressHeader currentStep={3} totalSteps={3} title="Finanzielle Kennzahlen" description="Konfigurieren Sie die finanziellen Parameter Ihres Batteriespeichersystems, um Ihren potenziellen ROI zu berechnen." />
 
       <div 
          className="my-8 flex-grow"
       >
         <section className="bg-white/80 backdrop-blur-xl border border-[#ffffff]   p-8 lg:p-12 mb-12">
           <h3  className="text-xs font-extrabold uppercase tracking-widest text-[#e12029] mb-8 flex items-center gap-2">
-            <div className="w-2 h-2  bg-[#e12029]" /> Financial Metrics
+            <div className="w-2 h-2  bg-[#e12029]" /> Finanzdaten
           </h3>
           <div className="space-y-8 max-w-md">
             <div  >
               <Input 
-                label="Current Electricity Price (€/kWh)" 
+                label="Aktueller Strompreis (€/kWh)" 
                 type="number" 
                 step="0.01" 
                 placeholder="0.35" 
@@ -82,7 +82,7 @@ export default function Step3Page() {
             </div>
             <div  >
               <Input 
-                label="Annual Electricity Bill (€)" 
+                label="Jährliche Stromkosten (€)" 
                 type="number" 
                 placeholder="2400" 
                 value={financial.yearlyElectricityBillEur ?? ''}
@@ -91,7 +91,7 @@ export default function Step3Page() {
             </div>
             <div  >
               <Input 
-                label="Target Budget (€)" 
+                label="Zielbudget (€)" 
                 type="number" 
                 placeholder="12500" 
                 value={financial.targetBudgetEur ?? ''}
@@ -120,7 +120,7 @@ export default function Step3Page() {
                 </div>
               </div>
               <span className="text-sm font-bold text-[#363636] uppercase tracking-widest group-hover:text-primary ">
-                Enable VPP Participation
+                VPP-Teilnahme aktivieren
               </span>
             </label>
           </div>
@@ -129,10 +129,10 @@ export default function Step3Page() {
 
       <footer className="mt-8 mb-12 flex justify-between items-center py-6 border-t border-[#dfdfdf] w-full mt-auto">
         <Link href="/calculator/step-2" className="text-sm font-bold uppercase tracking-widest text-[#565656] hover:text-primary  flex items-center gap-2 group">
-          <ArrowLeft className="w-4 h-4  " /> Back
+          <ArrowLeft className="w-4 h-4  " /> Zurück
         </Link>
         <Button variant="primary" onClick={handleNext} className="gap-2 pr-6 pl-5  text-base uppercase tracking-widest bg-[#e12029] text-white border-transparent hover:opacity-90">
-          <Calculator className="w-5 h-5 mr-1" /> Calculate Results
+          <Calculator className="w-5 h-5 mr-1" /> Ergebnisse berechnen
         </Button>
       </footer>
     </div>

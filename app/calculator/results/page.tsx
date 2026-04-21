@@ -95,13 +95,13 @@ export default function ResultsPage() {
           <Battery size={48} strokeWidth={1.5} />
         </div>
         <div className="space-y-4 max-w-md">
-          <h2 className="text-4xl font-black tracking-tight text-[#363636]">Data Unavailable</h2>
+          <h2 className="text-4xl font-black tracking-tight text-[#363636]">Daten nicht verfügbar</h2>
           <p className="text-base text-[#565656] leading-relaxed">
-            We couldn't find your calculation data. Please configure your system settings.
+            Wir konnten Ihre Berechnungsdaten nicht finden. Bitte konfigurieren Sie Ihre Systemeinstellungen.
           </p>
         </div>
         <Link href="/calculator/step-1">
-          <Button variant="primary" className="mt-4">Start Calculator</Button>
+          <Button variant="primary" className="mt-4">Rechner starten</Button>
         </Link>
       </div>
     );
@@ -116,17 +116,17 @@ export default function ResultsPage() {
             className="inline-flex items-center text-xs font-bold text-[#565656] hover:text-primary  uppercase tracking-widest mb-6 group"
           >
             <ArrowLeft className="mr-2 h-4 w-4  " />
-            Back to Finances
+            Zurück zu den Finanzen
           </Link>
-          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-[#363636]">Your ROI Projection</h1>
+          <h1 className="text-4xl md:text-5xl font-black tracking-tight text-[#363636]">Ihre ROI-Prognose</h1>
           <p className="text-[#565656] mt-4 text-lg max-w-xl">
-            Review the simulated financial performance of your custom battery solution over its projected lifespan.
+            Überprüfen Sie die simulierte finanzielle Performance Ihrer individuellen Batterielösung über deren prognostizierte Lebensdauer.
           </p>
         </div>
         
         <div className="glass p-6  min-w-[280px] ">
           <label className="text-xs font-bold uppercase tracking-widest text-[#e12029] mb-2 block flex items-center gap-2">
-            <div className="w-2 h-2  bg-[#e12029]" /> Battery Size Simulator
+            <div className="w-2 h-2  bg-[#e12029]" /> Batteriegröße-Simulator
           </label>
           <div className="flex items-center gap-4">
             <input
@@ -147,30 +147,30 @@ export default function ResultsPage() {
 
       <div  className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <MetricCard 
-          title="Net Present Value" 
+          title="Kapitalwert (NPV)" 
           value={`€${((derivedResults.yearlyProjection[14]?.cumulative || 0) + (technical.currentBatteryCapacityKwh || 10) * 1000).toLocaleString()}`} 
-          subtitle="Total Profit Over Lifetime" 
+          subtitle="Gesamtgewinn über Lebensdauer" 
           icon={TrendingUp}
           color="#565656"
         />
         <MetricCard 
-          title="Avg. Annual Return" 
+          title="Durchschn. Jahresertrag" 
           value={`€${Math.round(derivedResults.totalAnnualRevenue).toLocaleString()}`} 
-          subtitle="Combined Income & Savings" 
+          subtitle="Einnahmen & Einsparungen" 
           icon={Euro}
           color="#565656"
         />
         <MetricCard 
-          title="Autarky Rate" 
+          title="Autarkiegrad" 
           value={`${75}%`} 
-          subtitle="Grid Independence" 
+          subtitle="Netzunabhängigkeit" 
           icon={Zap}
           color="#565656"
         />
         <MetricCard 
-          title="Break-Even Year" 
-          value={`Year ${Math.ceil(derivedResults.paybackYears) || '-'}`} 
-          subtitle="Return on Investment" 
+          title="Amortisationsjahr" 
+          value={`Jahr ${Math.ceil(derivedResults.paybackYears) || '-'}`} 
+          subtitle="Kapitalrendite (ROI)" 
           icon={Battery}
           color="#e12029"
         />
@@ -180,7 +180,7 @@ export default function ResultsPage() {
         <div 
              className="lg:col-span-2 glass  ] p-8 border border-white"
         >
-          <h2 className="text-xl font-extrabold text-[#363636] mb-8">Lifetime Cashflow Projection</h2>
+          <h2 className="text-xl font-extrabold text-[#363636] mb-8">Cashflow-Prognose über die Lebensdauer</h2>
           <div ref={barRef} className="bg-white/50  p-4">
             <ProjectionChart data={derivedResults.yearlyProjection} />
           </div>
@@ -189,7 +189,7 @@ export default function ResultsPage() {
         <div 
              className="glass  ] p-8 border border-white flex flex-col"
         >
-          <h2 className="text-xl font-extrabold text-[#363636] mb-8">Revenue Breakdown</h2>
+          <h2 className="text-xl font-extrabold text-[#363636] mb-8">Einnahmen-Aufschlüsselung</h2>
           <div ref={pieRef} className="flex-grow flex items-center justify-center -mt-4">
             <RevenuePie data={derivedResults.annualRevenueByStream} />
           </div>
@@ -202,7 +202,7 @@ export default function ResultsPage() {
               disabled={isGeneratingImages}
               className="mb-4"
             >
-              {isGeneratingImages ? "Preparing Report..." : "Generate PDF Report"}
+              {isGeneratingImages ? "Bericht wird vorbereitet..." : "PDF-Bericht erstellen"}
             </Button>
             
             {isClient && pieChartImage && barChartImage && (
@@ -216,12 +216,12 @@ export default function ResultsPage() {
                       barChartImage={barChartImage}
                     />
                   }
-                  fileName="my-solar-battery-report.pdf"
+                  fileName="mein-solar-batterie-bericht.pdf"
                 >
                   {({ loading }: any) => (
                     <Button variant="outline" fullWidth className="border-2">
                        <Download className="w-4 h-4 mr-2" />
-                       {loading ? "Generating PDF..." : "Download PDF Now"}
+                       {loading ? "PDF wird generiert..." : "PDF jetzt herunterladen"}
                     </Button>
                   )}
                 </PDFDownloadLink>
@@ -236,13 +236,13 @@ export default function ResultsPage() {
           onClick={() => setIsModalOpen(true)}
           className="bg-[#363636] text-white px-10 py-5 font-black text-lg uppercase tracking-widest cursor-pointer"
         >
-          Request Personalized Offer
+          Individuelles Angebot anfordern
         </button>
         <Link href="/installers" className="inline-block">
           <div 
               className="bg-[#e12029] text-white px-10 py-5  font-black text-lg uppercase tracking-widest  cursor-pointer"
           >
-            Find a Certified Installer
+            Zertifizierten Installateur finden
           </div>
         </Link>
       </div>

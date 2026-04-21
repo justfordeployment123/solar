@@ -49,10 +49,10 @@ export default function LandingPage() {
              className="w-full text-center mb-10 md:mb-16"
         >
           <h1 className="text-[3rem] md:text-[4.5rem] font-bold leading-tight tracking-tight text-white mb-6 ">
-            Who are you?
+            Wer sind Sie?
           </h1>
           <p className="text-[0.95rem] md:text-[1.15rem] font-medium text-white max-w-2xl mx-auto bg-white/20 backdrop-blur-md py-3 px-6  border border-white/30  inline-block">
-            Select your profile below to tailor your energy storage experience.
+            Wählen Sie Ihr Profil aus, um Ihr Erlebnis mit dem Batteriespeicher-Rechner individuell anzupassen.
           </p>
         </div>
 
@@ -69,14 +69,14 @@ export default function LandingPage() {
                 <User className="w-6 h-6 md:w-7 md:h-7 text-[#e12029] group-hover:text-white  " />
               </div>
               <div>
-                <h3 className="text-xl md:text-2xl font-bold tracking-tight text-[#363636] mb-2 md:mb-3">Private Individual</h3>
+                <h3 className="text-xl md:text-2xl font-bold tracking-tight text-[#363636] mb-2 md:mb-3">Privatperson</h3>
                 <p className="text-sm md:text-base text-[#565656] font-medium leading-relaxed">
-                  I am a homeowner looking to optimize my energy usage and reduce my electricity bill.
+                  Ich bin ein Eigenheimbesitzer und möchte meinen Energieverbrauch optimieren sowie meine Stromrechnung senken.
                 </p>
               </div>
             </div>
             <div className="mt-6 md:mt-8 flex items-center text-[#e12029] font-bold uppercase tracking-widest text-xs md:text-sm">
-              <span>Continue</span>
+              <span>Weiter</span>
               <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-2   " />
             </div>
           </button>
@@ -91,14 +91,14 @@ export default function LandingPage() {
                 <Sun className="w-6 h-6 md:w-7 md:h-7 text-[#e12029] group-hover:text-white  " />
               </div>
               <div>
-                <h3 className="text-xl md:text-2xl font-bold tracking-tight text-[#363636] mb-2 md:mb-3">Solar Installer</h3>
+                <h3 className="text-xl md:text-2xl font-bold tracking-tight text-[#363636] mb-2 md:mb-3">Solarinstallateur</h3>
                 <p className="text-sm md:text-base text-[#565656] font-medium leading-relaxed">
-                  I am an installer or contractor registered to sell and configure photovoltaic systems.
+                  Ich bin ein Installateur oder Dienstleister, der für den Verkauf und die Konfiguration von Photovoltaikanlagen registriert ist.
                 </p>
               </div>
             </div>
             <div className="mt-6 md:mt-8 flex items-center text-[#e12029] font-bold uppercase tracking-widest text-xs md:text-sm">
-              <span>Continue</span>
+              <span>Weiter</span>
               <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-2   " />
             </div>
           </button>
@@ -113,14 +113,14 @@ export default function LandingPage() {
                 <Building className="w-6 h-6 md:w-7 md:h-7 text-[#e12029] group-hover:text-white  " />
               </div>
               <div>
-                <h3 className="text-xl md:text-2xl font-bold tracking-tight text-[#363636] mb-2 md:mb-3">Business</h3>
+                <h3 className="text-xl md:text-2xl font-bold tracking-tight text-[#363636] mb-2 md:mb-3">Unternehmen</h3>
                 <p className="text-sm md:text-base text-[#565656] font-medium leading-relaxed">
-                  I represent a company seeking large-scale energy storage solutions and grid services.
+                  Ich vertrete ein Unternehmen, das nach großflächigen Energiespeicherlösungen und Netzdienstleistungen sucht.
                 </p>
               </div>
             </div>
             <div className="mt-6 md:mt-8 flex items-center text-[#e12029] font-bold uppercase tracking-widest text-xs md:text-sm">
-              <span>Continue</span>
+              <span>Weiter</span>
               <ArrowRight className="w-4 h-4 md:w-5 md:h-5 ml-2   " />
             </div>
           </button>
@@ -135,7 +135,7 @@ export default function LandingPage() {
         </div>
         <nav className="flex gap-12 mt-4 md:mt-0">
           <a href="#" className="text-[0.75rem] font-bold uppercase tracking-widest text-[#e12029] opacity-70 hover:opacity-100  cursor-pointer">
-              Visit our homepage
+              Besuchen Sie unsere Homepage
           </a>
         </nav>
       </footer>

@@ -23,17 +23,17 @@ export function SideNav({ steps, currentStepIndex }: SideNavProps) {
         <div 
             className="text-xs font-bold text-primary uppercase tracking-widest mb-2"
         >
-          Calculator
+          Rechner
         </div>
         <h2 
              className="text-2xl font-black text-[#363636] tracking-tight"
         >
-          Steps Overview
+          Schritt-Übersicht
         </h2>
         <p 
              className="text-sm text-[#565656] mt-2 font-medium"
         >
-          Step {currentStepIndex + 1} of {steps.length}
+          Schritt {currentStepIndex + 1} von {steps.length}
         </p>
       </div>
 
@@ -74,14 +74,14 @@ export function SideNav({ steps, currentStepIndex }: SideNavProps) {
 
       <button 
           onClick={() => {
-          if (window.confirm("Are you sure you want to reset data?")) {
+          if (window.confirm("Sind Sie sicher, dass Sie alle Daten zurücksetzen möchten?")) {
             window.location.href = '/';
           }
         }} 
         className="mt-8 flex items-center justify-center gap-2 py-4 border-2 border-[#dfdfdf] text-[#565656] text-xs font-bold hover:bg-[#ffffff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary uppercase tracking-widest group"
       >
         <RotateCcw className="w-4 h-4 group-hover:-rotate-90 " />
-        Reset Data
+        Daten zurücksetzen
       </button>
     </aside>
   );

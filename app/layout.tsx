@@ -8,8 +8,8 @@ const openSans = Open_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Battery Storage Calculator",
-  description: "Battery Storage Economics Calculator",
+  title: "Batteriespeicher-Rechner",
+  description: "Wirtschaftlichkeitsrechner für Batteriespeicher",
 };
 
 export default function RootLayout({
@@ -19,7 +19,7 @@ export default function RootLayout({
 }>) {
   return (
     <html
-      lang="en"
+      lang="de"
       className={`${openSans.variable} h-full antialiased light`}
     >
       <body className="bg-white min-h-screen flex flex-col">

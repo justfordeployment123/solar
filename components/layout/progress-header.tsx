@@ -18,7 +18,7 @@ export function ProgressHeader({ currentStep, totalSteps, title, description }: 
     >
       <div className="flex items-center gap-4 mb-6">
         <span className="text-xs font-bold uppercase tracking-widest text-primary">
-          Step {currentStep} of {totalSteps}
+          Schritt {currentStep} von {totalSteps}
         </span>
         <div className="h-1.5 flex-1 bg-[#dfdfdf]  overflow-hidden relative">
           <div 

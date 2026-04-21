@@ -32,7 +32,7 @@ export function CsvUploader() {
         if (data.length === 0) {
           store.setCsvMetadata({
             hasErrors: true,
-            parseErrorSurface: 'CSV file is empty.'
+            parseErrorSurface: 'Die CSV-Datei ist leer.'
           });
           setIsProcessing(false);
           return;
@@ -42,7 +42,7 @@ export function CsvUploader() {
         if (!('timestamp' in firstRow)) {
           store.setCsvMetadata({
             hasErrors: true,
-            parseErrorSurface: 'Missing expected column "timestamp"'
+            parseErrorSurface: 'Erwartete Spalte "timestamp" fehlt.'
           });
           setIsProcessing(false);
           return;
@@ -50,7 +50,7 @@ export function CsvUploader() {
         if (!('consumption_kwh' in firstRow)) {
           store.setCsvMetadata({
             hasErrors: true,
-            parseErrorSurface: 'Missing expected column "consumption_kwh"'
+            parseErrorSurface: 'Erwartete Spalte "consumption_kwh" fehlt.'
           });
           setIsProcessing(false);
           return;
@@ -72,7 +72,7 @@ export function CsvUploader() {
         if (hasInvalidData) {
           store.setCsvMetadata({
             hasErrors: true,
-            parseErrorSurface: 'Invalid data format in consumption_kwh column. Must be numeric.'
+            parseErrorSurface: 'Ungültiges Datenformat in der Spalte "consumption_kwh". Muss numerisch sein.'
           });
           setIsProcessing(false);
           return;
@@ -91,7 +91,7 @@ export function CsvUploader() {
       error: (error: Error) => {
         store.setCsvMetadata({
           hasErrors: true,
-          parseErrorSurface: `Parse error: ${error.message}`
+          parseErrorSurface: `Einlesefehler: ${error.message}`
         });
         setIsProcessing(false);
       }
@@ -105,9 +105,9 @@ export function CsvUploader() {
 
   return (
     <div className="space-y-4 rounded-lg border border-slate-200 p-6">
-      <h3 className="text-lg font-medium text-slate-900">Upload Smart Meter Data (CSV)</h3>
+      <h3 className="text-lg font-medium text-slate-900">Smart-Meter-Daten hochladen (CSV)</h3>
       <p className="text-sm text-slate-500">
-        Upload your smart meter CSV containing <strong>timestamp</strong> and <strong>consumption_kwh</strong> columns to automatically calculate your annual consumption.
+        Laden Sie Ihre Smart-Meter-CSV hoch, die die Spalten <strong>timestamp</strong> und <strong>consumption_kwh</strong> enthält, um Ihren Jahresverbrauch automatisch zu berechnen.
       </p>
 
       <div className="flex items-center space-x-4">
@@ -124,7 +124,7 @@ export function CsvUploader() {
           onClick={() => fileInputRef.current?.click()}
           disabled={isProcessing}
         >
-          {isProcessing ? 'Processing...' : 'Select CSV File'}
+          {isProcessing ? 'Wird verarbeitet...' : 'CSV-Datei auswählen'}
         </Button>
         {store.csvMetadata.fileName && (
           <span className="text-sm font-medium text-slate-700">
@@ -135,13 +135,13 @@ export function CsvUploader() {
 
       {store.csvMetadata.hasErrors && store.csvMetadata.parseErrorSurface && (
         <div className="text-sm text-red-600 bg-red-50 p-3 rounded-md border border-red-200">
-          Error: {store.csvMetadata.parseErrorSurface}
+          Fehler: {store.csvMetadata.parseErrorSurface}
         </div>
       )}
 
       {store.csvMetadata.isConfigured && !store.csvMetadata.hasErrors && (
         <div className="text-sm text-emerald-600 bg-emerald-50 p-3 rounded-md border border-emerald-200">
-          Successfully processed {store.csvMetadata.rowCount} rows. Total consumption updated.
+          Erfolgreich verarbeitet: {store.csvMetadata.rowCount} Zeilen. Gesamtverbrauch aktualisiert.
         </div>
       )}
     </div>

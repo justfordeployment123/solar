@@ -3,9 +3,9 @@ import { z } from 'zod';
 import { createServerSupabaseClient } from '@/lib/supabase/server';
 
 const installerSchema = z.object({
-  companyName: z.string().min(1, 'Company name is required'),
-  contactName: z.string().min(1, 'Contact name is required'),
-  email: z.string().email('Invalid email address'),
+  companyName: z.string().min(1, 'Unternehmensname ist erforderlich'),
+  contactName: z.string().min(1, 'Ansprechpartner ist erforderlich'),
+  email: z.string().email('Ungültige E-Mail-Adresse'),
   phone: z.string().optional(),
 });
 
@@ -15,7 +15,7 @@ export async function POST(request: Request) {
     const parsed = installerSchema.safeParse(body);
 
     if (!parsed.success) {
-      return NextResponse.json({ error: 'Invalid input', details: parsed.error.format() }, { status: 400 });
+      return NextResponse.json({ error: 'Ungültige Eingabe', details: parsed.error.format() }, { status: 400 });
     }
 
     const data = parsed.data;
@@ -37,7 +37,7 @@ export async function POST(request: Request) {
 
     if (dbError) {
       console.error('Supabase error inserting installer:', dbError);
-      return NextResponse.json({ error: 'Failed to complete installer registration' }, { status: 500 });
+      return NextResponse.json({ error: 'Registrierung des Installateurs fehlgeschlagen' }, { status: 500 });
     }
 
     return NextResponse.json({ 
@@ -46,6 +46,6 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error('Server error in /api/installers:', error);
-    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    return NextResponse.json({ error: 'Interner Serverfehler' }, { status: 500 });
   }
 }

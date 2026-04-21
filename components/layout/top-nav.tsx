@@ -45,7 +45,7 @@ export function TopNav() {
           className="group flex items-center justify-center gap-2 px-4 py-2  hover:bg-[#ffffff]   text-[#565656] hover:text-[#e12029]"
         >
           <RotateCcw className="w-4 h-4  group-hover:-rotate-90" />
-          <span className="hidden md:inline font-bold uppercase tracking-widest text-[10px]">Reset</span>
+          <span className="hidden md:inline font-bold uppercase tracking-widest text-[10px]">Zurücksetzen</span>
         </button>
       </div>
     </nav>

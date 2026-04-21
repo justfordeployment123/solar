@@ -11,11 +11,11 @@ import { Button } from '@/components/ui/button';
 import { ChevronRight, ArrowLeft } from 'lucide-react';
 
 const GOAL_OPTIONS: { id: Goal & string; title: string; description: string; disclaimer?: string }[] = [
-  { id: 'Self-Consumption', title: 'Self-Consumption', description: 'Prioritize using solar energy locally to reduce dependence on external suppliers.' },
-  { id: 'Peak Shaving', title: 'Peak Shaving', description: 'Reduce power demand charges by discharging the battery during peak load periods.' },
-  { id: 'Grid Services (VPP/Balancing)', title: 'Grid Balancing (PRL/SRL)', description: 'Provide frequency control reserves to the national grid operator.' },
-  { id: 'EPEX Arbitrage', title: 'Energy Trading (EPEX Arbitrage)', description: 'Buy energy when prices are low and sell when they are high on the spot market.' },
-  { id: 'Backup Power', title: 'Backup Power', description: 'Ensure power availability during grid outages.' },
+  { id: 'Self-Consumption', title: 'Eigenverbrauch', description: 'Priorisieren Sie die lokale Nutzung von Solarenergie, um die Abhängigkeit von externen Anbietern zu verringern.' },
+  { id: 'Peak Shaving', title: 'Lastspitzenkappung (Peak Shaving)', description: 'Reduzieren Sie die Leistungsentgelte, indem Sie die Batterie während der Spitzenlastzeiten entladen.' },
+  { id: 'Grid Services (VPP/Balancing)', title: 'Netzstabilität (PRL/SRL)', description: 'Stellen Sie dem nationalen Übertragungsnetzbetreiber Frequenzregelreserven zur Verfügung.' },
+  { id: 'EPEX Arbitrage', title: 'Energiehandel (EPEX Arbitrage)', description: 'Kaufen Sie Energie, wenn die Preise niedrig sind, und verkaufen Sie diese, wenn sie auf dem Spotmarkt hoch sind.' },
+  { id: 'Backup Power', title: 'Notstromversorgung', description: 'Gewährleisten Sie die Stromverfügbarkeit bei Netzausfällen.' },
 ];
 
 const containerVariants = {
@@ -84,8 +84,8 @@ export default function Step1Page() {
       <ProgressHeader 
         currentStep={1} 
         totalSteps={3} 
-        title="What are your goals?" 
-        description="Select how your future battery system should interact with the grid and your local energy consumption network." 
+        title="Was sind Ihre Ziele?" 
+        description="Wählen Sie aus, wie Ihr zukünftiges Batteriesystem mit dem Stromnetz und Ihrem lokalen Energieverbrauchsnetz interagieren soll." 
       />
 
       <section 
@@ -104,10 +104,10 @@ export default function Step1Page() {
 
       <footer className="mt-12 pb-12 flex justify-between items-center py-6 border-t border-[#dfdfdf] w-full mt-auto">
         <Link href="/" className="text-sm font-bold uppercase tracking-widest text-[#565656] hover:text-primary  flex items-center gap-2 group">
-          <ArrowLeft className="w-4 h-4  " /> Back
+          <ArrowLeft className="w-4 h-4  " /> Zurück
         </Link>
         <Button variant="primary" onClick={handleNext} className="gap-2 pr-4  text-base uppercase tracking-widest bg-[#363636] text-white hover:bg-primary border-transparent">
-          Next Step <ChevronRight className="w-5 h-5" />
+          Nächster Schritt <ChevronRight className="w-5 h-5" />
         </Button>
       </footer>
     </div>

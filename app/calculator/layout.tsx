@@ -8,9 +8,9 @@ import { MobileBottomNav } from '@/components/layout/mobile-bottom-nav';
 import { Target, Zap, BarChart3 } from 'lucide-react';
 
 const steps = [
-  { id: '1', title: 'Your Goals', icon: Target },
-  { id: '2', title: 'System Details', icon: Zap },
-  { id: '3', title: 'Results Dashboard', icon: BarChart3 },
+  { id: '1', title: 'Ihre Ziele', icon: Target },
+  { id: '2', title: 'Systemdetails', icon: Zap },
+  { id: '3', title: 'Ergebnis-Dashboard', icon: BarChart3 },
 ];
 
 export default function CalculatorLayout({ children }: { children: React.ReactNode }) {

@@ -80,10 +80,10 @@ export default function InstallersPage() {
         <div    >
           <header className="mb-16 md:mb-24 text-center md:text-left">
             <h1 className="text-4xl md:text-6xl lg:text-7xl font-black tracking-tight text-[#e12029] mb-6">
-              Partner Portal
+              Partner-Portal
             </h1>
             <p className="text-lg md:text-xl text-slate-500 max-w-2xl leading-relaxed mx-auto md:mx-0">
-              Create your white-labeled instance of the battery storage calculator. Generate a customized tool to capture high-quality leads.
+              Erstellen Sie Ihre White-Label-Instanz des Batteriespeicher-Rechners. Generieren Sie ein maßgeschneidertes Tool zur Gewinnung hochwertiger Leads.
             </p>
           </header>
 
@@ -91,12 +91,12 @@ export default function InstallersPage() {
             <form className="lg:col-span-8 flex flex-col gap-10" onSubmit={handleSubmit}>
               <div className="glass  ] p-8 md:p-10 border border-white">
                 <h3 className="text-xs font-extrabold uppercase tracking-widest text-primary mb-8 flex items-center gap-2">
-                  <div className="w-2 h-2  bg-primary" /> Company Details
+                  <div className="w-2 h-2  bg-primary" /> Unternehmensdaten
                 </h3>
                 
                 <div className="space-y-8">
                   <Input 
-                    label="Company Name" 
+                    label="Unternehmensname" 
                     id="companyName" 
                     name="companyName" 
                     placeholder="Energy Solutions GmbH" 
@@ -106,21 +106,21 @@ export default function InstallersPage() {
                   />
                   
                   <Input 
-                    label="Contact Name" 
+                    label="Ansprechpartner" 
                     id="contactName" 
                     name="contactName" 
-                    placeholder="Jane Doe" 
+                    placeholder="Erika Mustermann" 
                     required 
                     value={installerProfile.contactName}
-                    onChange={(e: any) => setInstallerProfile({ contactName: e.target.value })}
+                    onChange={(e: any) => setInstallerProfile({ contactName: "Erika Mustermann" })}
                   />
                   
                   <div className="grid grid-cols-1 gap-8">
                     <Input 
-                      label="Telephone Number" 
+                      label="Telefonnummer" 
                       id="tel" 
                       name="tel" 
-                      placeholder="+44 ..." 
+                      placeholder="+49 ..." 
                       type="tel"
                       value={installerProfile.phone}
                       onChange={(e: any) => setInstallerProfile({ phone: e.target.value })}
@@ -128,10 +128,10 @@ export default function InstallersPage() {
                   </div>
 
                   <Input 
-                    label="Email Address" 
+                    label="E-Mail-Adresse" 
                     id="email" 
                     name="email" 
-                    placeholder="admin@company.com" 
+                    placeholder="admin@firma.de" 
                     type="email" 
                     required 
                     value={installerProfile.email}
@@ -140,15 +140,15 @@ export default function InstallersPage() {
                   
                   <div className="pt-4">
                     <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 ml-1 mb-2 block">
-                      Company Logo
+                      Unternehmenslogo
                     </label>
                     <label htmlFor="logo-upload" className="flex flex-col items-center justify-center p-10 border-2 border-dashed border-slate-300  bg-slate-50/50 hover:bg-primary/5 hover:border-primary/30  cursor-pointer group">
                       <input className="hidden" id="logo-upload" type="file" accept="image/*" onChange={handleLogoUpload} />
                       <div className="w-16 h-16  bg-white  flex items-center justify-center mb-4  ">
                         <UploadCloud className="w-8 h-8 text-primary" />
                       </div>
-                      <p className="text-sm font-bold text-slate-800">Click to upload or drag and drop</p>
-                      <p className="text-xs text-slate-500 mt-2 font-medium">SVG, PNG, or JPG (Max 2MB)</p>
+                      <p className="text-sm font-bold text-slate-800">Klicken Sie zum Hochladen oder ziehen Sie die Datei hierher</p>
+                      <p className="text-xs text-slate-500 mt-2 font-medium">SVG, PNG oder JPG (Max. 2MB)</p>
                     </label>
                   </div>
                 </div>
@@ -156,7 +156,7 @@ export default function InstallersPage() {
 
               <div className="flex justify-end">
                 <Button variant="primary" type="submit" disabled={loading} className="gap-3  text-base uppercase tracking-widest bg-[#e12029] text-white w-full md:w-auto py-4 px-10 border-transparent hover:opacity-95">
-                  {loading ? "Generating..." : "Generate Calculator"} <ArrowRight className="w-5 h-5" />
+                  {loading ? "Wird generiert..." : "Rechner generieren"} <ArrowRight className="w-5 h-5" />
                 </Button>
               </div>
             </form>
@@ -164,33 +164,33 @@ export default function InstallersPage() {
             <aside className="lg:col-span-4 space-y-8">
               <div className="glass   p-8 border border-white">
                 <div className="text-xs font-extrabold uppercase tracking-widest text-[#e12029] mb-6 flex items-center gap-2">
-                  <span className="w-2 h-2  bg-[#e12029]" /> Visual Preview
+                  <span className="w-2 h-2  bg-[#e12029]" /> Vorschau
                 </div>
                 <div className="aspect-square bg-slate-50  flex items-center justify-center relative border border-slate-200 overflow-hidden mb-6 ">
                   {logoPreview ? (
-                    <Image src={logoPreview} alt="Logo Preview" fill style={{ objectFit: 'contain' }} className="p-8" />
+                    <Image src={logoPreview} alt="Logo Vorschau" fill style={{ objectFit: 'contain' }} className="p-8" />
                   ) : (
                     <div className="flex flex-col items-center text-slate-400 gap-3">
                       <Building2 className="w-12 h-12 opacity-50" />
-                      <span className="text-xs font-semibold uppercase tracking-widest">Setup Needed</span>
+                      <span className="text-xs font-semibold uppercase tracking-widest">Einrichtung erforderlich</span>
                     </div>
                   )}
                 </div>
                 <p className="text-sm text-slate-500 leading-relaxed font-medium">
-                  This logo will appear proudly on the custom interface shared with your clients.
+                  Dieses Logo wird stolz auf der benutzerdefinierten Oberfläche angezeigt, die Sie mit Ihren Kunden teilen.
                 </p>
               </div>
 
               <div className="glass   p-8 border border-white">
                 <div className="text-xs font-extrabold uppercase tracking-widest text-[#e12029] mb-6 flex items-center gap-2">
-                  <span className="w-2 h-2  bg-[#e12029]" /> Partner Benefits
+                  <span className="w-2 h-2  bg-[#e12029]" /> Partner-Vorteile
                 </div>
                 <ul className="space-y-4">
                   {[
-                    "White-label branding for all exports",
-                    "Custom localized installation costs",
-                    "Lead generation dashboard access",
-                    "Priority support and onboarding"
+                    "White-Label-Branding für alle Exporte",
+                    "Individuelle lokale Installationskosten",
+                    "Zugang zum Lead-Generierungs-Dashboard",
+                    "Priorisierter Support und Onboarding"
                   ].map((benefit, i) => (
                     <li key={i} className="flex items-start gap-3 text-sm font-medium text-slate-700">
                       <div className="mt-0.5 p-1  bg-green-100 text-green-600">
@@ -212,7 +212,7 @@ export default function InstallersPage() {
         </div>
         <nav className="flex gap-8 mt-4 md:mt-0">
           <Link href="/" className="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-primary ">
-            Visit Homepage
+            Homepage besuchen
           </Link>
         </nav>
       </footer>

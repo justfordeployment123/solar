@@ -13,7 +13,7 @@ export default function InstallersSuccessPage() {
 
       <header className="fixed top-0 w-full z-50 glass border-b border-white/50 px-6 md:px-12 py-6 flex justify-between items-center text-center mx-auto max-w-7xl relative">
         <Link href="/" className="text-xl font-black uppercase tracking-tight text-[#363636] mx-auto md:mx-0">
-          Solar PV<span className="text-primary ml-1">Partner Portal</span>
+          Solar PV<span className="text-primary ml-1"> Partner-Portal</span>
         </Link>
       </header>
 
@@ -28,13 +28,13 @@ export default function InstallersSuccessPage() {
         <h1 
              className="text-5xl md:text-7xl font-black tracking-tight text-[#363636] mb-6"
         >
-          Success!
+          Erfolg!
         </h1>
         
         <p 
              className="text-xl text-[#565656] max-w-2xl mx-auto leading-relaxed mb-12"
         >
-          Your customized battery storage calculator has been successfully generated. You can now start sharing it with your clients.
+          Ihr individueller Batteriespeicher-Rechner wurde erfolgreich generiert. Sie können ihn nun mit Ihren Kunden teilen.
         </p>
 
         <div 
@@ -43,12 +43,12 @@ export default function InstallersSuccessPage() {
           <div className="absolute top-0 right-0 p-6 opacity-10">
             <Share2 className="w-24 h-24" />
           </div>
-          <p className="text-xs text-primary font-black uppercase tracking-widest relative z-10">Your Unique Link</p>
+          <p className="text-xs text-primary font-black uppercase tracking-widest relative z-10">Ihr persönlicher Link</p>
           <div className="flex items-center gap-4 relative z-10">
             <p className="text-[#363636] font-mono font-medium text-sm md:text-base break-all bg-white p-4  border border-[#dfdfdf] flex-grow ">
               https://featurenotimplemented.com/i/energy-solutions-gmbh
             </p>
-            <button className="p-4 bg-primary text-white   hover:bg-primary/90 " title="Copy to clipboard">
+            <button className="p-4 bg-primary text-white   hover:bg-primary/90 " title="In die Zwischenablage kopieren">
               <Copy className="w-5 h-5" />
             </button>
           </div>
@@ -58,7 +58,7 @@ export default function InstallersSuccessPage() {
              >
           <Link href="/calculator/step-1">
             <Button variant="primary" className="px-10 py-6 text-lg  uppercase tracking-widest gap-3    bg-[#363636] hover:bg-[#363636] border-transparent text-white">
-              Launch Calculator
+              Rechner starten
               <ArrowRight className="w-6 h-6" />
             </Button>
           </Link>

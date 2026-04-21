@@ -49,7 +49,7 @@ export function RadioCard({ option, checked, onChange, className }: RadioCardPro
           {option.description}
         </p>
         {option.disclaimer && (
-          <p className="text-xs italic text-[#565656]">Note: {option.disclaimer}</p>
+          <p className="text-xs italic text-[#565656]">Hinweis: {option.disclaimer}</p>
         )}
       </div>
       

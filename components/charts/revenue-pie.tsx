@@ -12,7 +12,7 @@ const COLORS = ["#e12029", "#363636", "#565656", "#dfdfdf", "#868686", "#1d1d1d"
 
 export function RevenuePie({ data }: RevenuePieProps) {
   const chartData = [
-    { name: "Self-Consumption", value: data.selfConsumption },
+    { name: "Eigenverbrauch", value: data.selfConsumption },
     { name: "PRL", value: data.prl },
     { name: "SRL/aFRR", value: data.srlAfrr },
     { name: "EPEX Arbitrage", value: data.epexArbitrage },
@@ -44,7 +44,7 @@ export function RevenuePie({ data }: RevenuePieProps) {
       },
       series: [
         {
-          name: 'Revenue Streams',
+          name: 'Einnahmequellen',
           type: 'pie',
           radius: ['50%', '80%'],
           center: ['50%', '45%'],
@@ -86,7 +86,7 @@ export function RevenuePie({ data }: RevenuePieProps) {
   }, [chartData]);
 
   if (chartData.length === 0) {
-    return <div className="flex items-center justify-center h-full text-[#565656] font-medium">No revenue data available</div>;
+    return <div className="flex items-center justify-center h-full text-[#565656] font-medium">Keine Einnahmedaten verfügbar</div>;
   }
 
   return (

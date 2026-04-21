@@ -70,18 +70,18 @@ export function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalProps) {
           <X className="w-5 h-5" />
         </button>
 
-        <h2 id="modal-title" className="text-2xl font-black tracking-tight text-[#363636] mb-2 uppercase">Request Personalized Offer</h2>
-        <p className="text-sm font-medium text-slate-500 mb-8">Enter your details to receive a full economic projection and a customized offer from a certified partner.</p>
+        <h2 id="modal-title" className="text-2xl font-black tracking-tight text-[#363636] mb-2 uppercase">Individuelles Angebot anfordern</h2>
+        <p className="text-sm font-medium text-slate-500 mb-8">Geben Sie Ihre Daten ein, um eine vollständige Wirtschaftlichkeitsprognose und ein maßgeschneidertes Angebot von einem zertifizierten Partner zu erhalten.</p>
         
         {success ? (
           <div className="text-center py-8">
             <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-green-100 mb-4">
               <CheckCircle2 className="w-8 h-8 text-green-600" />
             </div>
-            <h3 className="text-xl font-bold text-slate-800 mb-2">Request Sent</h3>
-            <p className="text-slate-600 mb-8">We will be in touch shortly with your personalized details.</p>
+            <h3 className="text-xl font-bold text-slate-800 mb-2">Anfrage gesendet</h3>
+            <p className="text-slate-600 mb-8">Wir werden uns in Kürze mit Ihren persönlichen Details bei Ihnen melden.</p>
             <Button onClick={onClose} fullWidth className="bg-[#363636] py-3 uppercase tracking-widest text-sm font-bold text-white hover:bg-black transition-colors">
-              Close
+              Schließen
             </Button>
           </div>
         ) : (
@@ -90,7 +90,7 @@ export function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalProps) {
             
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label="First Name"
+                label="Vorname"
                 id="firstName"
                 type="text"
                 required
@@ -98,7 +98,7 @@ export function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalProps) {
                 onChange={(e: any) => setLeadDraft({ firstName: e.target.value })}
               />
               <Input
-                label="Last Name"
+                label="Nachname"
                 id="lastName"
                 type="text"
                 required
@@ -108,7 +108,7 @@ export function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalProps) {
             </div>
             
             <Input
-              label="Email Address"
+              label="E-Mail-Adresse"
               id="email"
               type="email"
               required
@@ -117,7 +117,7 @@ export function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalProps) {
             />
             
             <Input
-              label="Phone Number"
+              label="Telefonnummer"
               id="phone"
               type="tel"
               value={leadDraft.phone || ''}
@@ -128,10 +128,10 @@ export function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalProps) {
             
             <div className="pt-4 flex gap-4">
               <Button type="button" variant="outline" onClick={onClose} className="flex-1 py-3 text-slate-600 border-slate-300 hover:bg-slate-50 uppercase tracking-widest text-sm font-bold">
-                Cancel
+                Abbrechen
               </Button>
               <Button type="submit" disabled={loading} className="flex-1 bg-[#e12029] hover:bg-[#c1151c] text-white py-3 uppercase tracking-widest text-sm font-bold border-none">
-                {loading ? "Sending..." : "Request Offer"}
+                {loading ? "Wird gesendet..." : "Angebot anfordern"}
               </Button>
             </div>
           </form>

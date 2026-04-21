@@ -38,54 +38,54 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ derivedResults, 
       <View style={styles.contentWrapper}>
         <View style={styles.header}>
           <View>
-            <Text style={styles.headerTitle}>ROI Projection</Text>
-            <Text style={styles.headerSubtitle}>Battery Storage Calculator</Text>
+            <Text style={styles.headerTitle}>ROI-Prognose</Text>
+            <Text style={styles.headerSubtitle}>Batteriespeicher-Rechner</Text>
           </View>
           <View style={{ alignItems: 'flex-end' }}>
-            <Text style={{ fontSize: 10, color: '#565656' }}>Date: {new Date().toLocaleDateString()}</Text>
-            <Text style={{ fontSize: 10, color: '#565656', fontWeight: 'bold', marginTop: 4 }}>Prepared exclusively for you</Text>
+            <Text style={{ fontSize: 10, color: '#565656' }}>Datum: {new Date().toLocaleDateString()}</Text>
+            <Text style={{ fontSize: 10, color: '#565656', fontWeight: 'bold', marginTop: 4 }}>Exklusiv für Sie erstellt</Text>
           </View>
         </View>
         
         <View style={styles.section}>
-          <Text style={styles.title}>System Configuration</Text>
+          <Text style={styles.title}>Systemkonfiguration</Text>
           <View style={styles.row}>
-            <Text style={styles.label}>Battery Capacity:</Text>
+            <Text style={styles.label}>Batteriekapazität:</Text>
             <Text style={styles.value}>{technical.currentBatteryCapacityKwh || 0} kWh</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>PV Size:</Text>
+            <Text style={styles.label}>PV-Größe:</Text>
             <Text style={styles.value}>{technical.pvSizeKwp || 0} kWp</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Annual Consumption:</Text>
+            <Text style={styles.label}>Jahresverbrauch:</Text>
             <Text style={styles.value}>{technical.annualConsumptionKwh || 0} kWh</Text>
           </View>
         </View>
 
         <View style={styles.section}>
-          <Text style={styles.title}>Financial Metrics</Text>
+          <Text style={styles.title}>Finanzielle Kennzahlen</Text>
           <View style={styles.row}>
-            <Text style={styles.label}>Return on Investment (NPV):</Text>
+            <Text style={styles.label}>Kapitalrendite (NPV):</Text>
             <Text style={styles.highlightValue}>€{((derivedResults.yearlyProjection[14]?.cumulative || 0) + (technical.currentBatteryCapacityKwh || 10) * 1000).toLocaleString()}</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Break-Even Point:</Text>
-            <Text style={styles.value}>{Math.ceil(derivedResults.paybackYears) ? `Year ${Math.ceil(derivedResults.paybackYears)}` : 'N/A'}</Text>
+            <Text style={styles.label}>Amortisationszeitpunkt:</Text>
+            <Text style={styles.value}>{Math.ceil(derivedResults.paybackYears) ? `Jahr ${Math.ceil(derivedResults.paybackYears)}` : 'N/A'}</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Total Average Yearly Revenue:</Text>
+            <Text style={styles.label}>Durchschn. Jahresertrag:</Text>
             <Text style={styles.value}>€{Math.round(derivedResults.totalAnnualRevenue).toLocaleString()}</Text>
           </View>
           <View style={styles.row}>
-            <Text style={styles.label}>Autarky Rate:</Text>
+            <Text style={styles.label}>Autarkiegrad:</Text>
             <Text style={styles.value}>{75} %</Text>
           </View>
         </View>
 
         {pieChartImage && (
           <View style={styles.section} wrap={false}>
-            <Text style={styles.title}>Revenue Split Overview</Text>
+            <Text style={styles.title}>Einnahmen-Aufschlüsselung</Text>
             <View style={styles.imageContainer}>
               <Image src={pieChartImage} style={styles.chartImage} />
             </View>
@@ -94,7 +94,7 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ derivedResults, 
 
         {barChartImage && (
           <View style={styles.section} wrap={false}>
-            <Text style={styles.title}>Lifetime Cashflow Projection</Text>
+            <Text style={styles.title}>Cashflow-Prognose über die Lebensdauer</Text>
             <View style={styles.imageContainer}>
               <Image src={barChartImage} style={styles.chartImage} />
             </View>
@@ -103,7 +103,7 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ derivedResults, 
       </View>
 
       <Text style={styles.footer} fixed={true}>
-        Financial projections are estimates based on the configured system logic. Actual results may vary depending on local regulations, market prices, and consumption behavior.
+        Finanzprognosen sind Schätzungen, die auf der konfigurierten Systemlogik basieren. Die tatsächlichen Ergebnisse können je nach lokalen Vorschriften, Marktpreisen und Verbrauchsverhalten variieren.
       </Text>
     </Page>
   </Document>
