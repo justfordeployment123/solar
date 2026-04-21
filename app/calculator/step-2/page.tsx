@@ -9,6 +9,7 @@ import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { useCalculatorStore } from '@/store/calculatorStore';
 import { UploadCloud, ArrowLeft, ChevronRight } from 'lucide-react';
+import { CsvUploader } from '@/components/forms/csv-uploader';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -130,25 +131,7 @@ export default function Step2Page() {
           <h3 className="text-xs font-extrabold uppercase tracking-widest text-[#e12029] mb-2 flex items-center gap-2">
             <div className="w-2 h-2  bg-[#e12029]" /> Smart Data
           </h3>
-          <label 
-              htmlFor="csv-upload" 
-            className="flex-grow min-h-[300px]  border-2 border-dashed border-[#dfdfdf] bg-white/50 backdrop-blur-sm p-12 text-center flex flex-col items-center justify-center gap-6 hover:border-primary hover:bg-white  cursor-pointer group  hover:"
-          >
-            <input type="file" accept=".csv" id="csv-upload" className="hidden" />
-            <div className="w-20 h-20  bg-[#ffffff] flex items-center justify-center border-2 border-[#ffffff] group-hover:border-primary/20 group-hover:bg-primary/5  relative overflow-hidden">
-               <div 
-                   >
-                 <UploadCloud className="w-8 h-8 text-[#565656] group-hover:text-primary " />
-               </div>
-            </div>
-            <div>
-              <p className="text-lg font-bold text-[#363636] mb-1">Upload Load Profile</p>
-              <p className="text-xs uppercase tracking-widest text-[#565656] font-semibold mb-2">.CSV File</p>
-            </div>
-            <p className="text-sm text-[#565656] max-w-[250px] leading-relaxed">
-              Upload your historical 15-minute interval smart meter data to get maximum precision out of your projections.
-            </p>
-          </label>
+          <CsvUploader />
         </section>
 
       </div>

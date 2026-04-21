@@ -7,6 +7,7 @@ import { RevenuePie } from "@/components/charts/revenue-pie";
 import { ProjectionChart } from "@/components/charts/projection-chart";
 import { toPng } from "html-to-image";
 import { ReportDocument } from "@/components/pdf/report-document";
+import { LeadCaptureModal } from "@/components/modals/lead-capture-modal";
 import Link from "next/link";
 import { ArrowLeft, Download, Battery, Zap, Euro, TrendingUp } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -34,8 +35,8 @@ const itemVariants = {
 function MetricCard({ title, value, subtitle, icon: Icon, color }: any) {
   return (
     <div  className="glass   p-6 relative overflow-hidden group hover: ">
-      <div className={`absolute top-0 right-0 w-32 h-32  -mr-16 -mt-16 opacity-10  `} style={{ backgroundColor: color }} />
       <div className="flex justify-between items-start mb-4 relative z-10">
+        
         <h3 className="text-sm font-bold uppercase tracking-widest text-[#565656]">{title}</h3>
         <div className="p-2.5  text-white " style={{ backgroundColor: color }}>
           <Icon size={20} strokeWidth={2.5} />
@@ -54,6 +55,7 @@ export default function ResultsPage() {
   const [barChartImage, setBarChartImage] = useState<string>();
   const [isClient, setIsClient] = useState(false);
   const [isGeneratingImages, setIsGeneratingImages] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const pieRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
@@ -149,7 +151,7 @@ export default function ResultsPage() {
           value={`€${((derivedResults.yearlyProjection[14]?.cumulative || 0) + (technical.currentBatteryCapacityKwh || 10) * 1000).toLocaleString()}`} 
           subtitle="Total Profit Over Lifetime" 
           icon={TrendingUp}
-          color="#dfdfdf"
+          color="#565656"
         />
         <MetricCard 
           title="Avg. Annual Return" 
@@ -229,7 +231,13 @@ export default function ResultsPage() {
         </div>
       </div>
       
-      <div className="pb-16 flex justify-center mt-12">
+      <div className="pb-16 flex justify-center gap-4 mt-12 flex-wrap">
+        <button
+          onClick={() => setIsModalOpen(true)}
+          className="bg-[#363636] text-white px-10 py-5 font-black text-lg uppercase tracking-widest cursor-pointer"
+        >
+          Request Personalized Offer
+        </button>
         <Link href="/installers" className="inline-block">
           <div 
               className="bg-[#e12029] text-white px-10 py-5  font-black text-lg uppercase tracking-widest  cursor-pointer"
@@ -238,6 +246,11 @@ export default function ResultsPage() {
           </div>
         </Link>
       </div>
+      
+      <LeadCaptureModal 
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+      />
     </div>
   );
 }

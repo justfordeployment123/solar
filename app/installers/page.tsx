@@ -6,9 +6,14 @@ import { UploadCloud, ArrowRight, Image as ImageIcon, Check, X, Building2 } from
 import { useState } from 'react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
+import { useCalculatorStore } from '@/store/calculatorStore';
 
 export default function InstallersPage() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+  const router = useRouter();
+  const { installerProfile, setInstallerProfile } = useCalculatorStore();
+  const [loading, setLoading] = useState(false);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -21,13 +26,43 @@ export default function InstallersPage() {
     }
   };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const payload = {
+        companyName: installerProfile.companyName,
+        contactName: installerProfile.contactName || "Default Contact", 
+        email: installerProfile.email,
+        phone: installerProfile.phone,
+      };
+      
+      const res = await fetch("/api/installers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      });
+      
+      const data = await res.json();
+      if (res.ok && data.url) {
+        router.push(data.url);
+      } else {
+        alert("Failed: " + (data.error || "Unknown"));
+      }
+    } catch (err) {
+      alert("Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="bg-slate-50 min-h-screen text-slate-900 font-sans relative overflow-hidden flex flex-col">
       {/* Background aesthetic blobs */}
       <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%]  bg-primary/10 blur-[150px] pointer-events-none" />
       <div className="absolute center right-[-10%] w-[40%] h-[50%]  bg-tertiary/10 blur-[150px] pointer-events-none" />
 
-      <header className="fixed top-0 w-full z-50 glass border-b border-white/50 px-6 md:px-12 py-4">
+      <header className="absolute top-0 w-full z-50 px-6 md:px-12 py-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link href="/" className="flex items-center gap-4">
             <Image priority src="/solar-logo.svg" alt="MySolar-PV Logo" width={120} height={32} className="h-6 md:h-8 w-auto object-contain opacity-80  " />
@@ -53,21 +88,55 @@ export default function InstallersPage() {
           </header>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
-            <form className="lg:col-span-8 flex flex-col gap-10" action="/installers/success">
+            <form className="lg:col-span-8 flex flex-col gap-10" onSubmit={handleSubmit}>
               <div className="glass  ] p-8 md:p-10 border border-white">
                 <h3 className="text-xs font-extrabold uppercase tracking-widest text-primary mb-8 flex items-center gap-2">
                   <div className="w-2 h-2  bg-primary" /> Company Details
                 </h3>
                 
                 <div className="space-y-8">
-                  <Input label="Company Name" id="companyName" name="companyName" placeholder="Energy Solutions GmbH" required />
+                  <Input 
+                    label="Company Name" 
+                    id="companyName" 
+                    name="companyName" 
+                    placeholder="Energy Solutions GmbH" 
+                    required 
+                    value={installerProfile.companyName}
+                    onChange={(e: any) => setInstallerProfile({ companyName: e.target.value })}
+                  />
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <Input label="Telephone Number" id="tel" name="tel" placeholder="+44 ..." type="tel" />
-                    <Input label="Mobile Number" id="mobile" name="mobile" placeholder="+44 ..." type="tel" />
+                  <Input 
+                    label="Contact Name" 
+                    id="contactName" 
+                    name="contactName" 
+                    placeholder="Jane Doe" 
+                    required 
+                    value={installerProfile.contactName}
+                    onChange={(e: any) => setInstallerProfile({ contactName: e.target.value })}
+                  />
+                  
+                  <div className="grid grid-cols-1 gap-8">
+                    <Input 
+                      label="Telephone Number" 
+                      id="tel" 
+                      name="tel" 
+                      placeholder="+44 ..." 
+                      type="tel"
+                      value={installerProfile.phone}
+                      onChange={(e: any) => setInstallerProfile({ phone: e.target.value })}
+                    />
                   </div>
 
-                  <Input label="Email Address" id="email" name="email" placeholder="admin@company.com" type="email" required />
+                  <Input 
+                    label="Email Address" 
+                    id="email" 
+                    name="email" 
+                    placeholder="admin@company.com" 
+                    type="email" 
+                    required 
+                    value={installerProfile.email}
+                    onChange={(e: any) => setInstallerProfile({ email: e.target.value })}
+                  />
                   
                   <div className="pt-4">
                     <label className="text-xs font-semibold uppercase tracking-wider text-slate-500 ml-1 mb-2 block">
@@ -86,8 +155,8 @@ export default function InstallersPage() {
               </div>
 
               <div className="flex justify-end">
-                <Button variant="primary" type="submit" className="gap-3  text-base uppercase tracking-widest bg-[#e12029] text-white w-full md:w-auto py-4 px-10 border-transparent hover:opacity-95">
-                  Generate Calculator <ArrowRight className="w-5 h-5" />
+                <Button variant="primary" type="submit" disabled={loading} className="gap-3  text-base uppercase tracking-widest bg-[#e12029] text-white w-full md:w-auto py-4 px-10 border-transparent hover:opacity-95">
+                  {loading ? "Generating..." : "Generate Calculator"} <ArrowRight className="w-5 h-5" />
                 </Button>
               </div>
             </form>

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -10,15 +10,6 @@ import { RotateCcw } from 'lucide-react';
 export function TopNav() {
   const router = useRouter();
   const resetData = useCalculatorStore((state) => state.resetData);
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 20);
-    };
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   const handleReset = () => {
     resetData();
@@ -27,11 +18,7 @@ export function TopNav() {
 
   return (
     <nav 
-         className={`fixed top-0 z-50 flex justify-between items-center px-6 md:px-8   ${
-        isScrolled 
-          ? 'glass  max-w-5xl mx-auto left-4 right-4 top-4  py-3 border border-[#dfdfdf]/50' 
-          : 'w-full py-6 left-0 right-0 bg-transparent'
-      }`}
+         className="w-full py-6 left-0 right-0 bg-transparent flex justify-between items-center px-6 md:px-8 z-50 absolute top-0"
     >
       <Link href="/" className="flex items-center gap-4">
         {/* We use neutral filters so it adapts to a light theme */}

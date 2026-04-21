@@ -46,7 +46,7 @@ export function SideNav({ steps, currentStepIndex }: SideNavProps) {
             <Link 
               key={step.id} 
               href={`#${step.id}`}
-              className={`relative flex items-center gap-4 p-4    group ${
+              className={`relative flex items-center gap-4 p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary group ${
                 isActive 
                   ? 'text-primary bg-primary/5 font-bold ' 
                   : isPast 
@@ -78,7 +78,7 @@ export function SideNav({ steps, currentStepIndex }: SideNavProps) {
             window.location.href = '/';
           }
         }} 
-        className="mt-8 flex items-center justify-center gap-2 py-4 border-2 border-[#dfdfdf] text-[#565656] text-xs font-bold hover:bg-[#ffffff]  uppercase tracking-widest  group"
+        className="mt-8 flex items-center justify-center gap-2 py-4 border-2 border-[#dfdfdf] text-[#565656] text-xs font-bold hover:bg-[#ffffff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary uppercase tracking-widest group"
       >
         <RotateCcw className="w-4 h-4 group-hover:-rotate-90 " />
         Reset Data
