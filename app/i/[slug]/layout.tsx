@@ -24,6 +24,17 @@ export default async function Layout({
     redirect('/');
   }
 
+  if (data.is_active === false) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
+        <div className="text-center">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">Access Revoked</h1>
+          <p className="text-gray-600">This installer link is no longer active or has been disabled.</p>
+        </div>
+      </div>
+    );
+  }
+
   const installer: ActiveInstaller = {
     id: data.id,
     companyName: data.company_name,
