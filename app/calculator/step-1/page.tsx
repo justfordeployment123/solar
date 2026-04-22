@@ -73,6 +73,10 @@ export default function Step1Page() {
 
   const handleNext = (e: React.MouseEvent) => {
     e.preventDefault();
+    if (!goals.primaryGoal && goals.secondaryGoals.length === 0) {
+      alert("Bitte wählen Sie mindestens ein Ziel aus, um fortzufahren.");
+      return;
+    }
     markStepComplete('step1', true);
     router.push('/calculator/step-2');
   };

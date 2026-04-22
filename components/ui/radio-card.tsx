@@ -60,8 +60,7 @@ export function RadioCard({ option, checked, onChange, className }: RadioCardPro
         }}
       >
         <input 
-          type="radio" 
-          name="goal" 
+          type="checkbox" 
           className="sr-only peer" 
           checked={checked} 
           onChange={() => onChange(option.id)}
