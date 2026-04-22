@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import "./globals.css";
+import { GlobalFooter } from "@/components/global-footer";
 
 const openSans = Open_Sans({
   variable: "--font-openSans",
@@ -8,8 +9,11 @@ const openSans = Open_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Batteriespeicher-Rechner",
-  description: "Wirtschaftlichkeitsrechner für Batteriespeicher",
+  title: "Batteriespeicher Deutschland | Großspeicher &amp; Gewerbespeicher | MySolar PV - MySolar PV GmbH",
+  description: "MySolar PV Deutschland: Schlüsselfertige Batteriespeicher für Industrie, Gewerbe &amp; Energieversorger. Planung, Bau, Marktanbindung - alles aus einer Hand.",
+  icons: {
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
@@ -24,6 +28,7 @@ export default function RootLayout({
     >
       <body className="bg-white min-h-screen flex flex-col">
         {children}
+        <GlobalFooter />
       </body>
     </html>
   );

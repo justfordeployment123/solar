@@ -10,33 +10,36 @@ import { RotateCcw } from 'lucide-react';
 export function TopNav() {
   const router = useRouter();
   const resetData = useCalculatorStore((state) => state.resetData);
+  const activeInstaller = useCalculatorStore((state) => state.activeInstaller);
+
+  const homeHref = activeInstaller ? `/i/${activeInstaller.generatedSlug}` : '/';
 
   const handleReset = () => {
     resetData();
-    router.push('/');
+    router.push(homeHref);
   };
 
   return (
     <nav 
          className="w-full py-6 left-0 right-0 bg-transparent flex justify-between items-center px-6 md:px-8 z-50 absolute top-0"
     >
-      <Link href="/" className="flex items-center gap-4">
+      <Link prefetch={false} href={homeHref} className="flex items-center gap-4">
         {/* We use neutral filters so it adapts to a light theme */}
-        <Image 
-          src="/solar-logo.svg" 
-          alt="MySolar-PV Logo" 
-          width={120} 
-          height={32} 
-          className="h-6 md:h-8 w-auto object-contain   opacity-80" 
-        />
-        <div className="w-[1px] h-6 bg-[#dfdfdf]"></div>
-        <Image 
-          src="/ngen-logo.svg" 
-          alt="Ngen Logo" 
-          width={100} 
-          height={32} 
-          className="h-6 md:h-8 w-auto object-contain   opacity-80" 
-        />
+        {activeInstaller?.logoUrl ? (
+          <img 
+            src={activeInstaller.logoUrl} 
+            alt={`${activeInstaller.companyName} Logo`} 
+            className="h-6 md:h-8 w-auto object-contain opacity-80" 
+          />
+        ) : (
+          <Image 
+            src="/solar-logo.svg" 
+            alt="MySolar-PV Logo" 
+            width={120} 
+            height={32} 
+            className="h-6 md:h-8 w-auto object-contain opacity-80" 
+          />
+        )}
       </Link>
       
       <div className="flex items-center justify-end">

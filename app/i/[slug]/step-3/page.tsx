@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ProgressHeader } from '@/components/layout/progress-header';
 import { Input } from '@/components/ui/input';
@@ -24,6 +24,7 @@ const itemVariants = {
 
 export default function Step3Page() {
   const router = useRouter();
+  const params = useParams() as { slug: string };
   const [mounted, setMounted] = useState(false);
   
   const stepCompletion = useCalculatorStore((state) => state.stepCompletion);
@@ -44,7 +45,7 @@ export default function Step3Page() {
   const handleNext = (e: React.MouseEvent) => {
     e.preventDefault();
     markStepComplete('step3', true);
-    router.push('/calculator/results');
+    router.push(`/i/${params.slug}/results`);
   };
 
   const handleInputChange = (field: keyof typeof financial) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -128,7 +129,7 @@ export default function Step3Page() {
       </div>
 
       <footer className="mt-8 mb-12 flex justify-between items-center py-6 border-t border-[#dfdfdf] w-full mt-auto">
-        <Link prefetch={false} href="/calculator/step-2" className="text-sm font-bold uppercase tracking-widest text-[#565656] hover:text-primary  flex items-center gap-2 group">
+        <Link prefetch={false} href={`/i/${params.slug}/step-2`} className="text-sm font-bold uppercase tracking-widest text-[#565656] hover:text-primary  flex items-center gap-2 group">
           <ArrowLeft className="w-4 h-4  " /> Zurück
         </Link>
         <Button variant="primary" onClick={handleNext} className="gap-2 pr-6 pl-5  text-base uppercase tracking-widest bg-[#e12029] text-white border-transparent hover:opacity-90">

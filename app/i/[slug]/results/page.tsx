@@ -49,6 +49,7 @@ function MetricCard({ title, value, subtitle, icon: Icon, color }: any) {
 }
 
 export default function ResultsPage() {
+  const params = typeof window !== "undefined" ? { slug: window.location.pathname.split("/")[2] } : { slug: "" };
   const { technical, derivedResults, setTechnicalInputs, activeInstaller } = useCalculatorStore();
   
   const [pieChartImage, setPieChartImage] = useState<string>();
@@ -100,7 +101,7 @@ export default function ResultsPage() {
             Wir konnten Ihre Berechnungsdaten nicht finden. Bitte konfigurieren Sie Ihre Systemeinstellungen.
           </p>
         </div>
-        <Link prefetch={false} href="/calculator/step-1">
+        <Link prefetch={false} href={`/i/${params.slug}/step-1`}>
           <Button variant="primary" className="mt-4">Rechner starten</Button>
         </Link>
       </div>
@@ -112,7 +113,7 @@ export default function ResultsPage() {
       <div   className="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
           <Link
-            href="/calculator/step-3"
+            href={`/i/${params.slug}/step-3`}
             className="inline-flex items-center text-xs font-bold text-[#565656] hover:text-primary  uppercase tracking-widest mb-6 group"
           >
             <ArrowLeft className="mr-2 h-4 w-4  " />
@@ -150,7 +151,7 @@ export default function ResultsPage() {
           title="Kapitalwert (NPV)" 
           value={`€${((derivedResults.yearlyProjection[14]?.cumulative || 0) + (technical.currentBatteryCapacityKwh || 10) * 1000).toLocaleString('de-DE', { 
   maximumFractionDigits: 0 
-})}`}
+})}`} 
           subtitle="Gesamtgewinn über Lebensdauer" 
           icon={TrendingUp}
           color="#565656"

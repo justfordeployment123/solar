@@ -7,6 +7,8 @@ const installerSchema = z.object({
   contactName: z.string().min(1, 'Ansprechpartner ist erforderlich'),
   email: z.string().email('Ungültige E-Mail-Adresse'),
   phone: z.string().optional(),
+  logoUrl: z.string().optional(),
+  websiteUrl: z.string().url().optional(),
 });
 
 export async function POST(request: Request) {
@@ -32,6 +34,8 @@ export async function POST(request: Request) {
       contact_name: data.contactName,
       email: data.email,
       phone: data.phone,
+      logo_url: data.logoUrl,
+      website_url: data.websiteUrl,
       generated_slug: generatedSlug,
     });
 

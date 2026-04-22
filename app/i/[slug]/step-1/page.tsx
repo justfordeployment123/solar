@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useCalculatorStore } from '@/store/calculatorStore';
 import { ProgressHeader } from '@/components/layout/progress-header';
@@ -35,6 +35,7 @@ const itemVariants = {
 
 export default function Step1Page() {
   const router = useRouter();
+  const params = useParams() as { slug: string };
   const [mounted, setMounted] = useState(false);
   
   const goals = useCalculatorStore((state) => state.goals);
@@ -74,7 +75,7 @@ export default function Step1Page() {
   const handleNext = (e: React.MouseEvent) => {
     e.preventDefault();
     markStepComplete('step1', true);
-    router.push('/calculator/step-2');
+    router.push(`/i/${params.slug}/step-2`);
   };
 
   if (!mounted) return null;

@@ -13,6 +13,7 @@ const leadSchema = z.object({
   persona: z.string().optional(),
   calculationSnapshot: z.any().optional(),
   honeypot: z.string().optional(),
+  installerId: z.string().optional(),
 });
 
 export async function POST(request: Request) {
@@ -46,6 +47,7 @@ export async function POST(request: Request) {
       phone: data.phone,
       persona: data.persona || 'homeowner',
       calculation_snapshot: data.calculationSnapshot || {},
+      installer_id: data.installerId || null,
     });
 
     if (dbError) {

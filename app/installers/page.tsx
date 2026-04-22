@@ -32,9 +32,11 @@ export default function InstallersPage() {
     try {
       const payload = {
         companyName: installerProfile.companyName,
-        contactName: installerProfile.contactName || "Default Contact", 
+        contactName: installerProfile.contactName || "Default Contact",
         email: installerProfile.email,
         phone: installerProfile.phone,
+        websiteUrl: installerProfile.websiteUrl,
+        logoUrl: logoPreview,
       };
       
       const res = await fetch("/api/installers", {
@@ -42,7 +44,7 @@ export default function InstallersPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
-      
+
       const data = await res.json();
       if (res.ok && data.url) {
         router.push(data.url);
@@ -64,12 +66,12 @@ export default function InstallersPage() {
 
       <header className="absolute top-0 w-full z-50 px-6 md:px-12 py-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
-          <Link href="/" className="flex items-center gap-4">
+          <Link prefetch={false} href="/" className="flex items-center gap-4">
             <Image priority src="/solar-logo.svg" alt="MySolar-PV Logo" width={120} height={32} className="h-6 md:h-8 w-auto object-contain opacity-80  " />
             <div className="w-[1px] h-6 bg-slate-300"></div>
             <Image priority src="/ngen-logo.svg" alt="Ngen Logo" width={100} height={32} className="h-6 md:h-8 w-auto object-contain opacity-80  " />
           </Link>
-          <Link href="/" className="group flex items-center justify-center gap-2 px-4 py-2  hover:bg-slate-100   text-slate-500 hover:text-slate-800">
+          <Link prefetch={false} href="/" className="group flex items-center justify-center gap-2 px-4 py-2  hover:bg-slate-100   text-slate-500 hover:text-slate-800">
             <span className="hidden md:inline font-bold uppercase tracking-widest text-[10px]">Cancel</span>
             <X className="w-4 h-4  " />
           </Link>
@@ -112,7 +114,7 @@ export default function InstallersPage() {
                     placeholder="Erika Mustermann" 
                     required 
                     value={installerProfile.contactName}
-                    onChange={(e: any) => setInstallerProfile({ contactName: "Erika Mustermann" })}
+                    onChange={(e: any) => setInstallerProfile({ contactName: e.target.value })}
                   />
                   
                   <div className="grid grid-cols-1 gap-8">
@@ -136,6 +138,16 @@ export default function InstallersPage() {
                     required 
                     value={installerProfile.email}
                     onChange={(e: any) => setInstallerProfile({ email: e.target.value })}
+                  />
+
+                  <Input 
+                    label="Website URL" 
+                    id="websiteUrl" 
+                    name="websiteUrl" 
+                    placeholder="https://www.firma.de" 
+                    type="url"
+                    value={installerProfile.websiteUrl || ""}
+                    onChange={(e: any) => setInstallerProfile({ websiteUrl: e.target.value })}
                   />
                   
                   <div className="pt-4">
@@ -206,16 +218,6 @@ export default function InstallersPage() {
         </div>
       </main>
 
-      <footer className="glass border-t border-white/50 w-full py-8 mt-auto flex flex-col md:flex-row items-center justify-between px-6 md:px-12 relative z-10">
-        <div className="text-xs font-bold uppercase tracking-widest text-slate-400">
-          © 2026 Solar PV
-        </div>
-        <nav className="flex gap-8 mt-4 md:mt-0">
-          <Link href="/" className="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-primary ">
-            Homepage besuchen
-          </Link>
-        </nav>
-      </footer>
     </div>
   );
 }

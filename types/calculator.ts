@@ -1,3 +1,4 @@
+
 export type Persona = 'Private' | 'Installer' | 'Company' | null;
 
 export type Goal = 
@@ -20,6 +21,13 @@ export interface TechnicalInputs {
   currentBatteryCapacityKwh: number | null;
   inverterPowerKw: number | null;
   gridConnectionLimitKw: number | null;
+  
+  // Questionnaire Goal Toggles
+  enableSelfConsumption?: boolean;
+  enablePeakShaving?: boolean;
+  enableEpex?: boolean;
+  enablePrl?: boolean;
+  enableSrl?: boolean;
 }
 
 export interface FinancialInputs {
@@ -74,6 +82,7 @@ export interface LeadFormDraft {
   lastName: string;
   email: string;
   phone: string;
+  websiteUrl?: string;
   companyName?: string;
 }
 
@@ -82,8 +91,20 @@ export interface InstallerProfileDraft {
   contactName: string;
   email: string;
   phone: string;
+  websiteUrl?: string;
   logoUrl?: string;
   generatedSlug?: string;
+}
+
+export interface ActiveInstaller {
+  id: string; // The supbase ID of the installer
+  companyName: string;
+  contactName: string;
+  email: string;
+  phone: string;
+  websiteUrl?: string;
+  logoUrl?: string;
+  generatedSlug: string;
 }
 
 export interface CalculatorState {
@@ -96,6 +117,7 @@ export interface CalculatorState {
   derivedResults: DerivedResults | null;
   leadDraft: LeadFormDraft;
   installerProfile: InstallerProfileDraft;
+  activeInstaller: ActiveInstaller | null;
   
   // Progress/Hydration Flags
   _hasHydrated: boolean;
@@ -116,6 +138,7 @@ export interface CalculatorActions {
   setCsvMetadata: (metadata: Partial<CsvMetadata>) => void;
   setLeadDraft: (draft: Partial<LeadFormDraft>) => void;
   setInstallerProfile: (draft: Partial<InstallerProfileDraft>) => void;
+  setActiveInstaller: (installer: ActiveInstaller | null) => void;
   markStepComplete: (step: keyof CalculatorState['stepCompletion'], isComplete: boolean) => void;
   resetData: () => void;
 }

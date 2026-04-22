@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import { useCalculatorStore } from '@/store/calculatorStore';
 import { RotateCcw } from 'lucide-react';
 
 interface Step {
@@ -17,6 +18,9 @@ interface SideNavProps {
 }
 
 export function SideNav({ steps, currentStepIndex }: SideNavProps) {
+  const activeInstaller = useCalculatorStore((state) => state.activeInstaller);
+  const basePath = activeInstaller ? `/i/${activeInstaller.generatedSlug}` : '/calculator';
+
   return (
     <aside className="hidden lg:flex flex-col h-[calc(100vh-88px)] w-72 bg-white border-r border-[#dfdfdf] p-8 sticky top-[88px] overflow-y-auto">
       <div className="mb-10">
@@ -41,11 +45,13 @@ export function SideNav({ steps, currentStepIndex }: SideNavProps) {
         {steps.map((step, index) => {
           const isActive = index === currentStepIndex;
           const isPast = index < currentStepIndex;
+          // Use step-3 instead of results for the 3rd step, or adapt if needed
+          const stepPath = step.id === '3' ? 'results' : `step-${step.id}`;
           
           return (
             <Link 
               key={step.id} 
-              href={`#${step.id}`}
+              href={`${basePath}/${stepPath}`}
               className={`relative flex items-center gap-4 p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary group ${
                 isActive 
                   ? 'text-primary bg-primary/5 font-bold ' 

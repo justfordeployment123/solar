@@ -46,6 +46,7 @@ const initialState: CalculatorState = {
     email: '',
     phone: '',
   },
+  activeInstaller: null,
   _hasHydrated: false,
   stepCompletion: {
     step1: false,
@@ -64,8 +65,23 @@ export const useCalculatorStore = create<CalculatorStore>()(
       
       setPersona: (persona) => set({ persona }),
       
-      setGoals: (goals) =>
-        set((state) => ({ goals: { ...state.goals, ...goals } })),
+      setGoals: (goalsPayload) =>
+        set((state) => {
+          const newGoals = { ...state.goals, ...goalsPayload };
+          const allGoals = [newGoals.primaryGoal, ...newGoals.secondaryGoals];
+          
+          const newTechnical = {
+            ...state.technical,
+            enableSelfConsumption: allGoals.includes('Self-Consumption'),
+            enablePeakShaving: allGoals.includes('Peak Shaving'),
+            enableEpex: allGoals.includes('EPEX Arbitrage'),
+            enablePrl: allGoals.includes('Grid Services (VPP/Balancing)'),
+            enableSrl: allGoals.includes('Grid Services (VPP/Balancing)')
+          };
+          
+          const derivedResults = calculateResults(newTechnical, state.financial);
+          return { goals: newGoals, technical: newTechnical, derivedResults };
+        }),
         
       setTechnicalInputs: (inputs) =>
         set((state) => {
@@ -89,6 +105,9 @@ export const useCalculatorStore = create<CalculatorStore>()(
         
       setInstallerProfile: (draft) =>
         set((state) => ({ installerProfile: { ...state.installerProfile, ...draft } })),
+        
+      setActiveInstaller: (installer) =>
+        set(() => ({ activeInstaller: installer })),
         
       markStepComplete: (step, isComplete) =>
         set((state) => ({

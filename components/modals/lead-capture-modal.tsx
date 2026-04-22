@@ -37,6 +37,7 @@ export function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalProps) {
         lastName: leadDraft.lastName,
         email: leadDraft.email,
         phone: leadDraft.phone,
+        installerId: state.activeInstaller?.id,
         calculationSnapshot: {
           technical: state.technical,
           financial: state.financial,
