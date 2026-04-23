@@ -19,7 +19,6 @@ import {
   ClipboardList,
   Settings2,
   CheckCircle2,
-  TrendingUp,
 } from 'lucide-react';
 
 export default function LandingPage() {
@@ -275,32 +274,6 @@ export default function LandingPage() {
 
           {/* RIGHT — self-contained product preview mockup */}
           <div className="lg:col-span-6 relative">
-            {/* Floating tag: Live-Kalkulation */}
-            <div className="hidden md:flex absolute -top-5 -left-5 z-20 bg-white border border-[#e5e5e5] shadow-[0_10px_40px_rgba(0,0,0,0.08)] px-4 py-3 items-center gap-3">
-              <div className="w-9 h-9 bg-[#d2d700] flex items-center justify-center">
-                <Zap className="w-4 h-4 text-black" />
-              </div>
-              <div>
-                <div className="text-[0.65rem] uppercase tracking-[0.18em] text-[#5a5859] font-bold">
-                  Live-Kalkulation
-                </div>
-                <div className="text-[0.85rem] font-bold text-[#1a1a1a]">
-                  Ergebnis &lt; 60 Sek.
-                </div>
-              </div>
-            </div>
-
-            {/* Floating right badge: ROI */}
-            <div className="hidden md:flex absolute -top-6 right-8 z-20 bg-[#1a1a1a] text-white px-5 py-3 items-center gap-3">
-              <TrendingUp className="w-5 h-5 text-[#ffdb00]" />
-              <div>
-                <div className="text-[0.6rem] uppercase tracking-[0.18em] text-white/60 font-bold">
-                  Amortisation
-                </div>
-                <div className="text-sm font-bold">Jahr 7,2</div>
-              </div>
-            </div>
-
             {/* Dashboard mockup card */}
             <div className="relative bg-white border border-[#e5e5e5] shadow-[0_20px_60px_rgba(0,0,0,0.08)]">
               {/* Window chrome */}
@@ -412,29 +385,6 @@ export default function LandingPage() {
               </div>
             </div>
 
-            {/* Floating bottom-right card: certified */}
-            <div className="hidden md:flex absolute -bottom-6 right-6 z-20 bg-white border border-[#e5e5e5] shadow-[0_10px_40px_rgba(0,0,0,0.08)] px-4 py-3 items-center gap-3">
-              <div className="w-9 h-9 bg-[#e20613] flex items-center justify-center">
-                <ShieldCheck className="w-4 h-4 text-white" />
-              </div>
-              <div>
-                <div className="text-[0.65rem] uppercase tracking-[0.18em] text-[#5a5859] font-bold">
-                  TÜV
-                </div>
-                <div className="text-[0.85rem] font-bold text-[#1a1a1a]">Zertifiziert</div>
-              </div>
-            </div>
-
-            {/* Floating bottom-left card: savings */}
-            <div className="hidden md:flex absolute -bottom-5 -left-4 z-20 bg-[#ffdb00] px-4 py-3 items-center gap-3">
-              <Leaf className="w-5 h-5 text-black" />
-              <div>
-                <div className="text-[0.6rem] uppercase tracking-[0.18em] text-black/70 font-bold">
-                  CO₂ gespart
-                </div>
-                <div className="text-sm font-bold text-black">4,2 t / Jahr</div>
-              </div>
-            </div>
           </div>
         </div>
 
