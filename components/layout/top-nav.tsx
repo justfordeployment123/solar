@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useCalculatorStore } from '@/store/calculatorStore';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, BatteryCharging } from 'lucide-react';
 
 export function TopNav() {
   const router = useRouter();
@@ -20,35 +20,42 @@ export function TopNav() {
   };
 
   return (
-    <nav 
-         className="w-full py-6 left-0 right-0 bg-transparent flex justify-between items-center px-6 md:px-8 z-50 absolute top-0"
-    >
-      <Link prefetch={false} href={homeHref} className="flex items-center gap-4">
-        {/* We use neutral filters so it adapts to a light theme */}
-        {activeInstaller?.logoUrl ? (
-          <img 
-            src={activeInstaller.logoUrl} 
-            alt={`${activeInstaller.companyName} Logo`} 
-            className="h-14 md:h-16 w-auto object-contain opacity-80" 
-          />
-        ) : (
-          <Image 
-            src="/solar-logo.svg" 
-            alt="MySolar-PV Logo" 
-            width={120} 
-            height={48} 
-            className="h-10 md:h-12 w-auto object-contain opacity-80" 
-          />
-        )}
-      </Link>
-      
-      <div className="flex items-center justify-end">
-        <button 
-          onClick={handleReset} 
-          className="group flex items-center justify-center gap-2 px-4 py-2  hover:bg-[#ffffff]   text-[#565656] hover:text-[#e12029]"
+    <nav className="fixed top-0 left-0 right-0 w-full z-50 bg-white border-b border-[#e5e5e5]">
+      {/* Tri-color accent stripe */}
+      <div className="flex w-full h-[4px]">
+        <div className="flex-1 bg-[#e20613]" />
+        <div className="flex-1 bg-[#d2d700]" />
+        <div className="flex-1 bg-[#ffdb00]" />
+      </div>
+
+      <div className="flex justify-between items-center px-6 md:px-8 py-4">
+        <Link prefetch={false} href={homeHref} className="flex items-center gap-3">
+          {activeInstaller?.logoUrl ? (
+            <img
+              src={activeInstaller.logoUrl}
+              alt={`${activeInstaller.companyName} Logo`}
+              className="h-10 md:h-12 w-auto object-contain"
+            />
+          ) : (
+            <>
+              <div className="w-9 h-9 bg-[#e20613] flex items-center justify-center">
+                <BatteryCharging className="w-5 h-5 text-white" />
+              </div>
+              <span className="font-bold tracking-tight text-[#1a1a1a] text-lg hidden sm:inline">
+                MySolar<span className="text-[#e20613]">·PV</span>
+              </span>
+            </>
+          )}
+        </Link>
+
+        <button
+          onClick={handleReset}
+          className="group flex items-center gap-2 px-4 py-2 border border-[#e5e5e5] hover:border-[#e20613] text-[#5a5859] hover:text-[#e20613] transition-colors"
         >
-          <RotateCcw className="w-4 h-4  group-hover:-rotate-90" />
-          <span className="hidden md:inline font-bold uppercase tracking-widest text-[10px]">Zurücksetzen</span>
+          <RotateCcw className="w-4 h-4 transition-transform group-hover:-rotate-90" />
+          <span className="hidden md:inline font-bold uppercase tracking-[0.18em] text-[10px]">
+            Zurücksetzen
+          </span>
         </button>
       </div>
     </nav>

@@ -2,23 +2,23 @@
 
 @theme inline {
   --color-surface-variant: #ffffff;
-  --color-background: #ffffff; /* Very Light Green */
+  --color-background: #ffffff;
   --color-surface: #ffffff;
-  --color-primary: #e12029; /* Ngen Green */
+  --color-primary: #e20613; /* MySolar brand red */
   --color-on-primary: #ffffff;
-  --color-secondary: #565656; /* Sky Blue */
-  --color-on-secondary: #ffffff;
-  --color-tertiary: #565656; /* Ngen Gray */
+  --color-secondary: #d2d700; /* MySolar lime */
+  --color-on-secondary: #000000;
+  --color-tertiary: #ffdb00; /* MySolar yellow */
   --color-surface-container: #ffffff;
-  --color-surface-container-high: #dfdfdf;
-  --color-surface-container-highest: #dfdfdf;
-  --color-outline: #dfdfdf;
-  --color-outline-variant: #565656;
-  
-  --color-on-surface: #363636;
-  --color-on-background: #363636;
-  
-  --color-error: #ff3b30;
+  --color-surface-container-high: #f4f4f4;
+  --color-surface-container-highest: #eeeeee;
+  --color-outline: #e5e5e5;
+  --color-outline-variant: #5a5859;
+
+  --color-on-surface: #1a1a1a;
+  --color-on-background: #1a1a1a;
+
+  --color-error: #e20613;
   --color-error-container: #ffe5e5;
   --color-on-error: #ffffff;
   

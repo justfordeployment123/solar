@@ -19,26 +19,11 @@ const GOAL_OPTIONS: { id: Goal & string; title: string; description: string; dis
   { id: 'Load Shifting', title: 'Lastverschiebung (Load Shifting)', description: 'Nutzen Sie dynamische Tarife, um günstige Energie zu speichern und zeitversetzt optimal einzusetzen.' },
 ];
 
-const containerVariants = {
-  hidden: { opacity: 0 },
-  show: {
-    opacity: 1,
-    transition: {
-      staggerChildren: 0.1
-    }
-  }
-};
-
-const itemVariants = {
-  hidden: { opacity: 0, y: 20 },
-  show: { opacity: 1, y: 0, transition: { type: "spring" as const, stiffness: 300, damping: 24 } }
-};
-
 export default function Step1Page() {
   const router = useRouter();
   const params = useParams() as { slug: string };
   const [mounted, setMounted] = useState(false);
-  
+
   const goals = useCalculatorStore((state) => state.goals);
   const setGoals = useCalculatorStore((state) => state.setGoals);
   const markStepComplete = useCalculatorStore((state) => state.markStepComplete);
@@ -50,7 +35,7 @@ export default function Step1Page() {
   const handleToggleGoal = (goal: string) => {
     const goalValue = goal as Goal;
     if (!goalValue) return;
-    
+
     const allSelected = new Set(
       goals.primaryGoal ? [goals.primaryGoal, ...goals.secondaryGoals] : goals.secondaryGoals
     );
@@ -85,34 +70,47 @@ export default function Step1Page() {
 
   if (!mounted) return null;
 
+  const selectedCount =
+    (goals.primaryGoal ? 1 : 0) + goals.secondaryGoals.length;
+
   return (
-    <div className="px-6 lg:px-12 pt-8 max-w-4xl mx-auto flex flex-col min-h-full">
-      <ProgressHeader 
-        currentStep={1} 
-        totalSteps={3} 
-        title="Was sind Ihre Ziele?" 
-        description="Wählen Sie aus, wie Ihr zukünftiges Batteriesystem mit dem Stromnetz und Ihrem lokalen Energieverbrauchsnetz interagieren soll." 
+    <div className="px-6 lg:px-12 pt-10 max-w-4xl mx-auto flex flex-col min-h-full">
+      <ProgressHeader
+        currentStep={1}
+        totalSteps={3}
+        title="Was sind Ihre Ziele?"
+        description="Wählen Sie aus, wie Ihr zukünftiges Batteriesystem mit dem Stromnetz und Ihrem lokalen Energieverbrauchsnetz interagieren soll."
       />
 
-      <section 
-         className="space-y-4 my-8 flex-grow"
-      >
+      <div className="flex items-center justify-between mb-6 pb-4 border-b border-[#e5e5e5]">
+        <span className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#5a5859]">
+          Mehrfachauswahl möglich
+        </span>
+        <span className="text-[0.8rem] font-bold text-[#1a1a1a]">
+          <span className="text-[#e20613]">{selectedCount}</span> / {GOAL_OPTIONS.length} ausgewählt
+        </span>
+      </div>
+
+      <section className="space-y-4 mb-12 flex-grow">
         {GOAL_OPTIONS.map((option) => (
-          <div key={option.id!}  >
-            <RadioCard 
-              option={option}
-              checked={isSelected(option.id)}
-              onChange={handleToggleGoal}
-            />
-          </div>
+          <RadioCard
+            key={option.id!}
+            option={option}
+            checked={isSelected(option.id)}
+            onChange={handleToggleGoal}
+          />
         ))}
       </section>
 
-      <footer className="mt-12 pb-12 flex justify-between items-center py-6 border-t border-[#dfdfdf] w-full mt-auto">
-        <Link prefetch={false} href="/" className="text-sm font-bold uppercase tracking-widest text-[#565656] hover:text-primary  flex items-center gap-2 group">
-          <ArrowLeft className="w-4 h-4  " /> Zurück
+      <footer className="mt-auto pb-10 flex justify-between items-center py-6 border-t border-[#e5e5e5] w-full">
+        <Link
+          prefetch={false}
+          href="/"
+          className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#5a5859] hover:text-[#e20613] flex items-center gap-2 group transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Zurück
         </Link>
-        <Button variant="primary" onClick={handleNext} className="gap-2 pr-4  text-base uppercase tracking-widest bg-[#363636] text-white hover:bg-primary border-transparent">
+        <Button variant="primary" onClick={handleNext}>
           Nächster Schritt <ChevronRight className="w-5 h-5" />
         </Button>
       </footer>

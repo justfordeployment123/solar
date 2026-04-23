@@ -19,26 +19,26 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [pathname]);
-  
+
   let currentIndex = 0;
   if (pathname.includes('/step-1')) currentIndex = 0;
   else if (pathname.includes('/step-2')) currentIndex = 1;
   else if (pathname.includes('/step-3') || pathname.includes('/results')) currentIndex = 2;
 
   return (
-    <div className="min-h-screen w-full bg-[#ffffff] flex flex-col font-sans   relative">
+    <div className="min-h-screen w-full bg-white flex flex-col font-opensans text-[#1a1a1a] relative">
       <TopNav />
-      
-      <div className="flex flex-1 pt-[88px] md:pt-[104px] w-full relative z-10">
+
+      <div className="flex flex-1 pt-[92px] w-full relative z-10">
         <SideNav steps={steps} currentStepIndex={currentIndex} />
-        
-        <main className="flex-1 w-full max-w-[1100px] mx-auto pb-32 lg:pb-12 h-content lg:px-8">
-            <div key={pathname} className="h-full">
-              {children}
-            </div>
+
+        <main className="flex-1 w-full max-w-[1100px] mx-auto pb-32 lg:pb-16 lg:px-8">
+          <div key={pathname} className="h-full">
+            {children}
+          </div>
         </main>
       </div>
-      
+
       <MobileBottomNav steps={steps} currentStepIndex={currentIndex} />
     </div>
   );

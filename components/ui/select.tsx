@@ -3,6 +3,7 @@
 import React from 'react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { ChevronDown } from 'lucide-react';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -21,16 +22,14 @@ export interface SelectProps extends Omit<React.SelectHTMLAttributes<HTMLSelectE
 export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
   ({ label, options, className, ...props }, ref) => {
     return (
-      <div 
-          className={cn("group flex flex-col gap-1.5", className)}
-      >
-        <label className="text-xs font-semibold uppercase tracking-wider text-[#565656] ml-1">
+      <div className={cn("group flex flex-col gap-2", className)}>
+        <label className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-[#5a5859]">
           {label}
         </label>
         <div className="relative">
-          <select 
+          <select
             ref={ref}
-            className="w-full bg-white border border-[#dfdfdf]  py-3 px-4 pr-10 outline-none focus:border-primary text-[#363636] font-medium   hover: appearance-none cursor-pointer"
+            className="w-full bg-white border border-[#e5e5e5] py-3.5 px-4 pr-10 outline-none focus:border-[#e20613] text-[#1a1a1a] font-semibold text-[0.95rem] transition-colors appearance-none cursor-pointer"
             {...props}
           >
             {options.map((option) => (
@@ -39,10 +38,8 @@ export const Select = React.forwardRef<HTMLSelectElement, SelectProps>(
               </option>
             ))}
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-4 text-[#565656]">
-            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-              <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-            </svg>
+          <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-4 text-[#5a5859]">
+            <ChevronDown className="h-4 w-4" />
           </div>
         </div>
       </div>

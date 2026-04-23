@@ -13,7 +13,7 @@ export default async function Layout({
 }) {
   const { slug } = await params;
   const supabase = createServerSupabaseClient();
-  
+
   const { data, error } = await supabase
     .from('installers')
     .select('*')
@@ -26,10 +26,25 @@ export default async function Layout({
 
   if (data.is_active === false) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-4">Access Revoked</h1>
-          <p className="text-gray-600">This installer link is no longer active or has been disabled.</p>
+      <div className="min-h-screen bg-white flex flex-col items-center justify-center px-6 font-opensans text-[#1a1a1a]">
+        <div className="flex w-full max-w-md h-[6px] mb-10">
+          <div className="flex-1 bg-[#e20613]" />
+          <div className="flex-1 bg-[#d2d700]" />
+          <div className="flex-1 bg-[#ffdb00]" />
+        </div>
+        <div className="max-w-md text-center">
+          <div className="inline-flex items-center gap-2 bg-[#fff5f5] border border-[#e20613]/20 px-3 py-1 mb-6">
+            <span className="w-2 h-2 bg-[#e20613]" />
+            <span className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#e20613]">
+              Zugriff gesperrt
+            </span>
+          </div>
+          <h1 className="text-4xl md:text-5xl font-bold tracking-tight text-[#1a1a1a] mb-4 leading-tight">
+            Access Revoked
+          </h1>
+          <p className="text-[#5a5859] font-medium leading-relaxed">
+            This installer link is no longer active or has been disabled.
+          </p>
         </div>
       </div>
     );

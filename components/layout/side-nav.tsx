@@ -3,7 +3,6 @@
 import React from 'react';
 import Link from 'next/link';
 import { useCalculatorStore } from '@/store/calculatorStore';
-import { RotateCcw } from 'lucide-react';
 
 interface Step {
   id: string;
@@ -22,61 +21,68 @@ export function SideNav({ steps, currentStepIndex }: SideNavProps) {
   const basePath = activeInstaller ? `/i/${activeInstaller.generatedSlug}` : '/calculator';
 
   return (
-    <aside className="hidden lg:flex flex-col h-[calc(100vh-88px)] w-72 bg-white border-r border-[#dfdfdf] p-8 sticky top-[88px] overflow-y-auto">
+    <aside className="hidden lg:flex flex-col h-[calc(100vh-88px)] w-72 bg-white border-r border-[#e5e5e5] p-8 sticky top-[88px] overflow-y-auto">
       <div className="mb-10">
-        <div 
-            className="text-xs font-bold text-primary uppercase tracking-widest mb-2"
-        >
-          Rechner
+        <div className="inline-flex items-center gap-2 mb-4">
+          <span className="w-2 h-2 bg-[#e20613]" />
+          <span className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-[#e20613]">
+            Rechner
+          </span>
         </div>
-        <h2 
-             className="text-2xl font-black text-[#363636] tracking-tight"
-        >
+        <h2 className="text-2xl font-bold text-[#1a1a1a] tracking-tight leading-tight">
           Schritt-Übersicht
         </h2>
-        <p 
-             className="text-sm text-[#565656] mt-2 font-medium"
-        >
+        <p className="text-sm text-[#5a5859] mt-2 font-medium">
           Schritt {currentStepIndex + 1} von {steps.length}
         </p>
       </div>
 
-      <nav className="flex flex-col gap-2 flex-grow">
+      <nav className="flex flex-col gap-1 flex-grow">
         {steps.map((step, index) => {
           const isActive = index === currentStepIndex;
           const isPast = index < currentStepIndex;
-          // Use step-3 instead of results for the 3rd step, or adapt if needed
           const stepPath = step.id === '3' ? 'results' : `step-${step.id}`;
-          
+
           return (
-            <Link 
-              key={step.id} 
+            <Link
+              key={step.id}
               href={`${basePath}/${stepPath}`}
-              className={`relative flex items-center gap-4 p-4 focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary group ${
-                isActive 
-                  ? 'text-primary bg-primary/5 font-bold ' 
-                  : isPast 
-                    ? 'text-[#565656] hover:bg-[#ffffff]' 
-                    : 'text-[#565656] hover:bg-[#ffffff]'
+              className={`relative flex items-center gap-4 p-4 border transition-colors group ${
+                isActive
+                  ? 'border-[#e20613] bg-[#fff5f5] text-[#e20613] font-bold'
+                  : isPast
+                  ? 'border-transparent text-[#1a1a1a] hover:border-[#e5e5e5] hover:bg-[#fafafa]'
+                  : 'border-transparent text-[#5a5859] hover:border-[#e5e5e5] hover:bg-[#fafafa]'
               }`}
             >
-              {isActive && (
-                <div 
-                  
-                  className="absolute inset-0 bg-white  border border-primary/20  -z-10"
-                   />
-              )}
-              
-              <div className={`flex items-center justify-center w-8 h-8   ${
-                isActive ? 'bg-primary text-white ' : isPast ? 'bg-[#dfdfdf] text-[#565656]' : 'bg-[#ffffff] text-[#565656]'
-              }`}>
+              <div
+                className={`flex items-center justify-center w-9 h-9 transition-colors ${
+                  isActive
+                    ? 'bg-[#e20613] text-white'
+                    : isPast
+                    ? 'bg-[#1a1a1a] text-white'
+                    : 'bg-[#f4f4f4] text-[#5a5859]'
+                }`}
+              >
                 <step.icon className="w-4 h-4" />
               </div>
-              <span className="font-medium text-sm tracking-wide z-10">{step.title}</span>
+              <div className="flex flex-col">
+                <span className="text-[0.65rem] font-bold uppercase tracking-[0.18em] opacity-70">
+                  Schritt {step.id}
+                </span>
+                <span className="font-semibold text-sm tracking-tight">{step.title}</span>
+              </div>
             </Link>
           );
         })}
       </nav>
+
+      {/* Bottom brand stripe */}
+      <div className="mt-8 pt-6 border-t border-[#e5e5e5] flex items-center gap-1">
+        <span className="w-6 h-[3px] bg-[#e20613]" />
+        <span className="w-6 h-[3px] bg-[#d2d700]" />
+        <span className="w-6 h-[3px] bg-[#ffdb00]" />
+      </div>
     </aside>
   );
 }

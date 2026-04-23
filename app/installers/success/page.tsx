@@ -2,14 +2,17 @@
 
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { CheckCircle, ArrowRight, Share2, Copy } from 'lucide-react';
+import { CheckCircle2, ArrowRight, Copy, BatteryCharging } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Suspense } from 'react';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const slug = searchParams.get("slug") || "energy-solutions-gmbh";
-  const url = typeof window !== "undefined" ? `${window.location.origin}/i/${slug}` : `https://example.com/i/${slug}`;
+  const url =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/i/${slug}`
+      : `https://example.com/i/${slug}`;
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(url);
@@ -18,48 +21,77 @@ function SuccessContent() {
 
   return (
     <>
-      <header className="fixed top-0 w-full z-50 bg-[#ffffff] border-b border-[#dfdfdf] px-6 md:px-12 py-6 flex justify-between items-center text-center mx-auto max-w-7xl relative">
-        <Link prefetch={false} href="/" className="text-xl font-black uppercase tracking-tight text-[#363636] mx-auto md:mx-0">
-          Solar PV<span className="text-primary ml-1"> Partner-Portal</span>
-        </Link>
+      {/* Top stripe */}
+      <div className="fixed top-0 left-0 right-0 z-40 flex w-full h-[6px]">
+        <div className="flex-1 bg-[#e20613]" />
+        <div className="flex-1 bg-[#d2d700]" />
+        <div className="flex-1 bg-[#ffdb00]" />
+      </div>
+
+      {/* Header */}
+      <header className="fixed top-[6px] left-0 right-0 w-full z-40 bg-white border-b border-[#e5e5e5]">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-4 flex justify-between items-center">
+          <Link prefetch={false} href="/" className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-[#e20613] flex items-center justify-center">
+              <BatteryCharging className="w-5 h-5 text-white" />
+            </div>
+            <span className="font-bold tracking-tight text-[#1a1a1a] text-lg">
+              MySolar<span className="text-[#e20613]">·PV</span>
+              <span className="hidden sm:inline text-[#5a5859] ml-2 text-xs font-bold uppercase tracking-[0.18em]">
+                Partner-Portal
+              </span>
+            </span>
+          </Link>
+        </div>
       </header>
 
-      <main className="w-full max-w-screen-md px-6 py-32 text-center relative z-10 flex flex-col items-center">
-        <div className="relative mb-12">
-          <CheckCircle className="w-24 h-24 text-[#e12029] relative" strokeWidth={2} />
+      <main className="w-full max-w-3xl mx-auto px-6 pt-32 pb-20 text-center flex flex-col items-center">
+        <div className="w-20 h-20 bg-[#e20613] flex items-center justify-center mb-8">
+          <CheckCircle2 className="w-10 h-10 text-white" strokeWidth={2} />
         </div>
-        
-        <h1 className="text-5xl md:text-7xl font-black tracking-tight text-[#363636] mb-6">
-          Erfolg!
+
+        <div className="inline-flex items-center gap-2 bg-[#fff5f5] border border-[#e20613]/20 px-3 py-1 mb-6">
+          <span className="w-2 h-2 bg-[#e20613]" />
+          <span className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#e20613]">
+            Fertig
+          </span>
+        </div>
+
+        <h1 className="text-[2.75rem] md:text-[4.25rem] font-bold tracking-tight text-[#1a1a1a] leading-[1.02] mb-6">
+          Erfolgreich <span className="text-[#e20613]">erstellt</span>
         </h1>
-        
-        <p className="text-xl text-[#565656] max-w-2xl mx-auto leading-relaxed mb-12">
-          Ihr individueller Batteriespeicher-Rechner wurde erfolgreich generiert. Sie können ihn nun mit Ihren Kunden teilen.
+
+        <p className="text-lg text-[#5a5859] max-w-xl leading-relaxed mb-12 font-medium">
+          Ihr individueller Batteriespeicher-Rechner wurde erfolgreich generiert.
+          Sie können ihn nun mit Ihren Kunden teilen.
         </p>
 
-        <div className="bg-[#ffffff] border border-[#dfdfdf] p-8 mb-12 flex flex-col gap-4 max-w-lg mx-auto text-left relative overflow-hidden w-full">
-          <div className="absolute top-0 right-0 p-6 opacity-10">
-            <Share2 className="w-24 h-24" />
+        <div className="relative bg-white border border-[#e5e5e5] p-8 mb-12 w-full max-w-xl text-left">
+          <span className="absolute top-0 left-0 right-0 h-[3px] bg-[#d2d700]" />
+          <div className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#e20613] mb-4 flex items-center gap-2">
+            <span className="w-2 h-2 bg-[#e20613]" />
+            Ihr persönlicher Link
           </div>
-          <p className="text-xs text-primary font-black uppercase tracking-widest relative z-10">Ihr persönlicher Link</p>
-          <div className="flex flex-col md:flex-row items-center gap-4 relative z-10 w-full">
-            <p className="text-[#363636] font-mono font-medium text-sm md:text-base break-all bg-white p-4 border border-[#dfdfdf] flex-grow w-full">
+          <div className="flex flex-col md:flex-row items-stretch gap-3">
+            <p className="text-[#1a1a1a] font-mono font-semibold text-sm md:text-base break-all bg-[#fafafa] p-4 border border-[#e5e5e5] flex-grow">
               {url}
             </p>
-            <button onClick={copyToClipboard} className="p-4 bg-primary text-white hover:bg-primary/90 w-full md:w-auto" title="In die Zwischenablage kopieren">
-              <Copy className="w-5 h-5 mx-auto" />
+            <button
+              onClick={copyToClipboard}
+              className="p-4 bg-[#e20613] text-white hover:bg-[#1a1a1a] transition-colors flex items-center justify-center gap-2 font-bold uppercase tracking-[0.18em] text-xs"
+              title="In die Zwischenablage kopieren"
+            >
+              <Copy className="w-4 h-4" />
+              <span className="md:hidden">Kopieren</span>
             </button>
           </div>
         </div>
 
-        <div>
-          <Link prefetch={false} href={`/i/${slug}/step-1`}>
-            <Button variant="primary" className="px-10 py-6 text-lg uppercase tracking-widest gap-3 bg-[#363636] hover:bg-[#363636] border-transparent text-white">
-              Rechner starten
-              <ArrowRight className="w-6 h-6" />
-            </Button>
-          </Link>
-        </div>
+        <Link prefetch={false} href={`/i/${slug}/step-1`}>
+          <Button variant="primary">
+            Rechner starten <ArrowRight className="w-5 h-5" />
+          </Button>
+        </Link>
       </main>
     </>
   );
@@ -67,7 +99,7 @@ function SuccessContent() {
 
 export default function InstallersSuccessPage() {
   return (
-    <div className="bg-[#ffffff] min-h-screen text-[#363636] font-sans flex flex-col items-center justify-center relative overflow-hidden">
+    <div className="bg-white min-h-screen text-[#1a1a1a] font-opensans flex flex-col items-center justify-center relative overflow-hidden">
       <Suspense fallback={<div>Loading...</div>}>
         <SuccessContent />
       </Suspense>
