@@ -30,6 +30,7 @@ export default function Step3Page() {
   const stepCompletion = useCalculatorStore((state) => state.stepCompletion);
   const markStepComplete = useCalculatorStore((state) => state.markStepComplete);
   const financial = useCalculatorStore((state) => state.financial);
+  const technical = useCalculatorStore((state) => state.technical);
   const setFinancialInputs = useCalculatorStore((state) => state.setFinancialInputs);
 
   useEffect(() => {
@@ -99,6 +100,62 @@ export default function Step3Page() {
                 onChange={handleInputChange('targetBudgetEur')}
               />
             </div>
+
+            {technical.enablePeakShaving && (
+              <div className="pt-4 border-t border-[#dfdfdf] mt-6">
+                <h4 className="text-xs font-bold uppercase tracking-widest text-[#565656] mb-4">Peak Shaving Daten</h4>
+                <div className="space-y-4">
+                  <Input 
+                    label="Leistungspreis (€/kW)" 
+                    type="number" 
+                    step="0.1" 
+                    placeholder="45" 
+                    value={financial.demandChargeEurPerKw ?? ''}
+                    onChange={handleInputChange('demandChargeEurPerKw')}
+                  />
+                  <Input 
+                    label="Einsparung (%)" 
+                    type="number" 
+                    step="1" 
+                    placeholder="75" 
+                    value={financial.peakShavingReductionPercentage ?? ''}
+                    onChange={handleInputChange('peakShavingReductionPercentage')}
+                  />
+                </div>
+              </div>
+            )}
+
+            {technical.enableLoadShifting && (
+              <div className="pt-4 border-t border-[#dfdfdf] mt-6">
+                <h4 className="text-xs font-bold uppercase tracking-widest text-[#565656] mb-4">Load Shifting Daten</h4>
+                <div className="space-y-4">
+                  <Input 
+                    label="Dynamischer Tarif (Cent/kWh)" 
+                    type="number" 
+                    step="0.1" 
+                    placeholder="30" 
+                    value={financial.dynamicFeedInTariffCentsKwh ?? ''}
+                    onChange={handleInputChange('dynamicFeedInTariffCentsKwh')}
+                  />
+                  <Input 
+                    label="Standard Tarif (Cent/kWh)" 
+                    type="number" 
+                    step="0.1" 
+                    placeholder="8" 
+                    value={financial.standardFeedInTariffCentsKwh ?? ''}
+                    onChange={handleInputChange('standardFeedInTariffCentsKwh')}
+                  />
+                  <Input 
+                    label="Netzentgelte (Cent/kWh)" 
+                    type="number" 
+                    step="0.1" 
+                    placeholder="12" 
+                    value={financial.gridFeesCentsKwh ?? ''}
+                    onChange={handleInputChange('gridFeesCentsKwh')}
+                  />
+                </div>
+              </div>
+            )}
             
             <label  className="flex items-center space-x-4 cursor-pointer mt-8 p-4  hover:bg-[#ffffff]  border border-transparent hover:border-[#ffffff] group">
               <div className="relative flex items-center justify-center">

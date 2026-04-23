@@ -16,6 +16,7 @@ const GOAL_OPTIONS: { id: Goal & string; title: string; description: string; dis
   { id: 'Grid Services (VPP/Balancing)', title: 'Netzstabilität (PRL/SRL)', description: 'Stellen Sie dem nationalen Übertragungsnetzbetreiber Frequenzregelreserven zur Verfügung.' },
   { id: 'EPEX Arbitrage', title: 'Energiehandel (EPEX Arbitrage)', description: 'Kaufen Sie Energie, wenn die Preise niedrig sind, und verkaufen Sie diese, wenn sie auf dem Spotmarkt hoch sind.' },
   { id: 'Backup Power', title: 'Notstromversorgung', description: 'Gewährleisten Sie die Stromverfügbarkeit bei Netzausfällen.' },
+  { id: 'Load Shifting', title: 'Lastverschiebung (Load Shifting)', description: 'Nutzen Sie dynamische Tarife, um günstige Energie zu speichern und zeitversetzt optimal einzusetzen.' },
 ];
 
 const containerVariants = {

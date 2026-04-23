@@ -22,6 +22,11 @@ const initialState: CalculatorState = {
     yearlyElectricityBillEur: null,
     targetBudgetEur: null,
     vppParticipationEnabled: false,
+    dynamicFeedInTariffCentsKwh: null,
+    standardFeedInTariffCentsKwh: null,
+    gridFeesCentsKwh: null,
+    demandChargeEurPerKw: null,
+    peakShavingReductionPercentage: null,
   },
   csvMetadata: {
     isConfigured: false,
@@ -76,7 +81,8 @@ export const useCalculatorStore = create<CalculatorStore>()(
             enablePeakShaving: allGoals.includes('Peak Shaving'),
             enableEpex: allGoals.includes('EPEX Arbitrage'),
             enablePrl: allGoals.includes('Grid Services (VPP/Balancing)'),
-            enableSrl: allGoals.includes('Grid Services (VPP/Balancing)')
+            enableSrl: allGoals.includes('Grid Services (VPP/Balancing)'),
+            enableLoadShifting: allGoals.includes('Load Shifting')
           };
           
           const derivedResults = calculateResults(newTechnical, state.financial);

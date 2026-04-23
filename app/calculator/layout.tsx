@@ -33,10 +33,10 @@ export default function CalculatorLayout({ children }: { children: React.ReactNo
       
       <TopNav />
       
-      <div className="flex flex-1 pt-[88px] md:pt-[104px] max-w-[1400px] mx-auto w-full relative z-10">
+      <div className="flex flex-1 pt-[88px] md:pt-[104px] w-full relative z-10">
         <SideNav steps={steps} currentStepIndex={currentIndex} />
         
-        <main className="flex-1 w-full pb-32 lg:pb-12 h-content lg:px-8">
+        <main className="flex-1 w-full max-w-[1100px] mx-auto pb-32 lg:pb-12 h-content lg:px-8">
           
             <div
               key={pathname}

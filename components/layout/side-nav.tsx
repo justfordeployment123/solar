@@ -77,18 +77,6 @@ export function SideNav({ steps, currentStepIndex }: SideNavProps) {
           );
         })}
       </nav>
-
-      <button 
-          onClick={() => {
-          if (window.confirm("Sind Sie sicher, dass Sie alle Daten zurücksetzen möchten?")) {
-            window.location.href = '/';
-          }
-        }} 
-        className="mt-8 flex items-center justify-center gap-2 py-4 border-2 border-[#dfdfdf] text-[#565656] text-xs font-bold hover:bg-[#ffffff] focus-visible:outline focus-visible:outline-2 focus-visible:outline-primary uppercase tracking-widest group"
-      >
-        <RotateCcw className="w-4 h-4 group-hover:-rotate-90 " />
-        Daten zurücksetzen
-      </button>
     </aside>
   );
 }

@@ -14,6 +14,7 @@ export default function InstallersPage() {
   const router = useRouter();
   const { installerProfile, setInstallerProfile } = useCalculatorStore();
   const [loading, setLoading] = useState(false);
+  const [showForm, setShowForm] = useState(false);
 
   const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -67,9 +68,15 @@ export default function InstallersPage() {
       <header className="absolute top-0 w-full z-50 px-6 md:px-12 py-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link prefetch={false} href="/" className="flex items-center gap-4">
-            <Image priority src="/solar-logo.svg" alt="MySolar-PV Logo" width={120} height={32} className="h-6 md:h-8 w-auto object-contain opacity-80  " />
-            <div className="w-[1px] h-6 bg-slate-300"></div>
-            <Image priority src="/ngen-logo.svg" alt="Ngen Logo" width={100} height={32} className="h-6 md:h-8 w-auto object-contain opacity-80  " />
+            <Image 
+  priority 
+  src="/solar-logo.svg" 
+  alt="MySolar-PV Logo" 
+  width={120}  // You may need to increase this to prevent blurriness/clipping
+  height={48} // Match your new maximum height here
+  className="h-10 md:h-12 w-auto object-contain opacity-80" 
+/>
+
           </Link>
           <Link prefetch={false} href="/" className="group flex items-center justify-center gap-2 px-4 py-2  hover:bg-slate-100   text-slate-500 hover:text-slate-800">
             <span className="hidden md:inline font-bold uppercase tracking-widest text-[10px]">Cancel</span>
@@ -89,6 +96,21 @@ export default function InstallersPage() {
             </p>
           </header>
 
+          {!showForm ? (
+            <div className="max-w-2xl mx-auto glass p-10 border border-white text-center flex flex-col items-center">
+              <h2 className="text-2xl font-bold mb-6 text-[#363636]">
+                Sind Sie ein Installateur und möchten diesen Batterierechner für sich und Ihr Unternehmen nutzen?
+              </h2>
+              <div className="flex gap-6 justify-center mt-4">
+                <Button variant="outline" className="px-8 py-4 border-2 border-slate-300" onClick={() => router.push('/calculator/step-1')}>
+                  Nein, danke
+                </Button>
+                <Button variant="primary" className="px-8 py-4 bg-[#e12029] text-white hover:opacity-90" onClick={() => setShowForm(true)}>
+                  Ja, ich möchte
+                </Button>
+              </div>
+            </div>
+          ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
             <form className="lg:col-span-8 flex flex-col gap-10" onSubmit={handleSubmit}>
               <div className="glass  ] p-8 md:p-10 border border-white">
@@ -215,6 +237,7 @@ export default function InstallersPage() {
               </div>
             </aside>
           </div>
+          )}
         </div>
       </main>
 

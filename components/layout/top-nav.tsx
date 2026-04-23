@@ -29,15 +29,15 @@ export function TopNav() {
           <img 
             src={activeInstaller.logoUrl} 
             alt={`${activeInstaller.companyName} Logo`} 
-            className="h-6 md:h-8 w-auto object-contain opacity-80" 
+            className="h-14 md:h-16 w-auto object-contain opacity-80" 
           />
         ) : (
           <Image 
             src="/solar-logo.svg" 
             alt="MySolar-PV Logo" 
             width={120} 
-            height={32} 
-            className="h-6 md:h-8 w-auto object-contain opacity-80" 
+            height={48} 
+            className="h-10 md:h-12 w-auto object-contain opacity-80" 
           />
         )}
       </Link>

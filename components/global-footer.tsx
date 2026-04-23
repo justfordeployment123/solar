@@ -22,14 +22,14 @@ export function GlobalFooter() {
 
   return (
     <>
-      <footer className="w-full bg-[#d9d9d9] mt-auto py-8 px-6 md:px-12 text-sm text-[#363636] z-10 border-t border-[#dfdfdf]">
+      <footer className="w-full bg-[#d9d9d9] mt-auto pt-8 pb-32 lg:pb-8 px-6 md:px-12 text-sm text-[#363636] z-10 border-t border-[#dfdfdf]">
         <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center">
             {activeInstaller?.logoUrl ? (
               <img 
                 src={activeInstaller.logoUrl} 
                 alt={`${activeInstaller.companyName} Logo`} 
-                className="h-8 md:h-10 w-auto object-contain" 
+                className="h-12 md:h-14 w-auto object-contain" 
               />
             ) : (
               <img 

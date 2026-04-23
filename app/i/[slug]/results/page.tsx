@@ -217,8 +217,8 @@ export default function ResultsPage() {
                       derivedResults={derivedResults}
                       pieChartImage={pieChartImage}
                       barChartImage={barChartImage}
-                      activeLogo={activeInstaller?.logoUrl}
-                      companyName={activeInstaller?.companyName || "My Solar GmbH"}
+                      activeLogo={activeInstaller?.logoUrl || "/solar-logo.png"}
+                      companyName={activeInstaller?.companyName || ""}
                     />
                   }
                   fileName="mein-solar-batterie-bericht.pdf"

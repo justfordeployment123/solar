@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   headerTitle: { fontSize: 24, fontWeight: 'bold', color: '#363636', letterSpacing: -0.5, marginBottom: 4 },
   headerSubtitle: { fontSize: 10, color: '#565656', textTransform: 'uppercase', letterSpacing: 1.5 },
   headerRight: { alignItems: 'flex-end', justifyContent: 'flex-start', maxWidth: 200 },
-  logoImage: { height: 45, width: 150, objectFit: 'contain', marginBottom: 8 },
+  logoImage: { height: 45, objectFit: 'contain', objectPosition: 'right', marginBottom: 8 },
   companyName: { fontSize: 14, fontWeight: 'bold', color: '#1e293b', marginBottom: 4, textAlign: 'right' },
   headerMeta: { fontSize: 9, color: '#565656', marginTop: 2, textAlign: 'right' },
   headerMetaBold: { fontSize: 9, color: '#363636', fontWeight: 'bold', marginTop: 8, textAlign: 'right' },
@@ -93,9 +93,6 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ derivedResults, 
             <View style={styles.headerRight}>
               {activeLogo && (
                 <Image src={activeLogo} style={styles.logoImage} />
-              )}
-              {companyName && (
-                <Text style={styles.companyName}>{companyName}</Text>
               )}
               <Text style={styles.headerMetaBold}>{LABELS.preparedFor}</Text>
               <Text style={styles.headerMeta}>{companyName || "My Solar GmbH"}</Text>

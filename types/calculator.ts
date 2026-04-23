@@ -7,6 +7,7 @@ export type Goal =
   | 'EPEX Arbitrage' 
   | 'Backup Power' 
   | 'Grid Services (VPP/Balancing)'
+  | 'Load Shifting'
   | null;
 
 export interface QuestionnaireGoals {
@@ -28,6 +29,7 @@ export interface TechnicalInputs {
   enableEpex?: boolean;
   enablePrl?: boolean;
   enableSrl?: boolean;
+  enableLoadShifting?: boolean;
 }
 
 export interface FinancialInputs {
@@ -35,6 +37,13 @@ export interface FinancialInputs {
   yearlyElectricityBillEur: number | null;
   targetBudgetEur: number | null;
   vppParticipationEnabled: boolean;
+  
+  // Load Shifting & Peak Shaving Inputs
+  dynamicFeedInTariffCentsKwh?: number | null;
+  standardFeedInTariffCentsKwh?: number | null;
+  gridFeesCentsKwh?: number | null;
+  demandChargeEurPerKw?: number | null;
+  peakShavingReductionPercentage?: number | null;
 }
 
 export interface CsvMetadata {
@@ -55,6 +64,7 @@ export interface RevenueStreams {
   epexArbitrage: number;
   peakShaving: number;
   vppParticipation: number;
+  loadShifting: number;
 }
 
 export interface YearlyCashflow {

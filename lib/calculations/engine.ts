@@ -53,8 +53,20 @@ export function calculateResults(
   const estimatedKwhOffset = currentBatteryCapacityKwh * 250;
   let selfConsumption = technical.enableSelfConsumption !== false ? userElectricityPrice * estimatedKwhOffset * 0.90 : 0;
 
-  // 6. Peak Shaving (Placeholder)
-  let peakShaving = technical.enablePeakShaving !== false ? (technical.gridConnectionLimitKw || 0) * 45 : 0;
+  // 6. Peak Shaving
+  const inverterPowerKw = technical.inverterPowerKw || 10;
+  const demandChargeEurPerKw = financial.demandChargeEurPerKw || 0;
+  const peakShavingReductionPercentage = financial.peakShavingReductionPercentage || 0;
+  let peakShaving = technical.enablePeakShaving !== false 
+    ? inverterPowerKw * demandChargeEurPerKw * (peakShavingReductionPercentage / 100) 
+    : 0;
+
+  // 7. Load Shifting
+  const dynamicTariff = financial.dynamicFeedInTariffCentsKwh || 0;
+  const standardTariff = financial.standardFeedInTariffCentsKwh || 0;
+  const gridFees = financial.gridFeesCentsKwh || 0;
+  const loadShiftingProfitCents = Math.max(0, dynamicTariff - standardTariff - gridFees);
+  let loadShifting = technical.enableLoadShifting ? currentBatteryCapacityKwh * 300 * 0.90 * (loadShiftingProfitCents / 100) : 0;
 
   const annualRevenueByStream: RevenueStreams = {
     selfConsumption,
@@ -62,7 +74,8 @@ export function calculateResults(
     srlAfrr,
     epexArbitrage,
     peakShaving,
-    vppParticipation
+    vppParticipation,
+    loadShifting
   };
 
   // Total base year
@@ -81,7 +94,7 @@ export function calculateResults(
     // because total functional capacity impacts self-consumption offset and peak shaving scaling
     const degradationFactor = Math.pow(1 - DEGRADATION_RATE, year - 1);
 
-    const yearRevenue = (prl + srlAfrr + epexArbitrage + vppParticipation + selfConsumption + peakShaving) * degradationFactor;
+    const yearRevenue = (prl + srlAfrr + epexArbitrage + vppParticipation + selfConsumption + peakShaving + loadShifting) * degradationFactor;
 
     let yearCost = 0;
 

@@ -57,6 +57,7 @@ export function CsvUploader() {
         }
 
         let totalConsumption = 0;
+        let maxPeakKw = 0;
         let hasInvalidData = false;
 
         for (let i = 0; i < data.length; i++) {
@@ -67,6 +68,9 @@ export function CsvUploader() {
             break;
           }
           totalConsumption += val;
+          if (val > maxPeakKw) {
+            maxPeakKw = val;
+          }
         }
 
         if (hasInvalidData) {
@@ -78,7 +82,10 @@ export function CsvUploader() {
           return;
         }
 
-        store.setTechnicalInputs({ annualConsumptionKwh: Math.round(totalConsumption) });
+        store.setTechnicalInputs({ 
+          annualConsumptionKwh: Math.round(totalConsumption),
+          gridConnectionLimitKw: Math.ceil(maxPeakKw) // Automatically set the peak load limit
+        });
         store.setCsvMetadata({
           isConfigured: true,
           rowCount: data.length,
