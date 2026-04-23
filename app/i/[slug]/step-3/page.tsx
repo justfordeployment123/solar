@@ -67,7 +67,7 @@ export default function Step3Page() {
       <div 
          className="my-8 flex-grow"
       >
-        <section className="bg-white/80 backdrop-blur-xl border border-[#ffffff]   p-8 lg:p-12 mb-12">
+        <section className="bg-[#ffffff] border border-[#dfdfdf] p-8 lg:p-12 mb-12">
           <h3  className="text-xs font-extrabold uppercase tracking-widest text-[#e12029] mb-8 flex items-center gap-2">
             <div className="w-2 h-2  bg-[#e12029]" /> Finanzdaten
           </h3>

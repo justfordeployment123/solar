@@ -62,7 +62,7 @@ export function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#363636]/60 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="modal-title">
-      <div className="relative w-full max-w-lg glass bg-white/90 shadow-2xl p-8 border border-white/50" style={{ animation: 'fade-in 150ms ease-out' }}>
+      <div className="relative w-full max-w-lg bg-[#ffffff] shadow-2xl p-8 border border-[#dfdfdf]" style={{ animation: 'fade-in 150ms ease-out' }}>
         <button 
           onClick={onClose}
           className="absolute top-4 right-4 p-2 text-slate-400 hover:text-slate-800 transition-colors"

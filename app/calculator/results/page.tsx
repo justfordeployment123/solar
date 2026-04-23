@@ -34,7 +34,7 @@ const itemVariants = {
 
 function MetricCard({ title, value, subtitle, icon: Icon, color }: any) {
   return (
-    <div  className="glass   p-6 relative overflow-hidden group hover: ">
+    <div  className="bg-[#ffffff] border border-[#dfdfdf] p-6 relative overflow-hidden group hover: ">
       <div className="flex justify-between items-start mb-4 relative z-10">
         
         <h3 className="text-sm font-bold uppercase tracking-widest text-[#565656]">{title}</h3>
@@ -124,7 +124,7 @@ export default function ResultsPage() {
           </p>
         </div>
         
-        <div className="glass p-6  min-w-[280px] ">
+        <div className="bg-[#ffffff] border border-[#dfdfdf] p-6  min-w-[280px] ">
           <label className="text-xs font-bold uppercase tracking-widest text-[#e12029] mb-2 block flex items-center gap-2">
             <div className="w-2 h-2  bg-[#e12029]" /> Batteriegröße-Simulator
           </label>
@@ -180,7 +180,7 @@ export default function ResultsPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div 
-             className="lg:col-span-2 glass  ] p-8 border border-white"
+             className="lg:col-span-2 bg-[#ffffff] border border-[#dfdfdf] p-8"
         >
           <h2 className="text-xl font-extrabold text-[#363636] mb-8">Cashflow-Prognose über die Lebensdauer</h2>
           <div ref={barRef} className="bg-white/50  p-4">
@@ -189,7 +189,7 @@ export default function ResultsPage() {
         </div>
 
         <div 
-             className="glass  ] p-8 border border-white flex flex-col"
+             className="bg-[#ffffff] p-8 border border-[#dfdfdf] flex flex-col"
         >
           <h2 className="text-xl font-extrabold text-[#363636] mb-8">Einnahmen-Aufschlüsselung</h2>
           <div ref={pieRef} className="flex-grow flex items-center justify-center -mt-4">

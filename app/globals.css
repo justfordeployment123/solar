@@ -51,22 +51,5 @@ body {
   -webkit-tap-highlight-color: transparent;
 }
 
-/* Glassmorphism Classes */
-.glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  
-  
-}
-
-.glass-dark {
-  background: rgba(54, 54, 54, 0.6);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  
-}
-
 /* Gradients */
 .text-gradient { color: var(--color-primary); }

@@ -18,10 +18,7 @@ function SuccessContent() {
 
   return (
     <>
-      <div className="absolute top-[-20%] left-[20%] w-[60%] h-[60%] bg-[#e12029]/10 blur-[150px] pointer-events-none" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] bg-primary/10 blur-[150px] pointer-events-none" />
-
-      <header className="fixed top-0 w-full z-50 glass border-b border-white/50 px-6 md:px-12 py-6 flex justify-between items-center text-center mx-auto max-w-7xl relative">
+      <header className="fixed top-0 w-full z-50 bg-[#ffffff] border-b border-[#dfdfdf] px-6 md:px-12 py-6 flex justify-between items-center text-center mx-auto max-w-7xl relative">
         <Link prefetch={false} href="/" className="text-xl font-black uppercase tracking-tight text-[#363636] mx-auto md:mx-0">
           Solar PV<span className="text-primary ml-1"> Partner-Portal</span>
         </Link>
@@ -29,7 +26,6 @@ function SuccessContent() {
 
       <main className="w-full max-w-screen-md px-6 py-32 text-center relative z-10 flex flex-col items-center">
         <div className="relative mb-12">
-          <div className="absolute -inset-4 bg-[#e12029]/20 blur-xl" />
           <CheckCircle className="w-24 h-24 text-[#e12029] relative" strokeWidth={2} />
         </div>
         
@@ -41,7 +37,7 @@ function SuccessContent() {
           Ihr individueller Batteriespeicher-Rechner wurde erfolgreich generiert. Sie können ihn nun mit Ihren Kunden teilen.
         </p>
 
-        <div className="glass border border-white p-8 mb-12 flex flex-col gap-4 max-w-lg mx-auto text-left relative overflow-hidden w-full">
+        <div className="bg-[#ffffff] border border-[#dfdfdf] p-8 mb-12 flex flex-col gap-4 max-w-lg mx-auto text-left relative overflow-hidden w-full">
           <div className="absolute top-0 right-0 p-6 opacity-10">
             <Share2 className="w-24 h-24" />
           </div>

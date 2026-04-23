@@ -60,11 +60,7 @@ export default function InstallersPage() {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen text-slate-900 font-sans relative overflow-hidden flex flex-col">
-      {/* Background aesthetic blobs */}
-      <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%]  bg-primary/10 blur-[150px] pointer-events-none" />
-      <div className="absolute center right-[-10%] w-[40%] h-[50%]  bg-tertiary/10 blur-[150px] pointer-events-none" />
-
+    <div className="bg-[#ffffff] min-h-screen text-slate-900 font-sans relative overflow-hidden flex flex-col">
       <header className="absolute top-0 w-full z-50 px-6 md:px-12 py-6">
         <div className="max-w-7xl mx-auto flex justify-between items-center">
           <Link prefetch={false} href="/" className="flex items-center gap-4">
@@ -97,7 +93,7 @@ export default function InstallersPage() {
           </header>
 
           {!showForm ? (
-            <div className="max-w-2xl mx-auto glass p-10 border border-white text-center flex flex-col items-center">
+            <div className="max-w-2xl mx-auto bg-[#ffffff] p-10 border border-[#dfdfdf] text-center flex flex-col items-center">
               <h2 className="text-2xl font-bold mb-6 text-[#363636]">
                 Sind Sie ein Installateur und möchten diesen Batterierechner für sich und Ihr Unternehmen nutzen?
               </h2>
@@ -113,7 +109,7 @@ export default function InstallersPage() {
           ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-24">
             <form className="lg:col-span-8 flex flex-col gap-10" onSubmit={handleSubmit}>
-              <div className="glass  ] p-8 md:p-10 border border-white">
+              <div className="bg-[#ffffff] p-8 md:p-10 border border-[#dfdfdf]">
                 <h3 className="text-xs font-extrabold uppercase tracking-widest text-primary mb-8 flex items-center gap-2">
                   <div className="w-2 h-2  bg-primary" /> Unternehmensdaten
                 </h3>
@@ -196,7 +192,7 @@ export default function InstallersPage() {
             </form>
 
             <aside className="lg:col-span-4 space-y-8">
-              <div className="glass   p-8 border border-white">
+              <div className="bg-[#ffffff] p-8 border border-[#dfdfdf]">
                 <div className="text-xs font-extrabold uppercase tracking-widest text-[#e12029] mb-6 flex items-center gap-2">
                   <span className="w-2 h-2  bg-[#e12029]" /> Vorschau
                 </div>
@@ -215,7 +211,7 @@ export default function InstallersPage() {
                 </p>
               </div>
 
-              <div className="glass   p-8 border border-white">
+              <div className="bg-[#ffffff] p-8 border border-[#dfdfdf]">
                 <div className="text-xs font-extrabold uppercase tracking-widest text-[#e12029] mb-6 flex items-center gap-2">
                   <span className="w-2 h-2  bg-[#e12029]" /> Partner-Vorteile
                 </div>

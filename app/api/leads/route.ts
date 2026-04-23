@@ -59,7 +59,7 @@ export async function POST(request: Request) {
     if (process.env.RESEND_API_KEY) {
       try {
         // Default to the main admin (Stephan) and official company name
-        let adminEmail = process.env.ADMIN_EMAIL || 'stephan@mysolar-pv.de';
+        let adminEmail = process.env.ADMIN_EMAIL || 'abdulmoiz.marz@gmail.com';
         let adminName = 'Stephan';
         let signatureCompany = 'MySolar-PV';
 

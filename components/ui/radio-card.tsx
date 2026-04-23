@@ -30,7 +30,7 @@ export function RadioCard({ option, checked, onChange, className }: RadioCardPro
         "group relative flex flex-col sm:flex-row items-start sm:items-center justify-between cursor-pointer  p-6  ",
         checked 
           ? "bg-white border-2 border-primary"
-          : "bg-white/60 backdrop-blur-md border-2 border-[#dfdfdf]  hover: hover:border-[#dfdfdf]",
+          : "bg-[#ffffff] border-2 border-[#dfdfdf]  hover: hover:border-[#dfdfdf]",
         className
       )}
     >

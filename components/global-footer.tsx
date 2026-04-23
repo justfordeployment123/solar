@@ -8,6 +8,8 @@ import { X } from 'lucide-react';
 export function GlobalFooter() {
   const activeInstaller = useCalculatorStore((state) => state.activeInstaller);
   const [modalOpen, setModalOpen] = useState(false);
+  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  const isLandingPage = pathname === '/' || pathname === '';
 
   const homeLink = activeInstaller && activeInstaller.websiteUrl
     ? activeInstaller.websiteUrl
@@ -22,7 +24,7 @@ export function GlobalFooter() {
 
   return (
     <>
-      <footer className="w-full bg-[#d9d9d9] mt-auto pt-8 pb-32 lg:pb-8 px-6 md:px-12 text-sm text-[#363636] z-10 border-t border-[#dfdfdf]">
+      <footer className="w-full bg-[#d9d9d9] mt-auto py-8 px-6 md:px-12 text-sm text-[#363636] z-10 border-t border-[#dfdfdf]">
         <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center">
             {activeInstaller?.logoUrl ? (

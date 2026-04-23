@@ -120,7 +120,11 @@ export const useCalculatorStore = create<CalculatorStore>()(
           stepCompletion: { ...state.stepCompletion, [step]: isComplete },
         })),
         
-      resetData: () => set(initialState),
+      resetData: () => set((state) => ({
+        ...initialState,
+        activeInstaller: state.activeInstaller,
+        persona: state.persona,
+      })),
     }),
     {
       name: 'battery-calculator-storage',

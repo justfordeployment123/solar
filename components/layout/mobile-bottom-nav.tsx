@@ -16,8 +16,8 @@ interface MobileBottomNavProps {
 
 export function MobileBottomNav({ steps, currentStepIndex }: MobileBottomNavProps) {
   return (
-    <div className="lg:hidden fixed bottom-6 left-6 right-6 z-50 pointer-events-none">
-      <div className="glass  ] px-4 py-3 flex justify-between items-center pointer-events-auto border border-white/50 bg-white/70">
+    <div className="lg:hidden sticky bottom-6 z-50 mx-6 mb-6 pointer-events-none">
+      <div className="bg-[#ffffff] px-4 py-3 flex justify-between items-center pointer-events-auto border-t border border-[#dfdfdf]">
         {steps.map((step, index) => {
           const isActive = index === currentStepIndex;
           const StepIcon = step.icon;
