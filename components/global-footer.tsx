@@ -2,13 +2,14 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useCalculatorStore } from '@/store/calculatorStore';
 import { X, BatteryCharging } from 'lucide-react';
 
 export function GlobalFooter() {
   const activeInstaller = useCalculatorStore((state) => state.activeInstaller);
   const [modalOpen, setModalOpen] = useState(false);
-  const pathname = typeof window !== 'undefined' ? window.location.pathname : '';
+  const pathname = usePathname();
   const isLandingPage = pathname === '/' || pathname === '';
 
   const homeLink = activeInstaller && activeInstaller.websiteUrl
@@ -26,24 +27,21 @@ export function GlobalFooter() {
 
   return (
     <>
-      <footer className="w-full bg-[#1a1a1a] text-white mt-auto z-10">
+      <footer className="w-full bg-[#1a1a1a] text-white mt-auto z-10 pb-24 lg:pb-0">
         <div className="max-w-7xl mx-auto px-6 md:px-12 py-10 flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center gap-3">
             {activeInstaller?.logoUrl ? (
               <img
                 src={activeInstaller.logoUrl}
                 alt={`${activeInstaller.companyName} Logo`}
-                className="h-10 md:h-12 w-auto object-contain brightness-0 invert opacity-90"
+                className="h-10 md:h-12 w-auto object-contain"
               />
             ) : (
-              <>
-                <div className="w-8 h-8 bg-[#e20613] flex items-center justify-center">
-                  <BatteryCharging className="w-4 h-4 text-white" />
-                </div>
-                <span className="font-bold tracking-tight text-white text-base">
-                  MySolar<span className="text-[#ffdb00]">·PV</span>
-                </span>
-              </>
+              <img
+                src="/solar-logo.svg"
+                alt="MySolar PV Logo"
+                className="h-10 md:h-12 w-auto object-contain"
+              />
             )}
           </div>
 

@@ -16,8 +16,8 @@ interface MobileBottomNavProps {
 
 export function MobileBottomNav({ steps, currentStepIndex }: MobileBottomNavProps) {
   return (
-    <div className="lg:hidden fixed bottom-0 left-0 right-0 z-50">
-      <div className="bg-white border-t border-[#e5e5e5] px-2 py-2 flex justify-between items-stretch">
+    <div className="lg:hidden sticky bottom-6 z-50 mx-6 mb-6 pointer-events-none">
+      <div className="bg-white border border-[#e5e5e5] px-2 py-2 flex justify-between items-stretch shadow-lg pointer-events-auto">
         {steps.map((step, index) => {
           const isActive = index === currentStepIndex;
           const isPast = index < currentStepIndex;

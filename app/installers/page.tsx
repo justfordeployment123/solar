@@ -72,12 +72,11 @@ export default function InstallersPage() {
       <header className="w-full border-b border-[#e5e5e5] bg-white sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
           <Link prefetch={false} href="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-[#e20613] flex items-center justify-center">
-              <BatteryCharging className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold tracking-tight text-[#1a1a1a] text-lg">
-              MySolar<span className="text-[#e20613]">·PV</span>
-            </span>
+            <img
+              src="/solar-logo.svg"
+              alt="MySolar PV Logo"
+              className="h-10 md:h-12 w-auto object-contain"
+            />
           </Link>
           <Link
             prefetch={false}

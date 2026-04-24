@@ -107,7 +107,7 @@ export default function Step2Page() {
             />
             <div className="grid grid-cols-2 gap-4">
               <Input
-                label="Wechselrichterleistung (kW)"
+                label="WR-Leistung (kW)"
                 type="number"
                 placeholder="8"
                 value={technical.inverterPowerKw ?? ''}

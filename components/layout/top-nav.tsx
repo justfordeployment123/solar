@@ -37,14 +37,11 @@ export function TopNav() {
               className="h-10 md:h-12 w-auto object-contain"
             />
           ) : (
-            <>
-              <div className="w-9 h-9 bg-[#e20613] flex items-center justify-center">
-                <BatteryCharging className="w-5 h-5 text-white" />
-              </div>
-              <span className="font-bold tracking-tight text-[#1a1a1a] text-lg hidden sm:inline">
-                MySolar<span className="text-[#e20613]">·PV</span>
-              </span>
-            </>
+            <img
+              src="/solar-logo.svg"
+              alt="MySolar-PV Logo"
+              className="h-10 md:h-12 w-auto object-contain opacity-80"
+            />
           )}
         </Link>
 

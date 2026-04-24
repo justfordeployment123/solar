@@ -79,7 +79,7 @@ export default function LandingPage() {
     {
       icon: LineChart,
       title: 'Transparente Wirtschaftlichkeit',
-      text: 'Klar nachvollziehbare Kalkulation — Amortisation in Echtzeit sichtbar.',
+      text: 'Klar nachvollziehbare Kalkulation - Amortisation in Echtzeit sichtbar.',
     },
     {
       icon: Leaf,
@@ -108,7 +108,7 @@ export default function LandingPage() {
       step: '02',
       title: 'Verbrauch konfigurieren',
       text:
-        'Geben Sie Verbrauchsdaten ein oder importieren Sie Lastprofile — wir berechnen die optimale Speichergröße.',
+        'Geben Sie Verbrauchsdaten ein oder importieren Sie Lastprofile - wir berechnen die optimale Speichergröße.',
       image:
         'https://images.unsplash.com/photo-1473341304170-971dccb5ac1e?w=900&q=80&auto=format&fit=crop',
     },
@@ -128,7 +128,7 @@ export default function LandingPage() {
       data-page="landing"
       className="bg-white min-h-screen flex flex-col font-opensans text-[#1a1a1a]"
     >
-      {/* Top accent strip — MySolar brand triad */}
+      {/* Top accent strip - MySolar brand triad */}
       <div className="flex w-full h-[6px]">
         <div className="flex-1 bg-[#e20613]" />
         <div className="flex-1 bg-[#d2d700]" />
@@ -139,12 +139,11 @@ export default function LandingPage() {
       <header className="w-full border-b border-[#e5e5e5] bg-white sticky top-0 z-30">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-[#e20613] flex items-center justify-center">
-              <BatteryCharging className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold tracking-tight text-[#1a1a1a] text-lg">
-              MySolar<span className="text-[#e20613]">·PV</span>
-            </span>
+            <img
+              src="/solar-logo.svg"
+              alt="MySolar PV Logo"
+              className="h-10 md:h-12 w-auto object-contain"
+            />
           </div>
           <span className="hidden md:inline text-xs font-semibold uppercase tracking-[0.2em] text-[#5a5859]">
             Batteriespeicher-Plattform
@@ -183,7 +182,7 @@ export default function LandingPage() {
                 <span className="relative w-2 h-2 bg-[#e20613]" />
               </span>
               <span className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-[#e20613]">
-                Batteriespeicher-Rechner · 2026
+                Batteriespeicher-Rechner
               </span>
             </div>
 
@@ -196,7 +195,7 @@ export default function LandingPage() {
 
             <p className="mt-6 text-[1.05rem] md:text-[1.15rem] text-[#5a5859] font-medium max-w-xl leading-relaxed">
               Präzise Kalkulation, faire Konfiguration und transparente
-              Angebote — individuell für Privatkunden, Installateure und
+              Angebote - individuell für Privatkunden, Installateure und
               Unternehmen.
             </p>
 
@@ -272,7 +271,7 @@ export default function LandingPage() {
             </div>
           </div>
 
-          {/* RIGHT — self-contained product preview mockup */}
+          {/* RIGHT - self-contained product preview mockup */}
           <div className="lg:col-span-6 relative">
             {/* Dashboard mockup card */}
             <div className="relative bg-white border border-[#e5e5e5] shadow-[0_20px_60px_rgba(0,0,0,0.08)]">
@@ -470,7 +469,7 @@ export default function LandingPage() {
             <p className="mt-6 text-[1rem] md:text-[1.1rem] text-[#5a5859] font-medium leading-relaxed max-w-xl">
               Ein moderner Batteriespeicher wandelt Ihre Photovoltaikanlage in
               ein verlässliches Kraftwerk. Mehr Eigenverbrauch, weniger
-              Netzbezug, maximale Unabhängigkeit von Strompreis-Schwankungen —
+              Netzbezug, maximale Unabhängigkeit von Strompreis-Schwankungen -
               planbar, skalierbar und zukunftssicher.
             </p>
 
@@ -551,7 +550,7 @@ export default function LandingPage() {
             </div>
             <p className="text-[#5a5859] font-medium max-w-md leading-relaxed">
               Kein Verkaufsgespräch, keine versteckten Kosten. Nur ein klarer,
-              transparenter Prozess — von der ersten Minute an.
+              transparenter Prozess - von der ersten Minute an.
             </p>
           </div>
 
@@ -633,7 +632,7 @@ export default function LandingPage() {
               Bereit für Ihren individuellen Speicher-Rechner?
             </h2>
             <p className="mt-3 text-white/85 text-[0.95rem] md:text-base leading-relaxed">
-              Starten Sie jetzt — in unter einer Minute zum ersten Ergebnis.
+              Starten Sie jetzt - in unter einer Minute zum ersten Ergebnis.
             </p>
           </div>
           <button
@@ -654,7 +653,7 @@ export default function LandingPage() {
               <BatteryCharging className="w-4 h-4 text-white" />
             </div>
             <span className="text-xs uppercase tracking-[0.2em] text-white/70">
-              © MySolar·PV — Batteriespeicher-Plattform
+              © MySolar·PV - Batteriespeicher-Plattform
             </span>
           </div>
           <div className="flex items-center gap-1">

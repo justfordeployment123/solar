@@ -4,19 +4,22 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle2, ArrowRight, Copy, BatteryCharging } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Suspense } from 'react';
+import { Suspense, useEffect, useState } from 'react';
 
 function SuccessContent() {
   const searchParams = useSearchParams();
   const slug = searchParams.get("slug") || "energy-solutions-gmbh";
-  const url =
-    typeof window !== "undefined"
-      ? `${window.location.origin}/i/${slug}`
-      : `https://example.com/i/${slug}`;
+  const [url, setUrl] = useState("");
+
+  useEffect(() => {
+    setUrl(`${window.location.origin}/i/${slug}`);
+  }, [slug]);
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(url);
-    alert("URL in die Zwischenablage kopiert!");
+    if (url) {
+      navigator.clipboard.writeText(url);
+      alert("URL in die Zwischenablage kopiert!");
+    }
   };
 
   return (
@@ -32,14 +35,13 @@ function SuccessContent() {
       <header className="fixed top-[6px] left-0 right-0 w-full z-40 bg-white border-b border-[#e5e5e5]">
         <div className="max-w-7xl mx-auto px-6 md:px-12 py-4 flex justify-between items-center">
           <Link prefetch={false} href="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-[#e20613] flex items-center justify-center">
-              <BatteryCharging className="w-5 h-5 text-white" />
-            </div>
-            <span className="font-bold tracking-tight text-[#1a1a1a] text-lg">
-              MySolar<span className="text-[#e20613]">·PV</span>
-              <span className="hidden sm:inline text-[#5a5859] ml-2 text-xs font-bold uppercase tracking-[0.18em]">
-                Partner-Portal
-              </span>
+            <img
+              src="/solar-logo.svg"
+              alt="MySolar PV Logo"
+              className="h-10 md:h-12 w-auto object-contain"
+            />
+            <span className="hidden sm:inline text-[#5a5859] ml-2 text-xs font-bold uppercase tracking-[0.18em]">
+              Partner-Portal
             </span>
           </Link>
         </div>

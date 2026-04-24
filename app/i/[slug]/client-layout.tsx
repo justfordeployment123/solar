@@ -29,7 +29,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     <div className="min-h-screen w-full bg-white flex flex-col font-opensans text-[#1a1a1a] relative">
       <TopNav />
 
-      <div className="flex flex-1 pt-[92px] w-full relative z-10">
+      <div className="flex flex-1 pt-[92px] w-full">
         <SideNav steps={steps} currentStepIndex={currentIndex} />
 
         <main className="flex-1 w-full max-w-[1100px] mx-auto pb-32 lg:pb-16 lg:px-8">

@@ -24,6 +24,7 @@ export default function RootLayout({
   return (
     <html
       lang="de"
+      suppressHydrationWarning
       className={`${openSans.variable} h-full antialiased light`}
     >
       <body className="bg-white min-h-screen flex flex-col">

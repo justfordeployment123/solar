@@ -124,12 +124,6 @@ export default function ResultsPage() {
             <ArrowLeft className="mr-2 h-4 w-4 group-hover:-translate-x-1 transition-transform" />
             Zurück zu den Finanzen
           </Link>
-          <div className="inline-flex items-center gap-2 mb-4">
-            <span className="w-2 h-2 bg-[#e20613]" />
-            <span className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#e20613]">
-              Ihr Ergebnis
-            </span>
-          </div>
           <h1 className="text-[2.5rem] md:text-[3.5rem] font-bold tracking-tight text-[#1a1a1a] leading-[1.05]">
             ROI-Prognose
           </h1>
@@ -140,7 +134,13 @@ export default function ResultsPage() {
         </div>
 
         {/* Battery slider */}
-        <div className="bg-white border border-[#e5e5e5] p-6 min-w-[280px] relative">
+        <div className="bg-white border border-[#e5e5e5] p-6 min-w-[280px] relative mt-8 md:mt-0">
+          <div className="absolute -top-10 right-0 inline-flex items-center gap-2 mb-4">
+            <span className="w-2 h-2 bg-[#e20613]" />
+            <span className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#e20613]">
+              Ihr Ergebnis
+            </span>
+          </div>
           <span className="absolute top-0 left-0 right-0 h-[3px] bg-[#d2d700]" />
           <label className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#1a1a1a] mb-3 flex items-center gap-2">
             <span className="w-2 h-2 bg-[#d2d700]" /> Batteriegröße-Simulator
@@ -274,7 +274,7 @@ export default function ResultsPage() {
               Erhalten Sie ein individuelles Angebot von zertifizierten Partnern.
             </h3>
             <p className="mt-3 text-white/75 text-sm md:text-base leading-relaxed">
-              Basierend auf Ihren Berechnungen — unverbindlich und kostenlos.
+              Basierend auf Ihren Berechnungen - unverbindlich und kostenlos.
             </p>
           </div>
           <button
