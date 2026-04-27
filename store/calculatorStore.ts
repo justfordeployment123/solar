@@ -15,7 +15,8 @@ const initialState: CalculatorState = {
     annualConsumptionKwh: null,
     currentBatteryCapacityKwh: null,
     inverterPowerKw: null,
-    gridConnectionLimitKw: null,
+    gridImportLimitKw: null,
+    gridExportLimitKw: null,
   },
   financial: {
     currentElectricityPriceCentsKwh: null,

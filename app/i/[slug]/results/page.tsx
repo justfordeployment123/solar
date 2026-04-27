@@ -8,9 +8,11 @@ import { ProjectionChart } from "@/components/charts/projection-chart";
 import { toPng } from "html-to-image";
 import { ReportDocument } from "@/components/pdf/report-document";
 import { LeadCaptureModal } from "@/components/modals/lead-capture-modal";
+import { ReferralModal } from "@/components/modals/referral-modal";
 import Link from "next/link";
-import { ArrowLeft, Download, Battery, Zap, Euro, TrendingUp } from "lucide-react";
+import { ArrowLeft, Download, Battery, Zap, Euro, TrendingUp, Share2, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 import { useParams } from "next/navigation";
 
@@ -25,20 +27,36 @@ function MetricCard({
   subtitle,
   icon: Icon,
   accent,
+  tooltipText,
 }: {
   title: string;
   value: string;
   subtitle: string;
   icon: any;
   accent: string;
+  tooltipText?: string;
 }) {
   return (
     <div className="bg-white border border-[#e5e5e5] p-6 relative">
       <span className="absolute top-0 left-0 right-0 h-[3px]" style={{ backgroundColor: accent }} />
       <div className="flex justify-between items-start mb-5">
-        <h3 className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-[#5a5859]">
-          {title}
-        </h3>
+        <div className="flex items-center gap-1.5">
+          <h3 className="text-[0.7rem] font-bold uppercase tracking-[0.18em] text-[#5a5859]">
+            {title}
+          </h3>
+          {tooltipText && (
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="w-3.5 h-3.5 text-gray-400 hover:text-gray-600 transition-colors cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent side="top">
+                  <p className="max-w-xs leading-relaxed">{tooltipText}</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          )}
+        </div>
         <div
           className="w-9 h-9 flex items-center justify-center"
           style={{ backgroundColor: accent }}
@@ -56,13 +74,14 @@ function MetricCard({
 
 export default function ResultsPage() {
   const params = useParams() as { slug: string };
-  const { technical, derivedResults, setTechnicalInputs, activeInstaller } = useCalculatorStore();
+  const { technical, financial, derivedResults, setTechnicalInputs, setFinancialInputs, activeInstaller } = useCalculatorStore();
 
   const [pieChartImage, setPieChartImage] = useState<string>();
   const [barChartImage, setBarChartImage] = useState<string>();
   const [isClient, setIsClient] = useState(false);
   const [isGeneratingImages, setIsGeneratingImages] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
 
   const pieRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
@@ -165,16 +184,53 @@ export default function ResultsPage() {
               <span className="text-xs font-semibold text-[#5a5859] ml-1">kWh</span>
             </span>
           </div>
+
+          <div className="mt-6 pt-6 border-t border-[#e5e5e5] space-y-4">
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                className="w-4 h-4 accent-[#e20613]"
+                checked={technical.enablePrl !== false}
+                onChange={(e) => setTechnicalInputs({ enablePrl: e.target.checked, enableSrl: e.target.checked })}
+              />
+              <span className="text-sm font-semibold text-[#1a1a1a] group-hover:text-[#e20613] transition-colors">
+                Netzstabilität (PRL/SRL)
+              </span>
+            </label>
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                className="w-4 h-4 accent-[#e20613]"
+                checked={technical.enableEpex !== false}
+                onChange={(e) => setTechnicalInputs({ enableEpex: e.target.checked })}
+              />
+              <span className="text-sm font-semibold text-[#1a1a1a] group-hover:text-[#e20613] transition-colors">
+                Energiehandel (EPEX)
+              </span>
+            </label>
+            <label className="flex items-center gap-3 cursor-pointer group">
+              <input
+                type="checkbox"
+                className="w-4 h-4 accent-[#e20613]"
+                checked={financial.vppParticipationEnabled}
+                onChange={(e) => setFinancialInputs({ vppParticipationEnabled: e.target.checked })}
+              />
+              <span className="text-sm font-semibold text-[#1a1a1a] group-hover:text-[#e20613] transition-colors">
+                VPP-Teilnahme
+              </span>
+            </label>
+          </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         <MetricCard
           title="Kapitalwert (NPV)"
-          value={`€${((derivedResults.yearlyProjection[14]?.cumulative || 0) + (technical.currentBatteryCapacityKwh || 10) * 1000).toLocaleString('de-DE', { maximumFractionDigits: 0 })}`}
+          value={`€${((derivedResults.yearlyProjection[14]?.cumulative || 0) + (technical.currentBatteryCapacityKwh || 10) * 1000 + derivedResults.engineeringFee).toLocaleString('de-DE', { maximumFractionDigits: 0 })}`}
           subtitle="Gesamtgewinn über Lebensdauer"
           icon={TrendingUp}
           accent="#1a1a1a"
+          tooltipText="Beinhaltet 3,8% Targeted Engineering-Gebühr für die genaue Erfassung von Ist-Daten und Infrastruktur. (Fördermittel möglich)."
         />
         <MetricCard
           title="Durchschn. Jahresertrag"
@@ -279,16 +335,25 @@ export default function ResultsPage() {
               Basierend auf Ihren Berechnungen - unverbindlich und kostenlos.
             </p>
           </div>
-          <button
-            onClick={() => setIsModalOpen(true)}
-            className="inline-flex items-center gap-3 bg-[#e20613] text-white font-bold uppercase tracking-[0.2em] text-xs md:text-sm px-7 py-4 hover:bg-[#ffdb00] hover:text-black transition-colors whitespace-nowrap"
-          >
-            Angebot anfordern
-          </button>
+          <div className="flex flex-col sm:flex-row items-center gap-4 w-full md:w-auto">
+            <button
+              onClick={() => setIsReferralModalOpen(true)}
+              className="inline-flex items-center justify-center gap-2 bg-transparent text-white border border-white/30 font-bold uppercase tracking-[0.2em] text-xs md:text-sm px-6 py-4 hover:border-white hover:bg-white/10 transition-colors w-full sm:w-auto"
+            >
+              <Share2 className="w-4 h-4" /> Freund empfehlen
+            </button>
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="inline-flex items-center justify-center gap-3 bg-[#e20613] text-white font-bold uppercase tracking-[0.2em] text-xs md:text-sm px-7 py-4 hover:bg-[#ffdb00] hover:text-black transition-colors whitespace-nowrap w-full sm:w-auto"
+            >
+              Angebot anfordern
+            </button>
+          </div>
         </div>
       </div>
 
       <LeadCaptureModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
+      <ReferralModal isOpen={isReferralModalOpen} onClose={() => setIsReferralModalOpen(false)} />
     </div>
   );
 }

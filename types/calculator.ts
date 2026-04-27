@@ -21,7 +21,8 @@ export interface TechnicalInputs {
   annualConsumptionKwh: number | null;
   currentBatteryCapacityKwh: number | null;
   inverterPowerKw: number | null;
-  gridConnectionLimitKw: number | null;
+  gridImportLimitKw: number | null;
+  gridExportLimitKw: number | null;
   
   // Questionnaire Goal Toggles
   enableSelfConsumption?: boolean;
@@ -81,6 +82,7 @@ export interface SensitivityPoint {
 export interface DerivedResults {
   annualRevenueByStream: RevenueStreams;
   totalAnnualRevenue: number;
+  engineeringFee: number;
   roiPercent: number;
   paybackYears: number;
   yearlyProjection: YearlyCashflow[];

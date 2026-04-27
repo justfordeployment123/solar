@@ -32,6 +32,10 @@ export default function Step3Page() {
 
   const handleNext = (e: React.MouseEvent) => {
     e.preventDefault();
+    if (technical.enablePeakShaving && (financial.gridFeesCentsKwh === null || financial.gridFeesCentsKwh === undefined)) {
+      alert("Bitte geben Sie die Netzentgelte an, da Peak Shaving aktiviert ist.");
+      return;
+    }
     markStepComplete('step3', true);
     router.push(`/i/${params.slug}/results`);
   };
@@ -90,13 +94,20 @@ export default function Step3Page() {
               value={financial.yearlyElectricityBillEur ?? ''}
               onChange={handleInputChange('yearlyElectricityBillEur')}
             />
-            <Input
-              label="Zielbudget (€)"
-              type="number"
-              placeholder="12500"
-              value={financial.targetBudgetEur ?? ''}
-              onChange={handleInputChange('targetBudgetEur')}
-            />
+            <div>
+              <Input
+                label="Zielbudget (€)"
+                type="number"
+                placeholder="12500"
+                value={financial.targetBudgetEur ?? ''}
+                onChange={handleInputChange('targetBudgetEur')}
+              />
+              {financial.targetBudgetEur && (
+                <div className="mt-3 text-sm text-[#0066cc] bg-[#eef2ff] p-3 rounded border border-[#bbd4ff]">
+                  💡 Basierend auf Ihrem Budget empfehlen wir eine Speichergröße von ca. {Math.floor(financial.targetBudgetEur / 1000)} kWh.
+                </div>
+              )}
+            </div>
 
             {technical.enablePeakShaving && (
               <div className="pt-6 mt-2 border-t border-[#e5e5e5]">

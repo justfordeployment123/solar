@@ -19,10 +19,19 @@ export default function Step2Page() {
   const markStepComplete = useCalculatorStore((state) => state.markStepComplete);
   const technical = useCalculatorStore((state) => state.technical);
   const setTechnicalInputs = useCalculatorStore((state) => state.setTechnicalInputs);
+  const persona = useCalculatorStore((state) => state.persona);
+
+  const showInverter = !(persona === 'Private' && !technical.enablePeakShaving);
 
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  useEffect(() => {
+    if (!showInverter && technical.pvSizeKwp) {
+      setTechnicalInputs({ inverterPowerKw: technical.pvSizeKwp * 1.2 });
+    }
+  }, [showInverter, technical.pvSizeKwp, setTechnicalInputs]);
 
   useEffect(() => {
     if (mounted && !stepCompletion.step1) {
@@ -106,19 +115,28 @@ export default function Step2Page() {
               onChange={handleInputChange('currentBatteryCapacityKwh')}
             />
             <div className="grid grid-cols-2 gap-4">
+              {showInverter && (
+                <Input
+                  label="WR-Leistung (kW)"
+                  type="number"
+                  placeholder="8"
+                  value={technical.inverterPowerKw ?? ''}
+                  onChange={handleInputChange('inverterPowerKw')}
+                />
+              )}
               <Input
-                label="WR-Leistung (kW)"
-                type="number"
-                placeholder="8"
-                value={technical.inverterPowerKw ?? ''}
-                onChange={handleInputChange('inverterPowerKw')}
-              />
-              <Input
-                label="Netzlimit (kW)"
+                label="Netzbezug Limit (kW)"
                 type="number"
                 placeholder="30"
-                value={technical.gridConnectionLimitKw ?? ''}
-                onChange={handleInputChange('gridConnectionLimitKw')}
+                value={technical.gridImportLimitKw ?? ''}
+                onChange={handleInputChange('gridImportLimitKw')}
+              />
+              <Input
+                label="Netzeinspeisung Limit (kW)"
+                type="number"
+                placeholder="30"
+                value={technical.gridExportLimitKw ?? ''}
+                onChange={handleInputChange('gridExportLimitKw')}
               />
             </div>
           </div>

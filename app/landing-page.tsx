@@ -635,13 +635,13 @@ export default function LandingPage() {
               Starten Sie jetzt - in unter einer Minute zum ersten Ergebnis.
             </p>
           </div>
-          <button
-            onClick={() => handleSelect('Private')}
+          <a
+            href="#personas"
             className="group inline-flex items-center gap-3 bg-white text-[#e20613] font-bold uppercase tracking-[0.2em] text-xs md:text-sm px-7 py-4 hover:bg-[#ffdb00] hover:text-black transition-colors"
           >
             <span>Jetzt starten</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-          </button>
+          </a>
         </div>
       </section>
 

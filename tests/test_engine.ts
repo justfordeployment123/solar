@@ -7,7 +7,8 @@ function testEngine() {
     annualConsumptionKwh: 4000,
     currentBatteryCapacityKwh: 10,
     inverterPowerKw: 10,
-    gridConnectionLimitKw: 30,
+    gridImportLimitKw: 30,
+    gridExportLimitKw: 30,
     region: 'South',
   };
 

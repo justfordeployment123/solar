@@ -84,7 +84,7 @@ export function CsvUploader() {
 
         store.setTechnicalInputs({ 
           annualConsumptionKwh: Math.round(totalConsumption),
-          gridConnectionLimitKw: Math.ceil(maxPeakKw) // Automatically set the peak load limit
+          gridImportLimitKw: Math.ceil(maxPeakKw) // Automatically set the peak load limit
         });
         store.setCsvMetadata({
           isConfigured: true,

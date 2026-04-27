@@ -17,11 +17,6 @@ export function calculateResults(
 ): DerivedResults {
   // Graceful fallbacks for missing inputs
   const currentBatteryCapacityKwh = technical.currentBatteryCapacityKwh || 10;
-  const regionMultiplier = technical.region ? REGIONAL_MULTIPLIERS[technical.region] : REGIONAL_MULTIPLIERS['Central'];
-  const pvSizeKwp = technical.pvSizeKwp || 10;
-
-  // Dummy solar generation based on region
-  const solarGeneration = pvSizeKwp * regionMultiplier;
 
   // --- Updated Base Revenue Streams ---
 
@@ -51,14 +46,15 @@ export function calculateResults(
   // The UI passes the value in Euros (e.g. 0.40), so no division is needed
   const userElectricityPrice = financial.currentElectricityPriceCentsKwh || 0.35;
   const estimatedKwhOffset = currentBatteryCapacityKwh * 250;
-  let selfConsumption = technical.enableSelfConsumption !== false ? userElectricityPrice * estimatedKwhOffset * 0.90 : 0;
+  const selfConsumption = technical.enableSelfConsumption !== false ? userElectricityPrice * estimatedKwhOffset * 0.90 : 0;
 
   // 6. Peak Shaving
-  const inverterPowerKw = technical.inverterPowerKw || 10;
+  // Hide inverter power if persona is private and peak shaving is false, we default inverter power to pvSizeKwp * 1.2
+  const gridImportLimitKw = technical.gridImportLimitKw || 100; // Just in case a fallback is needed for logic
   const demandChargeEurPerKw = financial.demandChargeEurPerKw || 0;
   const peakShavingReductionPercentage = financial.peakShavingReductionPercentage || 0;
-  let peakShaving = technical.enablePeakShaving !== false 
-    ? inverterPowerKw * demandChargeEurPerKw * (peakShavingReductionPercentage / 100) 
+  const peakShaving = technical.enablePeakShaving !== false 
+    ? gridImportLimitKw * demandChargeEurPerKw * (peakShavingReductionPercentage / 100) 
     : 0;
 
   // 7. Load Shifting
@@ -66,7 +62,7 @@ export function calculateResults(
   const standardTariff = financial.standardFeedInTariffCentsKwh || 0;
   const gridFees = financial.gridFeesCentsKwh || 0;
   const loadShiftingProfitCents = Math.max(0, dynamicTariff - standardTariff - gridFees);
-  let loadShifting = technical.enableLoadShifting ? currentBatteryCapacityKwh * 300 * 0.90 * (loadShiftingProfitCents / 100) : 0;
+  const loadShifting = technical.enableLoadShifting ? currentBatteryCapacityKwh * 300 * 0.90 * (loadShiftingProfitCents / 100) : 0;
 
   const annualRevenueByStream: RevenueStreams = {
     selfConsumption,
@@ -82,10 +78,12 @@ export function calculateResults(
   const baseAnnualRevenue = Object.values(annualRevenueByStream).reduce((sum, val) => sum + val, 0);
 
   const systemCost = currentBatteryCapacityKwh * COST_PER_KWH;
+  const engineeringFee = systemCost * 0.038;
+  const totalUpfrontCost = systemCost + engineeringFee;
 
   // Predict 15 years
   const yearlyProjection: YearlyCashflow[] = [];
-  let cumulative = -systemCost;
+  let cumulative = -totalUpfrontCost;
   let totalRevenue15Years = 0;
   let paybackYears = 0;
 
@@ -139,6 +137,7 @@ export function calculateResults(
   return {
     annualRevenueByStream,
     totalAnnualRevenue: baseAnnualRevenue,
+    engineeringFee,
     roiPercent,
     paybackYears,
     yearlyProjection,
