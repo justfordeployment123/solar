@@ -13,6 +13,8 @@ const initialState: CalculatorState = {
     region: null,
     pvSizeKwp: null,
     annualConsumptionKwh: null,
+    existingBatteryCapacityKwh: null,
+    existingBatteryManufacturer: null,
     currentBatteryCapacityKwh: null,
     inverterPowerKw: null,
     gridImportLimitKw: null,

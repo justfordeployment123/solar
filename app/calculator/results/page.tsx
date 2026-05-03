@@ -131,6 +131,10 @@ export default function ResultsPage() {
     );
   }
 
+  const totalCapacity = (technical.existingBatteryCapacityKwh || 0) + (technical.currentBatteryCapacityKwh || 0);
+  const estimatedConsumption = technical.annualConsumptionKwh || (financial.yearlyElectricityBillEur ? (financial.yearlyElectricityBillEur / 0.35) : 5000);
+  const autarkyPercent = totalCapacity > 0 ? Math.min(95, Math.round(30 + (totalCapacity * 250 / estimatedConsumption) * 100)) : 30;
+
   return (
     <div className="container mx-auto px-6 py-10 sm:px-8 space-y-10">
       {/* Header */}
@@ -222,7 +226,7 @@ export default function ResultsPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         <MetricCard
           title="Kapitalwert (NPV)"
-          value={`€${((derivedResults.yearlyProjection[14]?.cumulative || 0) + (technical.currentBatteryCapacityKwh || 10) * 1000 + derivedResults.engineeringFee).toLocaleString('de-DE', { maximumFractionDigits: 0 })}`}
+          value={`€${(derivedResults.yearlyProjection[14]?.cumulative || 0).toLocaleString('de-DE', { maximumFractionDigits: 0 })}`}
           subtitle="Gesamtgewinn über Lebensdauer"
           icon={TrendingUp}
           accent="#1a1a1a"
@@ -237,7 +241,7 @@ export default function ResultsPage() {
         />
         <MetricCard
           title="Autarkiegrad"
-          value={`${75}%`}
+          value={`${autarkyPercent}%`}
           subtitle="Netzunabhängigkeit"
           icon={Zap}
           accent="#d2d700"

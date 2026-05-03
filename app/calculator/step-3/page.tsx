@@ -83,6 +83,7 @@ export default function Step3Page() {
               type="number"
               step="0.01"
               placeholder="0.35"
+              tooltipText="Ihr aktueller Arbeitspreis für Strombezug in Cent pro kWh."
               value={financial.currentElectricityPriceCentsKwh ?? ''}
               onChange={handleInputChange('currentElectricityPriceCentsKwh')}
             />
@@ -90,6 +91,7 @@ export default function Step3Page() {
               label="Jährliche Stromkosten (€)"
               type="number"
               placeholder="2400"
+              tooltipText="Ihre geschätzten Stromkosten pro Jahr. Dient als Alternative zur direkten Eingabe des Verbrauchs."
               value={financial.yearlyElectricityBillEur ?? ''}
               onChange={handleInputChange('yearlyElectricityBillEur')}
             />
@@ -98,12 +100,17 @@ export default function Step3Page() {
                 label="Zielbudget (€)"
                 type="number"
                 placeholder="12500"
+                tooltipText="Ihr geplantes Budget für den neuen Batteriespeicher."
                 value={financial.targetBudgetEur ?? ''}
                 onChange={handleInputChange('targetBudgetEur')}
               />
               {financial.targetBudgetEur && (
                 <div className="mt-3 text-sm text-[#0066cc] bg-[#eef2ff] p-3 rounded border border-[#bbd4ff]">
-                  💡 Basierend auf Ihrem Budget empfehlen wir eine Speichergröße von ca. {Math.floor(financial.targetBudgetEur / 1000)} kWh.
+                  {(() => {
+                    const estimatedConsumption = technical.annualConsumptionKwh || (financial.yearlyElectricityBillEur ? (financial.yearlyElectricityBillEur / 0.35) : 5000);
+                    const recommendedKwh = Math.max(10, Math.ceil(estimatedConsumption / 1000) * 1.5, Math.floor((financial.targetBudgetEur || 0) / 1000));
+                    return `💡 Basierend auf Ihren Daten empfehlen wir eine großzügige Speichergröße von ca. ${recommendedKwh} kWh für maximale Autarkie.`;
+                  })()}
                 </div>
               )}
             </div>
@@ -117,6 +124,14 @@ export default function Step3Page() {
                   </h4>
                 </div>
                 <div className="space-y-4">
+                  <Input
+                    label="Netzentgelte (Cent/kWh)"
+                    type="number"
+                    placeholder="z.B. 8.5"
+                    tooltipText="Netzentgelte des Netzbetreibers. Zwingend erforderlich für Peak Shaving."
+                    value={financial.gridFeesCentsKwh ?? ''}
+                    onChange={handleInputChange('gridFeesCentsKwh')}
+                  />
                   <Input
                     label="Leistungspreis (€/kW)"
                     type="number"
@@ -151,6 +166,7 @@ export default function Step3Page() {
                     type="number"
                     step="0.1"
                     placeholder="30"
+                    tooltipText="Der höchste Preis in Ihrem dynamischen Stromtarif, zu dem Sie Strom nutzen möchten."
                     value={financial.dynamicFeedInTariffCentsKwh ?? ''}
                     onChange={handleInputChange('dynamicFeedInTariffCentsKwh')}
                   />
@@ -159,17 +175,21 @@ export default function Step3Page() {
                     type="number"
                     step="0.1"
                     placeholder="8"
+                    tooltipText="Der Basispreis oder durchschnittliche Preis in Ihrem Stromtarif."
                     value={financial.standardFeedInTariffCentsKwh ?? ''}
                     onChange={handleInputChange('standardFeedInTariffCentsKwh')}
                   />
-                  <Input
-                    label="Netzentgelte (Cent/kWh)"
-                    type="number"
-                    step="0.1"
-                    placeholder="12"
-                    value={financial.gridFeesCentsKwh ?? ''}
-                    onChange={handleInputChange('gridFeesCentsKwh')}
-                  />
+                  {!technical.enablePeakShaving && (
+                    <Input
+                      label="Netzentgelte (Cent/kWh)"
+                      type="number"
+                      step="0.1"
+                      placeholder="12"
+                      tooltipText="Netzentgelte des Netzbetreibers, die beim Netzbezug anfallen."
+                      value={financial.gridFeesCentsKwh ?? ''}
+                      onChange={handleInputChange('gridFeesCentsKwh')}
+                    />
+                  )}
                 </div>
               </div>
             )}

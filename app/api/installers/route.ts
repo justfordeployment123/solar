@@ -54,7 +54,7 @@ export async function POST(request: Request) {
       // Send email to Stephan
       await resend.emails.send({
         from: 'System <onboarding@resend.dev>',
-        to: 'stephan@mysolar-pv.de', // Placeholder for Stephan's actual email
+        to: ['info@mysolar-pv.de', 's.kluee@mysolar-pv.de'],
         subject: 'New Installer Registered',
         html: `<p>A new installer has registered:</p>
                <ul>

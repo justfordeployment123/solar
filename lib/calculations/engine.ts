@@ -16,20 +16,24 @@ export function calculateResults(
   financial: FinancialInputs
 ): DerivedResults {
   // Graceful fallbacks for missing inputs
-  const currentBatteryCapacityKwh = technical.currentBatteryCapacityKwh || 10;
+  const currentBatteryCapacityKwh = technical.currentBatteryCapacityKwh ?? 0;
+  const existingBatteryCapacityKwh = technical.existingBatteryCapacityKwh ?? 0;
+  const totalCapacity = existingBatteryCapacityKwh + currentBatteryCapacityKwh;
+  const isNGen = technical.existingBatteryManufacturer === 'NGen';
+  const controllableCapacity = currentBatteryCapacityKwh + (isNGen ? existingBatteryCapacityKwh : 0);
 
   // --- Updated Base Revenue Streams ---
 
   // 1. EPEX Arbitrage (Placeholder: assumes 1 cycle/day, €0.10 spread, 90% efficiency)
-  let epexArbitrage = technical.enableEpex !== false ? currentBatteryCapacityKwh * 300 * 0.10 * 0.90 : 0;
+  let epexArbitrage = technical.enableEpex !== false ? controllableCapacity * 300 * 0.10 * 0.90 : 0;
 
   // 2. PRL calculation based on regelleistung.net average
   const PRL_ANNUAL_EUR_PER_KW = (2350 / 1000) * 52;
-  let prl = technical.enablePrl !== false ? currentBatteryCapacityKwh * PRL_ANNUAL_EUR_PER_KW : 0;
+  let prl = technical.enablePrl !== false ? controllableCapacity * PRL_ANNUAL_EUR_PER_KW : 0;
 
   // 3. SRL/aFRR (Placeholder)
   const SRL_ANNUAL_EUR_PER_KW = 18;
-  let srlAfrr = technical.enableSrl !== false ? currentBatteryCapacityKwh * SRL_ANNUAL_EUR_PER_KW : 0;
+  let srlAfrr = technical.enableSrl !== false ? controllableCapacity * SRL_ANNUAL_EUR_PER_KW : 0;
 
   // 4. VPP Participation (Requirement: ~€450/mo per 41.9 kWh)
   let vppParticipation = 0;
@@ -39,22 +43,26 @@ export function calculateResults(
     epexArbitrage *= VPP_BONUS_MULTIPLIER;
     prl *= VPP_BONUS_MULTIPLIER;
     srlAfrr *= VPP_BONUS_MULTIPLIER;
-    vppParticipation = technical.enablePrl !== false || technical.enableSrl !== false ? currentBatteryCapacityKwh * VPP_ANNUAL_PER_KWH : 0;
+    vppParticipation = technical.enablePrl !== false || technical.enableSrl !== false ? controllableCapacity * VPP_ANNUAL_PER_KWH : 0;
   }
 
   // 5. Self-Consumption (Requirement: User Price * Offset * 90% efficiency)
   // The UI passes the value in Euros (e.g. 0.40), so no division is needed
   const userElectricityPrice = financial.currentElectricityPriceCentsKwh || 0.35;
-  const estimatedKwhOffset = currentBatteryCapacityKwh * 250;
+  const baseOffset = totalCapacity * 250;
+  const maxConsumption = technical.annualConsumptionKwh || 5000;
+  const maxPvYield = (technical.pvSizeKwp || 10) * 1000;
+  const estimatedKwhOffset = Math.min(baseOffset, maxConsumption * 0.8, maxPvYield * 0.8);
   const selfConsumption = technical.enableSelfConsumption !== false ? userElectricityPrice * estimatedKwhOffset * 0.90 : 0;
 
   // 6. Peak Shaving
-  // Hide inverter power if persona is private and peak shaving is false, we default inverter power to pvSizeKwp * 1.2
   const gridImportLimitKw = technical.gridImportLimitKw || 100; // Just in case a fallback is needed for logic
+  const fallbackInverterPower = technical.pvSizeKwp ? technical.pvSizeKwp * 1.2 : gridImportLimitKw;
+  const actualInverterPower = technical.inverterPowerKw || fallbackInverterPower;
   const demandChargeEurPerKw = financial.demandChargeEurPerKw || 0;
   const peakShavingReductionPercentage = financial.peakShavingReductionPercentage || 0;
   const peakShaving = technical.enablePeakShaving !== false 
-    ? gridImportLimitKw * demandChargeEurPerKw * (peakShavingReductionPercentage / 100) 
+    ? actualInverterPower * demandChargeEurPerKw * (peakShavingReductionPercentage / 100) 
     : 0;
 
   // 7. Load Shifting
@@ -62,7 +70,7 @@ export function calculateResults(
   const standardTariff = financial.standardFeedInTariffCentsKwh || 0;
   const gridFees = financial.gridFeesCentsKwh || 0;
   const loadShiftingProfitCents = Math.max(0, dynamicTariff - standardTariff - gridFees);
-  const loadShifting = technical.enableLoadShifting ? currentBatteryCapacityKwh * 300 * 0.90 * (loadShiftingProfitCents / 100) : 0;
+  const loadShifting = technical.enableLoadShifting ? controllableCapacity * 300 * 0.90 * (loadShiftingProfitCents / 100) : 0;
 
   const annualRevenueByStream: RevenueStreams = {
     selfConsumption,

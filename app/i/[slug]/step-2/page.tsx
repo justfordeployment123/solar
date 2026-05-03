@@ -82,6 +82,7 @@ export default function Step2Page() {
           <div className="space-y-6">
             <Select
               label="Region"
+              tooltipText="Ihr Standort zur Berechnung regionaler Durchschnittswerte."
               options={[
                 { value: '', label: 'Region wählen' },
                 { value: 'North', label: 'Norddeutschland' },
@@ -96,6 +97,7 @@ export default function Step2Page() {
                 label="PV-Größe (kWp)"
                 type="number"
                 placeholder="10"
+                tooltipText="Größe Ihrer Photovoltaikanlage in Kilowatt-Peak (kWp)."
                 value={technical.pvSizeKwp ?? ''}
                 onChange={handleInputChange('pvSizeKwp')}
               />
@@ -103,31 +105,51 @@ export default function Step2Page() {
                 label="Jährl. Verbrauch (kWh)"
                 type="number"
                 placeholder="5000"
+                tooltipText="Ihr jährlicher Stromverbrauch in Kilowattstunden (kWh)."
                 value={technical.annualConsumptionKwh ?? ''}
                 onChange={handleInputChange('annualConsumptionKwh')}
               />
             </div>
             <Input
-              label="Aktuelle Batteriekapazität (kWh)"
+              label="Vorhandene Batteriekapazität (kWh)"
               type="number"
               placeholder="0"
+              tooltipText="Kapazität eines bereits installierten Speichers (falls vorhanden)."
+              value={technical.existingBatteryCapacityKwh ?? ''}
+              onChange={handleInputChange('existingBatteryCapacityKwh')}
+            />
+            {Number(technical.existingBatteryCapacityKwh) > 0 && (
+              <Select
+                label="Hersteller des vorhandenen Speichers"
+                tooltipText="Wird für die Kompatibilitätsprüfung bei Energiehandel und Netzstabilität benötigt."
+                options={[
+                  { value: '', label: 'Hersteller wählen' },
+                  { value: 'NGen', label: 'NGen' },
+                  { value: 'Huawei', label: 'Huawei' },
+                  { value: 'Axitec', label: 'Axitec' },
+                  { value: 'Goodwe', label: 'Goodwe' },
+                  { value: 'Sungrow', label: 'Sungrow' },
+                  { value: 'SMA', label: 'SMA' },
+                  { value: 'Andere', label: 'Andere' }
+                ]}
+                value={technical.existingBatteryManufacturer || ''}
+                onChange={(e) => setTechnicalInputs({ existingBatteryManufacturer: e.target.value })}
+              />
+            )}
+            <Input
+              label="Geplante zusätzliche Batteriekapazität (kWh)"
+              type="number"
+              placeholder="0"
+              tooltipText="Die Speicherkapazität, die Sie neu anschaffen möchten."
               value={technical.currentBatteryCapacityKwh ?? ''}
               onChange={handleInputChange('currentBatteryCapacityKwh')}
             />
             <div className="grid grid-cols-2 gap-4">
-              {showInverter && (
-                <Input
-                  label="WR-Leistung (kW)"
-                  type="number"
-                  placeholder="8"
-                  value={technical.inverterPowerKw ?? ''}
-                  onChange={handleInputChange('inverterPowerKw')}
-                />
-              )}
               <Input
                 label="Netzbezug Limit (kW)"
                 type="number"
                 placeholder="30"
+                tooltipText="Maximale Strombezugsgrenze aus dem Netz (wichtig für Peak Shaving)."
                 value={technical.gridImportLimitKw ?? ''}
                 onChange={handleInputChange('gridImportLimitKw')}
               />
@@ -135,6 +157,7 @@ export default function Step2Page() {
                 label="Netzeinspeisung Limit (kW)"
                 type="number"
                 placeholder="30"
+                tooltipText="Maximale Einspeisegrenze in das öffentliche Netz."
                 value={technical.gridExportLimitKw ?? ''}
                 onChange={handleInputChange('gridExportLimitKw')}
               />

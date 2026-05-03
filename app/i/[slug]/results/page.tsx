@@ -136,6 +136,10 @@ export default function ResultsPage() {
     );
   }
 
+  const totalCapacity = (technical.existingBatteryCapacityKwh || 0) + (technical.currentBatteryCapacityKwh || 0);
+  const estimatedConsumption = technical.annualConsumptionKwh || (financial.yearlyElectricityBillEur ? (financial.yearlyElectricityBillEur / 0.35) : 5000);
+  const autarkyPercent = totalCapacity > 0 ? Math.min(95, Math.round(30 + (totalCapacity * 250 / estimatedConsumption) * 100)) : 30;
+
   return (
     <div className="container mx-auto px-6 py-10 sm:px-8 space-y-10">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">

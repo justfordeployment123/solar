@@ -19,6 +19,8 @@ export interface TechnicalInputs {
   region: 'North' | 'Central' | 'South' | null;
   pvSizeKwp: number | null;
   annualConsumptionKwh: number | null;
+  existingBatteryCapacityKwh: number | null;
+  existingBatteryManufacturer: string | null;
   currentBatteryCapacityKwh: number | null;
   inverterPowerKw: number | null;
   gridImportLimitKw: number | null;

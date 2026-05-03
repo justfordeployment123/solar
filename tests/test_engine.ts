@@ -4,9 +4,11 @@ import { TechnicalInputs, FinancialInputs } from '../types/calculator';
 function testEngine() {
   const technical: TechnicalInputs = {
     pvSizeKwp: 10,
-    annualConsumptionKwh: 4000,
+    annualConsumptionKwh: 5000,
+    existingBatteryCapacityKwh: 0,
+    existingBatteryManufacturer: null,
     currentBatteryCapacityKwh: 10,
-    inverterPowerKw: 10,
+    inverterPowerKw: 8,
     gridImportLimitKw: 30,
     gridExportLimitKw: 30,
     region: 'South',

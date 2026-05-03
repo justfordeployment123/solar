@@ -138,26 +138,32 @@ export default function InstallersPage() {
           </div>
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16">
-            <form className="lg:col-span-8 flex flex-col gap-8" onSubmit={handleSubmit}>
-              <div className="bg-white border border-[#e5e5e5] p-8 md:p-10 relative">
-                <span className="absolute top-0 left-0 right-0 h-[3px] bg-[#e20613]" />
-                <div className="flex items-center gap-3 mb-8">
-                  <div className="w-10 h-10 bg-[#e20613] flex items-center justify-center">
-                    <Building2 className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <div className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#e20613]">
-                      Schritt 01
+            <div className="lg:col-span-8 flex flex-col gap-8">
+              <div className="bg-[#fff5f5] border-l-4 border-[#e20613] p-6 mb-2">
+                <p className="text-sm md:text-base text-[#1a1a1a] leading-relaxed">
+                  <strong>Hinweis:</strong> Dieser Service ist für 3 Monate kostenlos und kostet danach 100 € pro Monat. Die Kosten werden jedoch mit offenen Bestellungen in unserem Hause ab einem noch zu vereinbarenden Umsatz gutgeschrieben. Diese Maßnahme schützt unser Netzwerk vor Trittbrettfahrern.
+                </p>
+              </div>
+              <form className="flex flex-col gap-8" onSubmit={handleSubmit}>
+                <div className="bg-white border border-[#e5e5e5] p-8 md:p-10 relative">
+                  <span className="absolute top-0 left-0 right-0 h-[3px] bg-[#e20613]" />
+                  <div className="flex items-center gap-3 mb-8">
+                    <div className="w-10 h-10 bg-[#e20613] flex items-center justify-center">
+                      <Building2 className="w-5 h-5 text-white" />
                     </div>
-                    <h3 className="text-lg font-bold text-[#1a1a1a] tracking-tight">
-                      Unternehmensdaten
-                    </h3>
+                    <div>
+                      <div className="text-[0.65rem] font-bold uppercase tracking-[0.2em] text-[#e20613]">
+                        Schritt 01
+                      </div>
+                      <h3 className="text-lg font-bold text-[#1a1a1a] tracking-tight">
+                        Unternehmensdaten
+                      </h3>
+                    </div>
                   </div>
-                </div>
 
-                <div className="space-y-6">
-                  <Input
-                    label="Unternehmensname"
+                  <div className="space-y-6">
+                    <Input
+                      label="Unternehmensname"
                     id="companyName"
                     name="companyName"
                     placeholder="Energy Solutions GmbH"
@@ -244,6 +250,7 @@ export default function InstallersPage() {
                 </Button>
               </div>
             </form>
+            </div>
 
             <aside className="lg:col-span-4 space-y-6">
               <div className="bg-white border border-[#e5e5e5] p-8 relative">
