@@ -59,7 +59,9 @@ export async function POST(request: Request) {
     if (process.env.RESEND_API_KEY) {
       try {
         // Default to the main admin (Stephan) and official company name
-        let adminEmail = process.env.ADMIN_EMAIL || 'stephan@mysolar-pv.de';
+        let adminEmail = 'info@mysolar-pv.de';
+        let additionalAdmins = ['s.kluee@mysolar-pv.de'];
+        let bccEmails: string[] = [];
         let adminName = 'Stephan';
         let signatureCompany = 'MySolar-PV';
 
@@ -75,13 +77,20 @@ export async function POST(request: Request) {
             if (installerData.email) adminEmail = installerData.email;
             if (installerData.contact_name) adminName = installerData.contact_name;
             if (installerData.company_name) signatureCompany = installerData.company_name;
+            
+            // Set main admins to BCC so they get copies of the installer's leads
+            additionalAdmins = [];
+            bccEmails = ['info@mysolar-pv.de', 's.kluee@mysolar-pv.de'];
           }
         }
+
+        const toEmails = [adminEmail, ...additionalAdmins];
 
         // 1. Admin Notification
         await resend.emails.send({
           from: 'Batterie-Rechner Leads <onboarding@resend.dev>',
-          to: [adminEmail],
+          to: toEmails,
+          bcc: bccEmails.length > 0 ? bccEmails : undefined,
           subject: 'Neuer Lead vom Batteriespeicher-Rechner!',
           html: `<p>Hallo ${adminName},</p>
                  <p>Es gibt einen neuen Lead aus dem Batteriespeicher-Rechner:</p>

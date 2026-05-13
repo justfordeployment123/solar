@@ -54,8 +54,6 @@ export interface CsvMetadata {
   fileName: string | null;
   rowCount: number;
   hasErrors: boolean;
-  expectedColumns: ('timestamp' | 'consumption_kwh')[];
-  acceptedDelimiters: (',' | ';' | '\t')[];
   parseErrorSurface: string | null;
   fallbackToManualMode: boolean;
 }

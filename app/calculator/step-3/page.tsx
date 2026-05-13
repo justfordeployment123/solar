@@ -87,14 +87,31 @@ export default function Step3Page() {
               value={financial.currentElectricityPriceCentsKwh ?? ''}
               onChange={handleInputChange('currentElectricityPriceCentsKwh')}
             />
-            <Input
-              label="Jährliche Stromkosten (€)"
-              type="number"
-              placeholder="2400"
-              tooltipText="Ihre geschätzten Stromkosten pro Jahr. Dient als Alternative zur direkten Eingabe des Verbrauchs."
-              value={financial.yearlyElectricityBillEur ?? ''}
-              onChange={handleInputChange('yearlyElectricityBillEur')}
-            />
+            <div>
+              <Input
+                label="Jährliche Stromkosten (€)"
+                type="number"
+                placeholder="2400"
+                tooltipText="Ihre geschätzten Stromkosten pro Jahr. Dient als Alternative zur direkten Eingabe des Verbrauchs."
+                value={financial.yearlyElectricityBillEur ?? ''}
+                onChange={handleInputChange('yearlyElectricityBillEur')}
+              />
+              {(() => {
+                if (technical.annualConsumptionKwh && financial.currentElectricityPriceCentsKwh && financial.yearlyElectricityBillEur) {
+                  const expected = technical.annualConsumptionKwh * financial.currentElectricityPriceCentsKwh;
+                  const diff = Math.abs(expected - financial.yearlyElectricityBillEur);
+                  const tolerance = expected * 0.2; // 20% tolerance
+                  if (diff > tolerance) {
+                    return (
+                      <div className="mt-2 text-sm text-[#e20613] bg-[#fff5f5] p-3 rounded border border-[#ffcccc]">
+                        ⚠️ <strong>Achtung:</strong> Die eingegebenen Stromkosten ({financial.yearlyElectricityBillEur} €) passen nicht zum angegebenen Verbrauch ({technical.annualConsumptionKwh} kWh) und Strompreis ({financial.currentElectricityPriceCentsKwh} €). Rechnerisch müssten diese bei ca. {Math.round(expected)} € liegen.
+                      </div>
+                    );
+                  }
+                }
+                return null;
+              })()}
+            </div>
             <div>
               <Input
                 label="Zielbudget (€)"
@@ -107,12 +124,20 @@ export default function Step3Page() {
               {financial.targetBudgetEur && (
                 <div className="mt-3 text-sm text-[#0066cc] bg-[#eef2ff] p-3 rounded border border-[#bbd4ff]">
                   {(() => {
-                    const estimatedConsumption = technical.annualConsumptionKwh || (financial.yearlyElectricityBillEur ? (financial.yearlyElectricityBillEur / 0.35) : 5000);
+                    const estimatedConsumption = technical.annualConsumptionKwh || (financial.yearlyElectricityBillEur ? (financial.yearlyElectricityBillEur / (financial.currentElectricityPriceCentsKwh || 0.35)) : 5000);
                     const recommendedKwh = Math.max(10, Math.ceil(estimatedConsumption / 1000) * 1.5, Math.floor((financial.targetBudgetEur || 0) / 1000));
                     return `💡 Basierend auf Ihren Daten empfehlen wir eine großzügige Speichergröße von ca. ${recommendedKwh} kWh für maximale Autarkie.`;
                   })()}
                 </div>
               )}
+              <div className="mt-3 text-sm text-[#1a1a1a] bg-[#fafafa] p-4 rounded border border-[#e5e5e5]">
+                <p className="font-semibold mb-2">Sie können gewinnbringend größer auslegen, wenn Ihr System an Märkten teilnimmt:</p>
+                <ul className="list-disc pl-5 space-y-1 text-[#5a5859]">
+                  <li>Strombörse: 5-8% Rendite zu erwarten</li>
+                  <li>Regelenergie: 7-12% Rendite zu erwarten</li>
+                  <li>Kombination (beides): 12-18% Rendite</li>
+                </ul>
+              </div>
             </div>
 
             {technical.enablePeakShaving && (

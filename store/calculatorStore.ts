@@ -36,8 +36,6 @@ const initialState: CalculatorState = {
     fileName: null,
     rowCount: 0,
     hasErrors: false,
-    expectedColumns: ['timestamp', 'consumption_kwh'],
-    acceptedDelimiters: [',', ';', '\t'],
     parseErrorSurface: null,
     fallbackToManualMode: false,
   },

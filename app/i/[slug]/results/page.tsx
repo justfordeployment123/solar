@@ -74,7 +74,7 @@ function MetricCard({
 
 export default function ResultsPage() {
   const params = useParams() as { slug: string };
-  const { technical, financial, derivedResults, setTechnicalInputs, setFinancialInputs, activeInstaller } = useCalculatorStore();
+  const { technical, financial, derivedResults, setTechnicalInputs, setFinancialInputs, activeInstaller, _hasHydrated } = useCalculatorStore();
 
   const [pieChartImage, setPieChartImage] = useState<string>();
   const [barChartImage, setBarChartImage] = useState<string>();
@@ -86,9 +86,21 @@ export default function ResultsPage() {
   const pieRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
 
+  const [initialCapacity, setInitialCapacity] = useState<number | null>(null);
+
   useEffect(() => {
     setIsClient(true);
   }, []);
+
+  useEffect(() => {
+    if (_hasHydrated && initialCapacity === null) {
+      setInitialCapacity(technical.currentBatteryCapacityKwh ?? 0);
+    }
+  }, [_hasHydrated, initialCapacity, technical.currentBatteryCapacityKwh]);
+
+  const baseCapacity = initialCapacity ?? 0;
+  const sliderMin = Math.max(0, baseCapacity - 100);
+  const sliderMax = baseCapacity + 100;
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTechnicalInputs({ currentBatteryCapacityKwh: parseFloat(e.target.value) });
@@ -176,10 +188,10 @@ export default function ResultsPage() {
           <div className="flex items-center gap-4">
             <input
               type="range"
-              min="0"
-              max="100"
+              min={sliderMin}
+              max={sliderMax}
               step="1"
-              value={technical.currentBatteryCapacityKwh || 0}
+              value={technical.currentBatteryCapacityKwh ?? 0}
               onChange={handleSliderChange}
               className="w-full h-2 bg-[#e5e5e5] appearance-none cursor-pointer accent-[#e20613]"
             />
