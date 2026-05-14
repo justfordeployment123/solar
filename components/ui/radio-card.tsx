@@ -3,7 +3,7 @@
 import React from 'react';
 import { clsx, type ClassValue } from 'clsx';
 import { twMerge } from 'tailwind-merge';
-import { Check } from 'lucide-react';
+import { Check, Info } from 'lucide-react';
 
 function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -14,6 +14,7 @@ export interface Option {
   title: string;
   description: string;
   disclaimer?: string;
+  onInfoClick?: (e: React.MouseEvent) => void;
 }
 
 export interface RadioCardProps {
@@ -40,15 +41,35 @@ export function RadioCard({ option, checked, onChange, className }: RadioCardPro
       )}
 
       <div className="flex-1 pr-6 order-2 sm:order-1 mt-4 sm:mt-0">
-        <span
-          className={cn(
-            "block text-lg md:text-xl font-bold tracking-tight mb-2 transition-colors",
-            checked ? "text-[#e20613]" : "text-[#1a1a1a]"
+        <div className="flex items-center gap-2 mb-2">
+          <span
+            className={cn(
+              "block text-lg md:text-xl font-bold tracking-tight transition-colors",
+              checked ? "text-[#e20613]" : "text-[#1a1a1a]"
+            )}
+          >
+            {option.title}
+          </span>
+          {option.onInfoClick && (
+            <div 
+              role="button"
+              tabIndex={0}
+              onClick={option.onInfoClick}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  option.onInfoClick!(e as any);
+                }
+              }}
+              className="p-1 text-gray-400 hover:text-[#e20613] transition-colors cursor-pointer"
+              title="Mehr erfahren"
+            >
+              <Info className="w-4 h-4" />
+            </div>
           )}
-        >
-          {option.title}
-        </span>
-        <p
+        </div>
+        <p 
           className={cn(
             "text-sm md:text-[0.95rem] text-[#5a5859] font-medium leading-relaxed",
             option.disclaimer ? "mb-3" : ""

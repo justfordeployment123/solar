@@ -21,6 +21,13 @@
   --color-error: #e20613;
   --color-error-container: #ffe5e5;
   --color-on-error: #ffffff;
+
+  /* Admin Portal Colors */
+  --color-brand-red: #e20613;
+  --color-brand-dark-gray: #1a1a1a;
+  --color-brand-light-gray: #5a5859;
+  --color-brand-lighter-gray: #e5e5e5;
+  --color-brand-white: #ffffff;
   
   --font-sans: var(--font-opensans);
 

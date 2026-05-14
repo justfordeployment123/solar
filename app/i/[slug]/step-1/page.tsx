@@ -9,20 +9,13 @@ import { Goal } from '@/types/calculator';
 import { RadioCard } from '@/components/ui/radio-card';
 import { Button } from '@/components/ui/button';
 import { ChevronRight, ArrowLeft } from 'lucide-react';
-
-const GOAL_OPTIONS: { id: Goal & string; title: string; description: string; disclaimer?: string }[] = [
-  { id: 'Self-Consumption', title: 'Eigenverbrauch', description: 'Priorisieren Sie die lokale Nutzung von Solarenergie, um die Abhängigkeit von externen Anbietern zu verringern.' },
-  { id: 'Peak Shaving', title: 'Lastspitzenkappung (Peak Shaving)', description: 'Reduzieren Sie die Leistungsentgelte, indem Sie die Batterie während der Spitzenlastzeiten entladen.' },
-  { id: 'Grid Services (VPP/Balancing)', title: 'Netzstabilität (PRL/SRL)', description: 'Stellen Sie dem nationalen Übertragungsnetzbetreiber Frequenzregelreserven zur Verfügung.' },
-  { id: 'EPEX Arbitrage', title: 'Energiehandel (EPEX Arbitrage)', description: 'Kaufen Sie Energie, wenn die Preise niedrig sind, und verkaufen Sie diese, wenn sie auf dem Spotmarkt hoch sind.' },
-  { id: 'Backup Power', title: 'Notstromversorgung', description: 'Gewährleisten Sie die Stromverfügbarkeit bei Netzausfällen.' },
-  { id: 'Load Shifting', title: 'Lastverschiebung (Load Shifting)', description: 'Nutzen Sie dynamische Tarife, um günstige Energie zu speichern und zeitversetzt optimal einzusetzen.' },
-];
+import { InfoModal } from '@/components/modals/info-modal';
 
 export default function Step1Page() {
   const router = useRouter();
   const params = useParams() as { slug: string };
   const [mounted, setMounted] = useState(false);
+  const [isRegelenergieModalOpen, setIsRegelenergieModalOpen] = useState(false);
 
   const goals = useCalculatorStore((state) => state.goals);
   const setGoals = useCalculatorStore((state) => state.setGoals);
@@ -31,6 +24,24 @@ export default function Step1Page() {
   useEffect(() => {
     setMounted(true);
   }, []);
+
+  const GOAL_OPTIONS: { id: Goal & string; title: string; description: string; disclaimer?: string; onInfoClick?: (e: React.MouseEvent) => void }[] = [
+    { id: 'Self-Consumption', title: 'Eigenverbrauch', description: 'Priorisieren Sie die lokale Nutzung von Solarenergie, um die Abhängigkeit von externen Anbietern zu verringern.' },
+    { id: 'Peak Shaving', title: 'Lastspitzenkappung (Peak Shaving)', description: 'Reduzieren Sie die Leistungsentgelte, indem Sie die Batterie während der Spitzenlastzeiten entladen.' },
+    { 
+      id: 'Grid Services (VPP/Balancing)', 
+      title: 'Netzstabilität (PRL/SRL)', 
+      description: 'Stellen Sie dem nationalen Übertragungsnetzbetreiber Frequenzregelreserven zur Verfügung.',
+      onInfoClick: (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setIsRegelenergieModalOpen(true);
+      }
+    },
+    { id: 'EPEX Arbitrage', title: 'Energiehandel (EPEX Arbitrage)', description: 'Kaufen Sie Energie, wenn die Preise niedrig sind, und verkaufen Sie diese, wenn sie auf dem Spotmarkt hoch sind.' },
+    { id: 'Backup Power', title: 'Notstromversorgung', description: 'Gewährleisten Sie die Stromverfügbarkeit bei Netzausfällen.' },
+    { id: 'Load Shifting', title: 'Lastverschiebung (Load Shifting)', description: 'Nutzen Sie dynamische Tarife, um günstige Energie zu speichern und zeitversetzt optimal einzusetzen.' },
+  ];
 
   const handleToggleGoal = (goal: string) => {
     const goalValue = goal as Goal;
@@ -114,6 +125,22 @@ export default function Step1Page() {
           Nächster Schritt <ChevronRight className="w-5 h-5" />
         </Button>
       </footer>
+
+      <InfoModal 
+        isOpen={isRegelenergieModalOpen} 
+        onClose={() => setIsRegelenergieModalOpen(false)}
+        title="Was ist Regelenergie (Netzstabilität)?"
+      >
+        <p>
+          Das Stromnetz muss jederzeit im Gleichgewicht sein – Erzeugung und Verbrauch müssen exakt übereinstimmen. Da erneuerbare Energien wie Wind und Sonne stark schwanken, entstehen kurzfristige Ungleichgewichte im Netz.
+        </p>
+        <p>
+          <strong>Ihre Chance:</strong> Moderne Batteriespeicher können innerhalb von Sekundenbruchteilen Strom einspeisen oder aufnehmen, um das Netz zu stabilisieren. Die Übertragungsnetzbetreiber (ÜNB) bezahlen Sie für diese Dienstleistung außerordentlich gut.
+        </p>
+        <p>
+          <strong>Darum lohnt sich ein größerer Speicher:</strong> Je mehr Kapazität Sie dem Netz zur Verfügung stellen können, desto höher fallen Ihre Renditen aus. Während kleine Heimspeicher oft nur den Eigenverbrauch abdecken, öffnen größere Speicher den Zugang zu hochlukrativen Märkten wie der Primärregelleistung (PRL) und der Sekundärregelleistung (SRL).
+        </p>
+      </InfoModal>
     </div>
   );
 }

@@ -7,12 +7,14 @@ import { ProgressHeader } from '@/components/layout/progress-header';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useCalculatorStore } from '@/store/calculatorStore';
-import { ArrowLeft, Calculator, Euro, Check } from 'lucide-react';
+import { ArrowLeft, Calculator, Euro, Check, Info } from 'lucide-react';
+import { InfoModal } from '@/components/modals/info-modal';
 
 export default function Step3Page() {
   const router = useRouter();
   const params = useParams() as { slug: string };
   const [mounted, setMounted] = useState(false);
+  const [isRegelenergieModalOpen, setIsRegelenergieModalOpen] = useState(false);
 
   const stepCompletion = useCalculatorStore((state) => state.stepCompletion);
   const markStepComplete = useCalculatorStore((state) => state.markStepComplete);
@@ -131,8 +133,16 @@ export default function Step3Page() {
                   })()}
                 </div>
               )}
-              <div className="mt-3 text-sm text-[#1a1a1a] bg-[#fafafa] p-4 rounded border border-[#e5e5e5]">
-                <p className="font-semibold mb-2">Sie können gewinnbringend größer auslegen, wenn Ihr System an Märkten teilnimmt:</p>
+              <div className="mt-3 text-sm text-[#1a1a1a] bg-[#fafafa] p-4 rounded border border-[#e5e5e5] relative">
+                <button 
+                  type="button"
+                  onClick={() => setIsRegelenergieModalOpen(true)}
+                  className="absolute top-4 right-4 p-1 text-gray-400 hover:text-[#e20613] transition-colors"
+                  title="Mehr über Regelenergie erfahren"
+                >
+                  <Info className="w-4 h-4" />
+                </button>
+                <p className="font-semibold mb-2 pr-6">Sie können gewinnbringend größer auslegen, wenn Ihr System an Märkten teilnimmt:</p>
                 <ul className="list-disc pl-5 space-y-1 text-[#5a5859]">
                   <li>Strombörse: 5-8% Rendite zu erwarten</li>
                   <li>Regelenergie: 7-12% Rendite zu erwarten</li>
@@ -153,7 +163,7 @@ export default function Step3Page() {
                   <Input
                     label="Netzentgelte (Cent/kWh)"
                     type="number"
-                    placeholder="z.B. 8.5"
+                    placeholder="8.5"
                     tooltipText="Netzentgelte des Netzbetreibers. Zwingend erforderlich für Peak Shaving."
                     value={financial.gridFeesCentsKwh ?? ''}
                     onChange={handleInputChange('gridFeesCentsKwh')}
@@ -257,6 +267,24 @@ export default function Step3Page() {
           <Calculator className="w-5 h-5" /> Ergebnisse berechnen
         </Button>
       </footer>
+      <InfoModal 
+        isOpen={isRegelenergieModalOpen} 
+        onClose={() => setIsRegelenergieModalOpen(false)}
+        title="Warum an Strommärkten teilnehmen?"
+      >
+        <p>
+          Das Stromnetz muss jederzeit im Gleichgewicht sein – Erzeugung und Verbrauch müssen exakt übereinstimmen. Da erneuerbare Energien wie Wind und Sonne stark schwanken, entstehen kurzfristige Ungleichgewichte im Netz.
+        </p>
+        <p>
+          <strong>Ihre Chance (Regelenergie):</strong> Moderne Batteriespeicher können innerhalb von Sekundenbruchteilen Strom einspeisen oder aufnehmen, um das Netz zu stabilisieren. Die Übertragungsnetzbetreiber (ÜNB) bezahlen Sie für diese Dienstleistung außerordentlich gut (7-12% Rendite).
+        </p>
+        <p>
+          <strong>Ihre Chance (Strombörse):</strong> Sie können Strom einkaufen, wenn er günstig ist (oder sogar negative Preise hat), und ihn verkaufen oder selbst nutzen, wenn er teuer ist (5-8% Rendite).
+        </p>
+        <p>
+          <strong>Darum lohnt sich ein größerer Speicher:</strong> Je mehr Kapazität Sie dem Netz zur Verfügung stellen können, desto höher fallen Ihre Renditen aus. Während kleine Heimspeicher oft nur den Eigenverbrauch abdecken, öffnen größere Speicher den Zugang zu hochlukrativen Märkten wie der Primärregelleistung (PRL) und der Sekundärregelleistung (SRL).
+        </p>
+      </InfoModal>
     </div>
   );
 }

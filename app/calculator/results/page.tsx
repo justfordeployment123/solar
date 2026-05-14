@@ -9,6 +9,7 @@ import { toPng } from "html-to-image";
 import { ReportDocument } from "@/components/pdf/report-document";
 import { LeadCaptureModal } from "@/components/modals/lead-capture-modal";
 import { ReferralModal } from "@/components/modals/referral-modal";
+import { RevenueAccordion } from "@/components/layout/revenue-accordion";
 import Link from "next/link";
 import { ArrowLeft, Download, Battery, Zap, Euro, TrendingUp, Share2, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -95,7 +96,7 @@ export default function ResultsPage() {
     }
   }, [_hasHydrated, initialCapacity, technical.currentBatteryCapacityKwh]);
 
-  const baseCapacity = initialCapacity ?? 0;
+  const baseCapacity = initialCapacity !== null ? initialCapacity : (technical.currentBatteryCapacityKwh ?? 0);
   const sliderMin = Math.max(0, baseCapacity - 100);
   const sliderMax = baseCapacity + 100;
 
@@ -328,6 +329,10 @@ export default function ResultsPage() {
             )}
           </div>
         </div>
+      </div>
+
+      <div className="pt-4">
+        <RevenueAccordion />
       </div>
 
       {/* CTA band */}
