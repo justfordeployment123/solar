@@ -144,24 +144,26 @@ export default function Step2Page() {
               value={technical.currentBatteryCapacityKwh ?? ''}
               onChange={handleInputChange('currentBatteryCapacityKwh')}
             />
-            <div className="grid grid-cols-2 gap-4">
-              <Input
-                label="Netzbezug Limit (kW)"
-                type="number"
-                placeholder="30"
-                tooltipText="Maximale Strombezugsgrenze aus dem Netz (wichtig für Peak Shaving)."
-                value={technical.gridImportLimitKw ?? ''}
-                onChange={handleInputChange('gridImportLimitKw')}
-              />
-              <Input
-                label="Netzeinspeisung Limit (kW)"
-                type="number"
-                placeholder="30"
-                tooltipText="Maximale Einspeisegrenze in das öffentliche Netz."
-                value={technical.gridExportLimitKw ?? ''}
-                onChange={handleInputChange('gridExportLimitKw')}
-              />
-            </div>
+            {technical.enablePeakShaving && (
+              <div className="grid grid-cols-2 gap-4">
+                <Input
+                  label="Netzbezug Limit (kW)"
+                  type="number"
+                  placeholder="30"
+                  tooltipText="Maximale Strombezugsgrenze aus dem Netz (wichtig für Peak Shaving)."
+                  value={technical.gridImportLimitKw ?? ''}
+                  onChange={handleInputChange('gridImportLimitKw')}
+                />
+                <Input
+                  label="Netzeinspeisung Limit (kW)"
+                  type="number"
+                  placeholder="30"
+                  tooltipText="Maximale Einspeisegrenze in das öffentliche Netz."
+                  value={technical.gridExportLimitKw ?? ''}
+                  onChange={handleInputChange('gridExportLimitKw')}
+                />
+              </div>
+            )}
           </div>
         </section>
 
