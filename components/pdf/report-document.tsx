@@ -11,7 +11,7 @@ const LABELS = {
   pvSize: "Installierte PV-Leistung:",
   annualConsumption: "Bisheriger Jahresverbrauch:",
   financialMetricsTitle: "Finanzielle Kennzahlen & Wirtschaftlichkeit",
-  roi: "Kapitalrendite (NPV):",
+  roi: "Gesamtergebnis (15 Jahre):",
   breakEven: "Amortisationszeitpunkt (Break-Even):",
   avgAnnualRevenue: "Durchschnittlicher Jahresertrag:",
   autarkyRate: "Autarkiegrad (Schätzung):",
@@ -63,15 +63,18 @@ const styles = StyleSheet.create({
 interface ReportDocumentProps {
   derivedResults: any;
   technical: any;
+  financial?: any;
   pieChartImage?: string;
   barChartImage?: string;
   letterheadImage?: string;
   activeLogo?: string;
   companyName?: string;
+  autarkyPercent?: number;
 }
 
-export const ReportDocument: React.FC<ReportDocumentProps> = ({ derivedResults, technical, pieChartImage, barChartImage, letterheadImage, activeLogo, companyName }) => {
-  const formatCurrency = (val: number) => `€${Math.round(val).toLocaleString('de-DE')}`;
+export const ReportDocument: React.FC<ReportDocumentProps> = ({ derivedResults, technical, financial, pieChartImage, barChartImage, letterheadImage, activeLogo, companyName, autarkyPercent = 75 }) => {
+  const formatCurrency = (val: number) => 
+    new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(Math.round(val));
   
   return (
     <Document>
@@ -116,7 +119,7 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ derivedResults, 
               </View>
               <View style={styles.row}>
                 <Text style={styles.label}>Batterie-Degradation (Jährlich):</Text>
-                <Text style={styles.value}>2.50 %</Text>
+                <Text style={styles.value}>2.00 %</Text>
               </View>
               <View style={styles.row}>
                 <Text style={styles.label}>Hardware-Ersatzzyklus:</Text>
@@ -129,12 +132,11 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ derivedResults, 
               <View style={styles.row}>
                 <Text style={styles.label}>{LABELS.roi}</Text>
                 <Text style={styles.highlightValue}>
-                  {formatCurrency((derivedResults.yearlyProjection[14]?.cumulative || 0) + (technical.currentBatteryCapacityKwh || 10) * 1000)}
+                  {formatCurrency((derivedResults.yearlyProjection[derivedResults.yearlyProjection.length - 1]?.cumulative || 0))}
                 </Text>
-              </View>
-              <View style={styles.row}>
+              </View>              <View style={styles.row}>
                 <Text style={styles.label}>{LABELS.breakEven}</Text>
-                <Text style={styles.value}>{Math.ceil(derivedResults.paybackYears) ? `${LABELS.yearLabel} ${Math.ceil(derivedResults.paybackYears)}` : LABELS.na}</Text>
+                <Text style={styles.value}>{derivedResults.paybackYears !== null ? `${LABELS.yearLabel} ${Math.ceil(derivedResults.paybackYears)}` : "Nein Amortisation"}</Text>
               </View>
               <View style={styles.row}>
                 <Text style={styles.label}>{LABELS.avgAnnualRevenue}</Text>
@@ -142,11 +144,11 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ derivedResults, 
               </View>
               <View style={styles.row}>
                 <Text style={styles.label}>{LABELS.autarkyRate}</Text>
-                <Text style={styles.value}>{75} %</Text>
+                <Text style={styles.value}>{autarkyPercent}%</Text>
               </View>
               <View style={styles.row}>
                 <Text style={styles.label}>Zusatzerträge (VPP):</Text>
-                <Text style={styles.value}>Aktiv</Text>
+                <Text style={styles.value}>{financial?.vppParticipationEnabled ? "Aktiv" : "Inaktiv"}</Text>
               </View>
             </View>
           </View>

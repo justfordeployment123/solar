@@ -84,9 +84,10 @@ export interface DerivedResults {
   totalAnnualRevenue: number;
   engineeringFee: number;
   roiPercent: number;
-  paybackYears: number;
+  paybackYears: number | null;
   yearlyProjection: YearlyCashflow[];
   sensitivityToBatterySize: SensitivityPoint[];
+  autarkyPercent: number;
 }
 
 export interface LeadFormDraft {

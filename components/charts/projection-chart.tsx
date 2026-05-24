@@ -114,7 +114,7 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
   }, [data]);
 
   if (!data || data.length === 0) {
-    return <div className="flex items-center justify-center h-[350px] text-[#565656] font-medium">Keine Prognosedaten verfügbar</div>;
+    return <div className="flex items-center justify-center h-[350px] text-[#565656] font-medium">Nein Prognosedaten verfügbar</div>;
   }
 
   return (

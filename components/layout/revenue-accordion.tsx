@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Info } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
 
@@ -75,10 +75,18 @@ export function RevenueAccordion() {
         </AccordionItem>
 
         <AccordionItem title="Eigenverbrauchsoptimierung">
-          <p>
-            Dies ist der klassische Nutzen eines Speichers: Überschüssiger Solarstrom vom Tag wird gespeichert und in den Abend- und Nachtstunden verbraucht. 
-            Das senkt den Bezug von teurem Netzstrom und erhöht die Autarkie Ihres Unternehmens.
-          </p>
+          <div className="space-y-4">
+            <p>
+              Dies ist der klassische Nutzen eines Speichers: Überschüssiger Solarstrom vom Tag wird gespeichert und in den Abend- und Nachtstunden verbraucht. 
+              Das senkt den Bezug von teurem Netzstrom und erhöht die Autarkie Ihres Unternehmens.
+            </p>
+            <div className="bg-[#eef2ff] border border-[#bbd4ff] p-4 rounded-md flex gap-3 items-start">
+              <Info className="w-5 h-5 text-[#0066cc] flex-shrink-0 mt-0.5" />
+              <p className="text-sm text-[#1a1a1a]">
+                Für die Berechnung der Eigenverbrauchsoptimierung wurde eine Strompreissteigerungsrate (konservativ betrachtet und historisch belegbar bei 3,8 %) angenommen.
+              </p>
+            </div>
+          </div>
         </AccordionItem>
       </div>
     </div>

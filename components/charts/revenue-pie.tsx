@@ -86,7 +86,7 @@ export function RevenuePie({ data }: RevenuePieProps) {
   }, [chartData]);
 
   if (chartData.length === 0) {
-    return <div className="flex items-center justify-center h-full text-[#565656] font-medium">Keine Einnahmedaten verfügbar</div>;
+    return <div className="flex items-center justify-center h-full text-[#565656] font-medium">Nein Einnahmedaten verfügbar</div>;
   }
 
   return (

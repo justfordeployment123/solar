@@ -139,7 +139,7 @@ export function CsvUploader() {
     }
 
     if (validCount === 0) {
-      setMappingError("Konnte keine numerischen Werte in der gewählten Verbrauchs-Spalte finden.");
+      setMappingError("Konnte Nein numerischen Werte in der gewählten Verbrauchs-Spalte finden.");
       setPreviewStats(null);
     } else {
       setMappingError(null);

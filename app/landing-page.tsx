@@ -549,7 +549,7 @@ export default function LandingPage() {
               </h2>
             </div>
             <p className="text-[#5a5859] font-medium max-w-md leading-relaxed">
-              Kein Verkaufsgespräch, keine versteckten Kosten. Nur ein klarer,
+              Kein Verkaufsgespräch, Nein versteckten Kosten. Nur ein klarer,
               transparenter Prozess - von der ersten Minute an.
             </p>
           </div>

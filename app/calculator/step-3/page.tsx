@@ -81,10 +81,10 @@ export default function Step3Page() {
 
           <div className="space-y-6 max-w-md">
             <Input
-              label="Aktueller Strompreis (€/kWh)"
+              label="Aktueller Strompreis (Cent/kWh)"
               type="number"
-              step="0.01"
-              placeholder="0.35"
+              step="0.1"
+              placeholder="35"
               tooltipText="Ihr aktueller Arbeitspreis für Strombezug in Cent pro kWh."
               value={financial.currentElectricityPriceCentsKwh ?? ''}
               onChange={handleInputChange('currentElectricityPriceCentsKwh')}
@@ -100,7 +100,8 @@ export default function Step3Page() {
               />
               {(() => {
                 if (technical.annualConsumptionKwh && financial.currentElectricityPriceCentsKwh && financial.yearlyElectricityBillEur) {
-                  const expected = technical.annualConsumptionKwh * financial.currentElectricityPriceCentsKwh;
+                  // Convert cents back to euros for the UI warning comparison
+                  const expected = technical.annualConsumptionKwh * (financial.currentElectricityPriceCentsKwh / 100);
                   const diff = Math.abs(expected - financial.yearlyElectricityBillEur);
                   const tolerance = expected * 0.2; // 20% tolerance
                   if (diff > tolerance) {
@@ -126,7 +127,8 @@ export default function Step3Page() {
               {financial.targetBudgetEur && (
                 <div className="mt-3 text-sm text-[#0066cc] bg-[#eef2ff] p-3 rounded border border-[#bbd4ff]">
                   {(() => {
-                    const estimatedConsumption = technical.annualConsumptionKwh || (financial.yearlyElectricityBillEur ? (financial.yearlyElectricityBillEur / (financial.currentElectricityPriceCentsKwh || 0.35)) : 5000);
+                    // Safely convert the cent value (or default 35 cents) to euros before dividing
+                    const estimatedConsumption = technical.annualConsumptionKwh || (financial.yearlyElectricityBillEur ? (financial.yearlyElectricityBillEur / ((financial.currentElectricityPriceCentsKwh || 35) / 100)) : 5000);
                     const recommendedKwh = Math.max(10, Math.ceil(estimatedConsumption / 1000) * 1.5, Math.floor((financial.targetBudgetEur || 0) / 1000));
                     return `💡 Basierend auf Ihren Daten empfehlen wir eine großzügige Speichergröße von ca. ${recommendedKwh} kWh für maximale Autarkie.`;
                   })()}

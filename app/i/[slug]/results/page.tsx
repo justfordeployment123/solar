@@ -77,6 +77,9 @@ export default function ResultsPage() {
   const params = useParams() as { slug: string };
   const { technical, financial, derivedResults, setTechnicalInputs, setFinancialInputs, activeInstaller, _hasHydrated } = useCalculatorStore();
 
+  const formatCurrency = (val: number) => 
+    new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(val);
+
   const [pieChartImage, setPieChartImage] = useState<string>();
   const [barChartImage, setBarChartImage] = useState<string>();
   const [isClient, setIsClient] = useState(false);
@@ -100,8 +103,8 @@ export default function ResultsPage() {
   }, [_hasHydrated, initialCapacity, technical.currentBatteryCapacityKwh]);
 
   const baseCapacity = initialCapacity !== null ? initialCapacity : (technical.currentBatteryCapacityKwh ?? 0);
-  const sliderMin = Math.max(0, baseCapacity - 100);
-  const sliderMax = baseCapacity + 100;
+  const sliderMin = 0;
+  const sliderMax = baseCapacity > 0 ? baseCapacity * 3 : 100;
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTechnicalInputs({ currentBatteryCapacityKwh: parseFloat(e.target.value) });
@@ -149,9 +152,7 @@ export default function ResultsPage() {
     );
   }
 
-  const totalCapacity = (technical.existingBatteryCapacityKwh || 0) + (technical.currentBatteryCapacityKwh || 0);
-  const estimatedConsumption = technical.annualConsumptionKwh || (financial.yearlyElectricityBillEur ? (financial.yearlyElectricityBillEur / 0.35) : 5000);
-  const autarkyPercent = totalCapacity > 0 ? Math.min(95, Math.round(30 + (totalCapacity * 250 / estimatedConsumption) * 100)) : 30;
+  const autarkyPercent = derivedResults.autarkyPercent;
 
   return (
     <div className="container mx-auto px-6 py-10 sm:px-8 space-y-10">
@@ -240,32 +241,65 @@ export default function ResultsPage() {
         </div>
       </div>
 
+      {/* Negative ROI Warning */}
+      {(derivedResults.yearlyProjection[derivedResults.yearlyProjection.length - 1]?.cumulative || 0) < 0 && (
+        <div className="bg-[#fff5f5] border-l-4 border-[#e20613] p-6 shadow-sm">
+          <h3 className="text-lg font-bold text-[#e20613] mb-2">Hinweis zur Wirtschaftlichkeit</h3>
+          <div className="text-sm md:text-base text-[#1a1a1a] leading-relaxed space-y-2">
+            <p>Es ist gut und sinnvoll, dass Sie Ihren Speicher etwas überdimensionieren wollen. Aber dann sollten Sie auch:</p>
+            <ol className="list-decimal pl-5 space-y-1">
+              <li>Das Gerät am Arbitrage-Markt (EPEX Spot) teilnehmen lassen.</li>
+              <li>Dem Regelenergiemarkt zur Verfügung stellen, um die Netzbetreiber netzdienlich zu unterstützen.</li>
+            </ol>
+            <p className="text-sm italic text-[#5a5859] mt-2">(Ganz unter uns: Damit können Sie wirklich Geld verdienen.)</p>
+          </div>
+        </div>
+      )}
+
+      {/* NEW: Inflation Info Box (Client Request) */}
+      <div className="bg-[#f8fafc] border-l-4 border-[#5a5859] p-5 shadow-sm">
+        <div className="flex items-start gap-3">
+          <Info className="w-5 h-5 text-[#5a5859] mt-0.5 shrink-0" />
+          <div>
+            <h3 className="text-sm font-bold text-[#1a1a1a] mb-1">Hinweis zur Berechnung</h3>
+            <p className="text-sm text-[#5a5859] leading-relaxed">
+              Für die Berechnung der Eigenverbrauchsoptimierung wurde eine Strompreissteigerungsrate (konservativ betrachtet und historisch belegbar) von <strong>3,8 % pro Jahr</strong> angenommen.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
         <MetricCard
-          title="Kapitalwert (NPV)"
-          value={`€${((derivedResults.yearlyProjection[14]?.cumulative || 0) + (technical.currentBatteryCapacityKwh || 10) * 1000 + derivedResults.engineeringFee).toLocaleString('de-DE', { maximumFractionDigits: 0 })}`}
-          subtitle="Gesamtgewinn über Lebensdauer"
+          title="Kumulierter Gewinn"
+          value={formatCurrency(derivedResults.yearlyProjection[derivedResults.yearlyProjection.length - 1]?.cumulative || 0)}
+          subtitle="Gesamtergebnis nach 15 Jahren"
           icon={TrendingUp}
           accent="#1a1a1a"
-          tooltipText="Beinhaltet 3,8% Targeted Engineering-Gebühr für die genaue Erfassung von Ist-Daten und Infrastruktur. (Fördermittel möglich)."
+          tooltipText="Beinhaltet 3,8% Engineering-Gebühr für die genaue Erfassung von Ist-Daten und Infrastruktur. (Fördermittel möglich)."
         />
         <MetricCard
           title="Durchschn. Jahresertrag"
-          value={`€${Math.round(derivedResults.totalAnnualRevenue).toLocaleString()}`}
+          value={formatCurrency(derivedResults.totalAnnualRevenue)}
           subtitle="Einnahmen & Einsparungen"
           icon={Euro}
           accent="#5a5859"
         />
         <MetricCard
           title="Autarkiegrad"
-          value={`${75}%`}
+          value={`${autarkyPercent}%`}
           subtitle="Netzunabhängigkeit"
           icon={Zap}
           accent="#d2d700"
         />
         <MetricCard
           title="Deckungsjahr"
-          value={`Jahr ${Math.ceil(derivedResults.paybackYears) || '-'}`}
+          value={
+            derivedResults.paybackYears !== null 
+              ? `Jahr ${Math.ceil(derivedResults.paybackYears)}` 
+              : "Nein Amortisation"
+          }
           subtitle="Kapitalrendite (ROI)"
           icon={Battery}
           accent="#e20613"
@@ -313,11 +347,13 @@ export default function ResultsPage() {
                 document={
                   <ReportDocument
                     technical={technical}
+                    financial={financial}
                     derivedResults={derivedResults}
                     pieChartImage={pieChartImage}
                     barChartImage={barChartImage}
                     activeLogo={activeInstaller?.logoUrl || "/solar-logo.png"}
                     companyName={activeInstaller?.companyName || ""}
+                    autarkyPercent={autarkyPercent}
                   />
                 }
                 fileName="mein-solar-batterie-bericht.pdf"
