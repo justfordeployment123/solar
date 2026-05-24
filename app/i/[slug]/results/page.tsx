@@ -188,15 +188,15 @@ export default function ResultsPage() {
             <span className="w-2 h-2 bg-[#d2d700]" /> Batteriegröße-Simulator
           </label>
           <div className="flex items-center gap-4">
-            <input
-              type="range"
-              min={sliderMin}
-              max={sliderMax}
-              step="1"
-              value={technical.currentBatteryCapacityKwh ?? 0}
-              onChange={handleSliderChange}
-              className="w-full h-2 bg-[#e5e5e5] appearance-none cursor-pointer accent-[#e20613]"
-            />
+<input
+  type="range"
+  min={0}
+  max={sliderMax}
+  step="1"
+  value={technical.currentBatteryCapacityKwh ?? 0}
+  onChange={handleSliderChange}
+  className="w-full h-2 bg-[#e5e5e5] appearance-none cursor-pointer accent-[#e20613]"
+/>
             <span className="font-bold text-xl text-[#1a1a1a] tabular-nums w-16 text-right">
               {technical.currentBatteryCapacityKwh || 0}
               <span className="text-xs font-semibold text-[#5a5859] ml-1">kWh</span>

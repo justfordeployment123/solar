@@ -82,10 +82,10 @@ export default function Step3Page() {
 
           <div className="space-y-6 max-w-md">
             <Input
-              label="Aktueller Strompreis (€/kWh)"
+              label="Aktueller Strompreis (Cent/kWh)"
               type="number"
-              step="0.01"
-              placeholder="0.35"
+              step="0.1"
+              placeholder="35"
               tooltipText="Ihr aktueller Arbeitspreis für Strombezug in Cent pro kWh."
               value={financial.currentElectricityPriceCentsKwh ?? ''}
               onChange={handleInputChange('currentElectricityPriceCentsKwh')}
@@ -101,13 +101,14 @@ export default function Step3Page() {
               />
               {(() => {
                 if (technical.annualConsumptionKwh && financial.currentElectricityPriceCentsKwh && financial.yearlyElectricityBillEur) {
-                  const expected = technical.annualConsumptionKwh * financial.currentElectricityPriceCentsKwh;
+                  // Convert cents back to euros for the UI warning comparison
+                  const expected = technical.annualConsumptionKwh * (financial.currentElectricityPriceCentsKwh / 100);
                   const diff = Math.abs(expected - financial.yearlyElectricityBillEur);
                   const tolerance = expected * 0.2; // 20% tolerance
                   if (diff > tolerance) {
                     return (
                       <div className="mt-2 text-sm text-[#e20613] bg-[#fff5f5] p-3 rounded border border-[#ffcccc]">
-                        ⚠️ <strong>Achtung:</strong> Die eingegebenen Stromkosten ({financial.yearlyElectricityBillEur} €) passen nicht zum angegebenen Verbrauch ({technical.annualConsumptionKwh} kWh) und Strompreis ({financial.currentElectricityPriceCentsKwh} €). Rechnerisch müssten diese bei ca. {Math.round(expected)} € liegen.
+                        ⚠️ <strong>Achtung:</strong> Die eingegebenen Stromkosten ({financial.yearlyElectricityBillEur} €) passen nicht zum angegebenen Verbrauch ({technical.annualConsumptionKwh} kWh) und Strompreis ({financial.currentElectricityPriceCentsKwh} Cent). Rechnerisch müssten diese bei ca. {Math.round(expected)} € liegen.
                       </div>
                     );
                   }
