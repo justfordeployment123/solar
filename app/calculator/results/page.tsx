@@ -370,6 +370,35 @@ export default function ResultsPage() {
         <RevenueAccordion />
       </div>
 
+      {/* NEW: Catalog Downloads */}
+      <div className="bg-[#f8fafc] border border-[#e5e5e5] p-8 md:p-12 text-center mt-4">
+        <h3 className="text-xl md:text-2xl font-bold text-[#1a1a1a] mb-3">
+          Erfahren Sie mehr über unsere Technologie
+        </h3>
+        <p className="text-[#5a5859] mb-8 max-w-2xl mx-auto leading-relaxed">
+          Laden Sie sich unsere detaillierten Produktkataloge herunter.
+        </p>
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Button 
+            variant="outline" 
+            className="w-full sm:w-auto h-12 px-6"
+            onClick={() => window.open("https://neehkgiayqkpvnuwqcnu.supabase.co/storage/v1/object/public/Catalog%20Bucket/marketing-2.pdf", "_blank")}
+          >
+            <Download className="w-4 h-4 mr-2" /> 
+            Gesamtkatalog (39 Seiten)
+          </Button>
+          
+          <Button 
+            variant="outline" 
+            className="w-full sm:w-auto h-12 px-6"
+            onClick={() => window.open("https://neehkgiayqkpvnuwqcnu.supabase.co/storage/v1/object/public/Catalog%20Bucket/marketing-1.pdf", "_blank")}
+          >
+            <Download className="w-4 h-4 mr-2" /> 
+            Broschüre Landwirtschaft
+          </Button>
+        </div>
+      </div>
+
       {/* CTA band */}
       <div className="relative bg-[#1a1a1a] text-white p-8 md:p-12 overflow-hidden mt-4">
         <div className="absolute top-0 left-0 right-0 h-[4px] flex">
