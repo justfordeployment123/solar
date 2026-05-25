@@ -14,6 +14,7 @@ import Link from "next/link";
 import { ArrowLeft, Download, Battery, Zap, Euro, TrendingUp, Share2, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 const PDFDownloadLink = dynamic(
   () => import("@react-pdf/renderer").then((mod) => mod.PDFDownloadLink),
@@ -292,7 +293,7 @@ export default function ResultsPage() {
           value={
             derivedResults.paybackYears !== null 
               ? `Jahr ${Math.ceil(derivedResults.paybackYears)}` 
-              : "Nein Amortisation"
+              : "Keine Amortisation"
           }
           subtitle="Kapitalrendite (ROI)"
           icon={Battery}
@@ -370,7 +371,7 @@ export default function ResultsPage() {
       </div>
 
       {/* CTA band */}
-      <div className="relative bg-[#1a1a1a] text-white p-8 md:p-12 overflow-hidden">
+      <div className="relative bg-[#1a1a1a] text-white p-8 md:p-12 overflow-hidden mt-4">
         <div className="absolute top-0 left-0 right-0 h-[4px] flex">
           <span className="flex-1 bg-[#e20613]" />
           <span className="flex-1 bg-[#d2d700]" />

@@ -22,23 +22,15 @@ export default function Step2Page() {
   const setTechnicalInputs = useCalculatorStore((state) => state.setTechnicalInputs);
   const persona = useCalculatorStore((state) => state.persona);
 
-  const showInverter = !(persona === 'Private' && !technical.enablePeakShaving);
-
   useEffect(() => {
     setMounted(true);
   }, []);
-
-  useEffect(() => {
-    if (!showInverter && technical.pvSizeKwp) {
-      setTechnicalInputs({ inverterPowerKw: technical.pvSizeKwp * 1.2 });
-    }
-  }, [showInverter, technical.pvSizeKwp, setTechnicalInputs]);
-
+  
   useEffect(() => {
     if (mounted && !stepCompletion.step1) {
-      router.replace('/calculator/step-1');
+      router.replace(`/i/${params.slug}/step-1`);
     }
-  }, [mounted, stepCompletion.step1, router]);
+  }, [mounted, stepCompletion.step1, router, params.slug]);
 
   const handleNext = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -90,7 +82,7 @@ export default function Step2Page() {
                 { value: 'South', label: 'Süddeutschland' },
               ]}
               value={technical.region || ''}
-              onChange={(e) => setTechnicalInputs({ region: e.target.value as any })}
+              onChange={(e) => setTechnicalInputs({ region: (e.target.value === '' ? null : e.target.value) as any })}
             />
             <div className="grid grid-cols-2 gap-4">
               <Input

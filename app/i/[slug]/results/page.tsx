@@ -14,6 +14,7 @@ import Link from "next/link";
 import { ArrowLeft, Download, Battery, Zap, Euro, TrendingUp, Share2, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 import { useParams } from "next/navigation";
 
@@ -87,6 +88,13 @@ export default function ResultsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
 
+  // --- CATALOG DOWNLOAD STATE ---
+  const [isDownloadingCatalog, setIsDownloadingCatalog] = useState(false);
+  const [isDownloadingAgri, setIsDownloadingAgri] = useState(false);
+
+  const SUPABASE_CATALOG_URL = "https://neehkgiayqkpvnuwqcnu.supabase.co/storage/v1/object/public/Catalog%20Bucket/marketing-2.pdf";
+  const SUPABASE_AGRI_URL = "https://neehkgiayqkpvnuwqcnu.supabase.co/storage/v1/object/public/Catalog%20Bucket/marketing-1.pdf";
+
   const pieRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
 
@@ -125,6 +133,138 @@ export default function ResultsPage() {
       console.error("Failed to generate images", err);
     } finally {
       setIsGeneratingImages(false);
+    }
+  };
+
+ const generateWhiteLabelPdf = async (pdfUrl: string, fileName: string, setLoader: (val: boolean) => void) => {
+    setLoader(true);
+    try {
+      const existingPdfBytes = await fetch(pdfUrl).then(res => res.arrayBuffer());
+      
+      if (!activeInstaller) {
+        const blob = new Blob([existingPdfBytes], { type: 'application/pdf' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${fileName}.pdf`;
+        a.click();
+        setLoader(false);
+        return;
+      }
+
+      const pdfDoc = await PDFDocument.load(existingPdfBytes);
+      const helveticaFont = await pdfDoc.embedFont(StandardFonts.Helvetica);
+      const helveticaBold = await pdfDoc.embedFont(StandardFonts.HelveticaBold);
+      
+      const pages = pdfDoc.getPages();
+      const lastPage = pages[pages.length - 1];
+
+      // ---------------------------------------------------------------------------
+      // GRID HACK: Uncomment this block below to see the red coordinate grid!
+      // This will help you find the exact numbers to put in the config below.
+      // ---------------------------------------------------------------------------
+
+      // for (let x = 0; x < 600; x += 50) {
+      //   for (let y = 0; y < 850; y += 50) {
+      //     lastPage.drawText(`${x},${y}`, { x, y, size: 6, font: helveticaBold, color: rgb(1, 0, 0) });
+      //     lastPage.drawCircle({ x, y, size: 1, color: rgb(1, 0, 0) });
+      //   }
+      // }
+
+
+      // --- INDEPENDENT COORDINATE CONFIGURATION ---
+      // We set different X/Y values depending on which PDF is being downloaded
+      const isCatalog = pdfUrl === SUPABASE_CATALOG_URL;
+
+      const config = isCatalog 
+        ? {
+            // Document 1: 39-Page Catalog (marketing-2.pdf)
+            eraseBox: { x: 210  , y: 430, width: 250, height: 200 }, 
+            logo: { x: 220, y: 570, maxWidth: 160, maxHeight: 60 },
+            text: { x: 220, y: 530 } // Starting Y coordinate for the first line of text
+          }
+        : {
+            // Document 2: Agriculture Brochure (marketing-1.pdf)
+            eraseBox: { x: 180, y: 450, width: 400, height: 180 }, 
+            logo: { x: 180, y: 560, maxWidth: 160, maxHeight: 60 },
+            text: { x: 370, y: 600 }
+          };
+
+      // 1. Draw the White Box to erase MySolar Info (leaving the footer alone)
+      lastPage.drawRectangle({
+        x: config.eraseBox.x, 
+        y: config.eraseBox.y, 
+        width: config.eraseBox.width, 
+        height: config.eraseBox.height, 
+        color: rgb(1,1,1) // Pure White
+      });
+
+      // 2. Draw Installer Logo
+      if (activeInstaller.logoUrl) {
+        try {
+          const res = await fetch(activeInstaller.logoUrl);
+          const contentType = res.headers.get('content-type') || '';
+          const imageBytes = await res.arrayBuffer();
+          
+          let image;
+          if (contentType.includes('png') || activeInstaller.logoUrl.toLowerCase().endsWith('.png')) {
+            image = await pdfDoc.embedPng(imageBytes);
+          } else {
+            image = await pdfDoc.embedJpg(imageBytes);
+          }
+
+          const scaledDims = image.scaleToFit(config.logo.maxWidth, config.logo.maxHeight);
+          
+          lastPage.drawImage(image, {
+            x: config.logo.x,
+            y: config.logo.y, // Bottom-left anchor of the image
+            width: scaledDims.width,
+            height: scaledDims.height,
+          });
+          
+        } catch (e) {
+          console.warn("Konnte Logo nicht einbetten:", e);
+        }
+      }
+
+      // 3. Draw Installer Contact Details
+      const textX = config.text.x;
+      let textY = config.text.y;
+
+      if (activeInstaller.companyName) {
+        lastPage.drawText(activeInstaller.companyName, { x: textX, y: textY, size: 12, font: helveticaBold, color: rgb(0, 0, 0) });
+        textY -= 15;
+      }
+      if (activeInstaller.contactName) { 
+        lastPage.drawText(activeInstaller.contactName, { x: textX, y: textY, size: 10, font: helveticaFont, color: rgb(0, 0, 0) }); 
+        textY -= 15; 
+      }
+      if (activeInstaller.phone) { 
+        lastPage.drawText(activeInstaller.phone, { x: textX, y: textY, size: 10, font: helveticaFont, color: rgb(0, 0, 0) }); 
+        textY -= 15; 
+      }
+      if (activeInstaller.email) { 
+        lastPage.drawText(activeInstaller.email, { x: textX, y: textY, size: 10, font: helveticaFont, color: rgb(0, 0, 0) }); 
+        textY -= 15; 
+      }
+      if (activeInstaller.websiteUrl) { 
+        lastPage.drawText(activeInstaller.websiteUrl, { x: textX, y: textY, size: 10, font: helveticaFont, color: rgb(0, 0, 0) }); 
+      }
+
+      // 4. Save and Trigger Download
+      const pdfBytes = await pdfDoc.save();
+      const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `${activeInstaller.companyName ? activeInstaller.companyName.replace(/\s+/g, '-') : 'Katalog'}-${fileName}.pdf`;
+      a.click();
+
+    } catch (error) {
+      console.error("Fehler bei der PDF-Erstellung:", error);
+      alert("Fehler beim Herunterladen des Katalogs. Bitte überprüfen Sie Ihre Netzwerkverbindung.");
+    } finally {
+      setLoader(false);
     }
   };
 
@@ -298,7 +438,7 @@ export default function ResultsPage() {
           value={
             derivedResults.paybackYears !== null 
               ? `Jahr ${Math.ceil(derivedResults.paybackYears)}` 
-              : "Nein Amortisation"
+              : "Keine Amortisation"
           }
           subtitle="Kapitalrendite (ROI)"
           icon={Battery}
@@ -374,7 +514,40 @@ export default function ResultsPage() {
         <RevenueAccordion />
       </div>
 
-      <div className="relative bg-[#1a1a1a] text-white p-8 md:p-12 overflow-hidden">
+      {/* NEW: White-Label Catalog Downloads */}
+      {activeInstaller && (
+        <div className="bg-[#f8fafc] border border-[#e5e5e5] p-8 md:p-12 text-center mt-4">
+          <h3 className="text-xl md:text-2xl font-bold text-[#1a1a1a] mb-3">
+            Erfahren Sie mehr über unsere Technologie
+          </h3>
+          <p className="text-[#5a5859] mb-8 max-w-2xl mx-auto leading-relaxed">
+            Laden Sie sich unsere detaillierten Produktkataloge herunter, bereitgestellt durch Ihren Fachpartner <strong>{activeInstaller.companyName}</strong>.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <Button 
+              variant="outline" 
+              className="w-full sm:w-auto h-12 px-6"
+              disabled={isDownloadingCatalog}
+              onClick={() => generateWhiteLabelPdf(SUPABASE_CATALOG_URL, "Gesamtkatalog", setIsDownloadingCatalog)}
+            >
+              <Download className="w-4 h-4 mr-2" /> 
+              {isDownloadingCatalog ? "Wird vorbereitet..." : "Gesamtkatalog (39 Seiten)"}
+            </Button>
+            
+            <Button 
+              variant="outline" 
+              className="w-full sm:w-auto h-12 px-6"
+              disabled={isDownloadingAgri}
+              onClick={() => generateWhiteLabelPdf(SUPABASE_AGRI_URL, "Landwirtschaft", setIsDownloadingAgri)}
+            >
+              <Download className="w-4 h-4 mr-2" /> 
+              {isDownloadingAgri ? "Wird vorbereitet..." : "Broschüre Landwirtschaft"}
+            </Button>
+          </div>
+        </div>
+      )}
+
+      <div className="relative bg-[#1a1a1a] text-white p-8 md:p-12 overflow-hidden mt-4">
         <div className="absolute top-0 left-0 right-0 h-[4px] flex">
           <span className="flex-1 bg-[#e20613]" />
           <span className="flex-1 bg-[#d2d700]" />

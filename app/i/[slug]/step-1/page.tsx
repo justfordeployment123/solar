@@ -116,7 +116,7 @@ export default function Step1Page() {
       <footer className="mt-auto pb-10 flex justify-between items-center py-6 border-t border-[#e5e5e5] w-full">
         <Link
           prefetch={false}
-          href="/"
+          href={`/i/${params.slug}`}
           className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#5a5859] hover:text-[#e20613] flex items-center gap-2 group transition-colors"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" /> Zurück

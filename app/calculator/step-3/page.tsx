@@ -107,7 +107,7 @@ export default function Step3Page() {
                   if (diff > tolerance) {
                     return (
                       <div className="mt-2 text-sm text-[#e20613] bg-[#fff5f5] p-3 rounded border border-[#ffcccc]">
-                        ⚠️ <strong>Achtung:</strong> Die eingegebenen Stromkosten ({financial.yearlyElectricityBillEur} €) passen nicht zum angegebenen Verbrauch ({technical.annualConsumptionKwh} kWh) und Strompreis ({financial.currentElectricityPriceCentsKwh} €). Rechnerisch müssten diese bei ca. {Math.round(expected)} € liegen.
+                        ⚠️ <strong>Achtung:</strong> Die eingegebenen Stromkosten ({financial.yearlyElectricityBillEur} €) passen nicht zum angegebenen Verbrauch ({technical.annualConsumptionKwh} kWh) und Strompreis ({financial.currentElectricityPriceCentsKwh} Cent). Rechnerisch müssten diese bei ca. {Math.round(expected)} € liegen.
                       </div>
                     );
                   }

@@ -26,11 +26,11 @@ export default function Step3Page() {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
+useEffect(() => {
     if (mounted && !stepCompletion.step2) {
-      router.replace('/calculator/step-2');
+      router.replace(`/i/${params.slug}/step-2`); // <--- FIX: Keeps them in the installer funnel
     }
-  }, [mounted, stepCompletion.step2, router]);
+  }, [mounted, stepCompletion.step2, router, params.slug]);
 
   const handleNext = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -128,7 +128,7 @@ export default function Step3Page() {
               {financial.targetBudgetEur && (
                 <div className="mt-3 text-sm text-[#0066cc] bg-[#eef2ff] p-3 rounded border border-[#bbd4ff]">
                   {(() => {
-                    const estimatedConsumption = technical.annualConsumptionKwh || (financial.yearlyElectricityBillEur ? (financial.yearlyElectricityBillEur / (financial.currentElectricityPriceCentsKwh || 0.35)) : 5000);
+                    const estimatedConsumption = technical.annualConsumptionKwh || (financial.yearlyElectricityBillEur ? (financial.yearlyElectricityBillEur / ((financial.currentElectricityPriceCentsKwh || 35) / 100)) : 5000);
                     const recommendedKwh = Math.max(10, Math.ceil(estimatedConsumption / 1000) * 1.5, Math.floor((financial.targetBudgetEur || 0) / 1000));
                     return `💡 Basierend auf Ihren Daten empfehlen wir eine großzügige Speichergröße von ca. ${recommendedKwh} kWh für maximale Autarkie.`;
                   })()}
