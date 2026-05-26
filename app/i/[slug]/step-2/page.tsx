@@ -154,6 +154,15 @@ export default function Step2Page() {
                 onChange={handleInputChange('gridExportLimitKw')}
               />
             </div>
+            <Input
+              label="Entfernung zum nächsten Umspannwerk (km)"
+              type="number"
+              step="0.1"
+              placeholder="z.B. 0,3"
+              tooltipText="Entfernung zum nächsten Umspannwerk. Kürzere Distanzen bedeuten geringere Netzverluste bei Handels- und Regelenergieerträgen. Optional."
+              value={technical.substationDistanceKm ?? ''}
+              onChange={handleInputChange('substationDistanceKm')}
+            />
           </div>
         </section>
 

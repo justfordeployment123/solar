@@ -396,6 +396,18 @@ export default function ResultsPage() {
         </div>
       )}
 
+      {/* Bottleneck Warning: grid connection smaller than storage power */}
+      {derivedResults.bottleneckActive && (
+        <div className="bg-[#fffbe6] border-l-4 border-[#d2a800] p-6 shadow-sm">
+          <h3 className="text-lg font-bold text-[#8a6d00] mb-2">Hinweis: Netzanschluss-Engpass (Bottleneck)</h3>
+          <p className="text-sm md:text-base text-[#1a1a1a] leading-relaxed">
+            Ihre Speicherleistung ({technical.inverterPowerKw ?? '–'} kW) übersteigt Ihr Netzeinspeise-Limit ({technical.gridExportLimitKw} kW).
+            Die netzdienlichen Erträge (Arbitrage & Regelenergie) wurden entsprechend auf die tatsächlich
+            nutzbare Anschlussleistung gedrosselt. Ein stärkerer Netzanschluss würde die Erträge erhöhen.
+          </p>
+        </div>
+      )}
+
       {/* NEW: Inflation Info Box (Client Request) */}
       <div className="bg-[#f8fafc] border-l-4 border-[#5a5859] p-5 shadow-sm">
         <div className="flex items-start gap-3">

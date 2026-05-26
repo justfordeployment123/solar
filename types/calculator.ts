@@ -25,6 +25,9 @@ export interface TechnicalInputs {
   inverterPowerKw: number | null;
   gridImportLimitKw: number | null;
   gridExportLimitKw: number | null;
+  // Distance to the nearest substation in km. Shorter distance = lower line losses
+  // for grid-facing markets (arbitrage / balancing). Optional.
+  substationDistanceKm?: number | null;
   
   // Questionnaire Goal Toggles
   enableSelfConsumption?: boolean;
@@ -39,6 +42,9 @@ export interface FinancialInputs {
   currentElectricityPriceCentsKwh: number | null;
   yearlyElectricityBillEur: number | null;
   targetBudgetEur: number | null;
+  // Actual quoted system cost (CapEx). When provided (> 0) it drives ROI/payback
+  // directly; otherwise the engine falls back to a capacity-based estimate.
+  actualSystemCostEur?: number | null;
   vppParticipationEnabled: boolean;
   
   // Load Shifting & Peak Shaving Inputs
@@ -88,6 +94,11 @@ export interface DerivedResults {
   yearlyProjection: YearlyCashflow[];
   sensitivityToBatterySize: SensitivityPoint[];
   autarkyPercent: number;
+  // CapEx actually used in the projection (real quote if entered, else estimate)
+  systemCost: number;
+  totalUpfrontCost: number;
+  // True when storage power exceeds the grid connection limit (output throttled)
+  bottleneckActive: boolean;
 }
 
 export interface LeadFormDraft {

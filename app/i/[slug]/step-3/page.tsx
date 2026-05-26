@@ -7,6 +7,7 @@ import { ProgressHeader } from '@/components/layout/progress-header';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useCalculatorStore } from '@/store/calculatorStore';
+import { normalizeElectricityPriceCents } from '@/lib/calculations/engine';
 import { ArrowLeft, Calculator, Euro, Check, Info } from 'lucide-react';
 import { InfoModal } from '@/components/modals/info-modal';
 
@@ -100,15 +101,25 @@ useEffect(() => {
                 onChange={handleInputChange('yearlyElectricityBillEur')}
               />
               {(() => {
-                if (technical.annualConsumptionKwh && financial.currentElectricityPriceCentsKwh && financial.yearlyElectricityBillEur) {
-                  // Convert cents back to euros for the UI warning comparison
-                  const expected = technical.annualConsumptionKwh * (financial.currentElectricityPriceCentsKwh / 100);
+                const rawPrice = financial.currentElectricityPriceCentsKwh;
+                // Real retail prices are ~15–60 ct/kWh. A value below 3 almost
+                // certainly means the user typed €/kWh (e.g. 0,35) into the Cent field.
+                const looksLikeEuro = rawPrice != null && rawPrice > 0 && rawPrice < 3;
+                if (looksLikeEuro) {
+                  return (
+                    <div className="mt-2 text-sm text-[#e20613] bg-[#fff5f5] p-3 rounded border border-[#ffcccc]">
+                      ⚠️ <strong>Einheit prüfen:</strong> Dieses Feld erwartet den Preis in <strong>Cent/kWh</strong> (z.B. 35 für 0,35 €/kWh). Sie haben {rawPrice} eingegeben – das sieht nach €/kWh aus. Wir rechnen automatisch mit {normalizeElectricityPriceCents(rawPrice)} Cent.
+                    </div>
+                  );
+                }
+                if (technical.annualConsumptionKwh && rawPrice && financial.yearlyElectricityBillEur) {
+                  const expected = technical.annualConsumptionKwh * (normalizeElectricityPriceCents(rawPrice) / 100);
                   const diff = Math.abs(expected - financial.yearlyElectricityBillEur);
                   const tolerance = expected * 0.2; // 20% tolerance
                   if (diff > tolerance) {
                     return (
                       <div className="mt-2 text-sm text-[#e20613] bg-[#fff5f5] p-3 rounded border border-[#ffcccc]">
-                        ⚠️ <strong>Achtung:</strong> Die eingegebenen Stromkosten ({financial.yearlyElectricityBillEur} €) passen nicht zum angegebenen Verbrauch ({technical.annualConsumptionKwh} kWh) und Strompreis ({financial.currentElectricityPriceCentsKwh} Cent). Rechnerisch müssten diese bei ca. {Math.round(expected)} € liegen.
+                        ⚠️ <strong>Achtung:</strong> Die eingegebenen Stromkosten ({financial.yearlyElectricityBillEur} €) passen nicht zum angegebenen Verbrauch ({technical.annualConsumptionKwh} kWh) und Strompreis ({rawPrice} Cent). Rechnerisch müssten diese bei ca. {Math.round(expected)} € liegen.
                       </div>
                     );
                   }
@@ -116,6 +127,14 @@ useEffect(() => {
                 return null;
               })()}
             </div>
+            <Input
+              label="Tatsächliche Systemkosten (€)"
+              type="number"
+              placeholder="z.B. 28500"
+              tooltipText="Der tatsächliche Angebotspreis für den Speicher (CapEx). Wird – falls angegeben – direkt für ROI und Amortisation verwendet. Bei leerem Feld schätzt der Rechner die Kosten anhand der Kapazität."
+              value={financial.actualSystemCostEur ?? ''}
+              onChange={handleInputChange('actualSystemCostEur')}
+            />
             <div>
               <Input
                 label="Zielbudget (€)"
@@ -128,7 +147,7 @@ useEffect(() => {
               {financial.targetBudgetEur && (
                 <div className="mt-3 text-sm text-[#0066cc] bg-[#eef2ff] p-3 rounded border border-[#bbd4ff]">
                   {(() => {
-                    const estimatedConsumption = technical.annualConsumptionKwh || (financial.yearlyElectricityBillEur ? (financial.yearlyElectricityBillEur / ((financial.currentElectricityPriceCentsKwh || 35) / 100)) : 5000);
+                    const estimatedConsumption = technical.annualConsumptionKwh || (financial.yearlyElectricityBillEur ? (financial.yearlyElectricityBillEur / (normalizeElectricityPriceCents(financial.currentElectricityPriceCentsKwh) / 100)) : 5000);
                     const recommendedKwh = Math.max(10, Math.ceil(estimatedConsumption / 1000) * 1.5, Math.floor((financial.targetBudgetEur || 0) / 1000));
                     return `💡 Basierend auf Ihren Daten empfehlen wir eine großzügige Speichergröße von ca. ${recommendedKwh} kWh für maximale Autarkie.`;
                   })()}

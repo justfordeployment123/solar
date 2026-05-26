@@ -91,6 +91,12 @@ export default function ResultsPage() {
   const [sliderMax, setSliderMax] = useState<number>(100);
   const hasLockedMax = useRef(false);
 
+  // Mark that we're on the client so the (client-only) PDF download link can
+  // render. Without this the "PDF herunterladen" button never appears.
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   useEffect(() => {
     // If your store uses _hasHydrated, wait for it to be true. 
     // If it's undefined, we safely ignore it and proceed.
@@ -248,6 +254,18 @@ export default function ResultsPage() {
             </ol>
             <p className="text-sm italic text-[#5a5859] mt-2">(Ganz unter uns: Damit können Sie wirklich Geld verdienen.)</p>
           </div>
+        </div>
+      )}
+
+      {/* Bottleneck Warning: grid connection smaller than storage power */}
+      {derivedResults.bottleneckActive && (
+        <div className="bg-[#fffbe6] border-l-4 border-[#d2a800] p-6 shadow-sm">
+          <h3 className="text-lg font-bold text-[#8a6d00] mb-2">Hinweis: Netzanschluss-Engpass (Bottleneck)</h3>
+          <p className="text-sm md:text-base text-[#1a1a1a] leading-relaxed">
+            Ihre Speicherleistung ({technical.inverterPowerKw ?? '–'} kW) übersteigt Ihr Netzeinspeise-Limit ({technical.gridExportLimitKw} kW).
+            Die netzdienlichen Erträge (Arbitrage & Regelenergie) wurden entsprechend auf die tatsächlich
+            nutzbare Anschlussleistung gedrosselt. Ein stärkerer Netzanschluss würde die Erträge erhöhen.
+          </p>
         </div>
       )}
 

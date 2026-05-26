@@ -19,11 +19,13 @@ const initialState: CalculatorState = {
     inverterPowerKw: null,
     gridImportLimitKw: null,
     gridExportLimitKw: null,
+    substationDistanceKm: null,
   },
   financial: {
     currentElectricityPriceCentsKwh: null,
     yearlyElectricityBillEur: null,
     targetBudgetEur: null,
+    actualSystemCostEur: null,
     vppParticipationEnabled: false,
     dynamicFeedInTariffCentsKwh: null,
     standardFeedInTariffCentsKwh: null,

@@ -12,6 +12,43 @@ const MARKET_DECLINE_RATE = 0.02; // 2% annual market decline for traded service
 const INFLATION_RATE = 0.038; // 3.8% annual inflation for retail electricity prices
 const MAINTENANCE_YEAR = 10;
 
+// Maximum share of annual consumption a (well-sized) battery can self-supply.
+// Real systems never reach 100% (winter / multi-day clouds), but an oversized
+// battery on a small load can realistically approach this. Tunable.
+const MAX_AUTARKY = 0.95;
+
+// Average captured intraday spread on the spot market (EPEX), €/kWh per full
+// cycle. Calibrated so a ~1,000 kWh system trading ~300 cycles yields the
+// €60–70k/yr range confirmed as realistic by the field team. Tunable.
+const EPEX_SPREAD_EUR_PER_KWH = 0.25;
+
+// Real German retail electricity is ~15–60 ct/kWh. The price field is in
+// Cent/kWh, but users frequently type the €/kWh figure (e.g. 0.35 instead of
+// 35). Anything below 3 "cents" is implausible as a retail price and is treated
+// as €/kWh and scaled up. Exported so the input forms validate consistently.
+export function normalizeElectricityPriceCents(raw: number | null | undefined): number {
+  if (raw == null || !(raw > 0)) return 35; // sensible default
+  return raw < 3 ? raw * 100 : raw;
+}
+
+// Balancing-market access scales with fleet size (N-Gen pools many storage
+// systems as a BSP), so larger storage earns a higher effective return. Applied
+// on top of the per-kW PRL/SRL rates. Tunable.
+function balancingTierMultiplier(capacityKwh: number): number {
+  if (capacityKwh >= 500) return 1.15;
+  if (capacityKwh >= 200) return 1.10;
+  if (capacityKwh >= 100) return 1.05;
+  return 1.0;
+}
+
+// Distance to the nearest substation drives line losses for grid-facing markets.
+// <=1 km is treated as effectively loss-free; beyond that ~1% loss per km, with a
+// floor so very remote sites still model a usable (if reduced) baseline. Tunable.
+function substationLossFactor(km: number | null | undefined): number {
+  if (km == null || km <= 1) return 1;
+  return Math.max(0.85, 1 - 0.01 * (km - 1));
+}
+
 export function calculateResults(
   technical: TechnicalInputs,
   financial: FinancialInputs
@@ -29,19 +66,30 @@ const gridImportLimitKw = technical.gridImportLimitKw ?? 100;
   const actualInverterPower = technical.inverterPowerKw ?? fallbackInverterPower;
 
   // --- Cycle Budget Allocation (Physics Enforced) ---
-// --- Cycle Budget Allocation (Physics Enforced) ---
   let remainingCycles = 400; // Absolute physical limit of equivalent full cycles per year for LFP
   const safeInverterPower = Math.min(actualInverterPower, controllableCapacity); // 1C Cap Limit
-  
-  // NEW: Constrain export power by the physical grid connection limit
-const exportConstrainedPower =
-  technical.gridExportLimitKw != null
-    ? Math.min(safeInverterPower, technical.gridExportLimitKw)
-    : safeInverterPower;
-    
+
+  // --- Bottleneck: a grid connection smaller than the storage power throttles
+  // everything that flows through the grid (arbitrage + balancing). When no grid
+  // limit is given we assume the connection is adequate. ---
+  const gridExportLimitKw = technical.gridExportLimitKw ?? null;
+  const exportConstrainedPower =
+    gridExportLimitKw != null
+      ? Math.min(safeInverterPower, gridExportLimitKw)
+      : safeInverterPower;
+  const bottleneckActive = gridExportLimitKw != null && gridExportLimitKw < safeInverterPower;
+  const gridThroughputFactor = safeInverterPower > 0 ? exportConstrainedPower / safeInverterPower : 1;
+
+  // Line losses to the nearest substation derate grid-facing revenue.
+  const substationFactor = substationLossFactor(technical.substationDistanceKm);
+  // Combined derate applied to every grid-facing (traded) stream.
+  const gridRevenueFactor = gridThroughputFactor * substationFactor;
+
   // 1. Self-Consumption (Highest Priority)
-  const priceInput = financial.currentElectricityPriceCentsKwh ?? 35; // Default 35 cents
-  const userElectricityPrice = priceInput / 100; // Strictly convert cents to euros
+  // normalizeElectricityPriceCents tolerates a €/kWh value typed into the
+  // Cent/kWh field (e.g. 0.35 -> 35) so the result is never off by 100x.
+  const priceInput = normalizeElectricityPriceCents(financial.currentElectricityPriceCentsKwh);
+  const userElectricityPrice = priceInput / 100; // cents -> euros
   const baseOffset = totalCapacity * 250;
   
   // Safely determine consumption: prioritize explicit kWh, then bill, then default to 5000.
@@ -57,8 +105,12 @@ const exportConstrainedPower =
   // Use strictly the provided PV size, or 0 if none. No ghost arrays.
   const maxPvYield = (technical.pvSizeKwp ?? 0) * regionMultiplier;
   
-  let estimatedKwhOffset = Math.min(baseOffset, maxConsumption * 0.8, maxPvYield * 0.8);
-  
+  // Self-consumption is capped by: (a) what the battery can shift annually,
+  // (b) the share of load a battery can realistically cover (MAX_AUTARKY — an
+  // oversized battery on a small load approaches near-full self-supply), and
+  // (c) what the PV array actually produces.
+  let estimatedKwhOffset = Math.min(baseOffset, maxConsumption * MAX_AUTARKY, maxPvYield * 0.8);
+
   let scCyclesNeeded = totalCapacity > 0 ? (estimatedKwhOffset / totalCapacity) : 0;
   if (technical.enableSelfConsumption === false) {
     scCyclesNeeded = 0;
@@ -70,8 +122,11 @@ const exportConstrainedPower =
     estimatedKwhOffset = scCyclesNeeded * totalCapacity;
   }
   remainingCycles -= scCyclesNeeded;
-  
-  const selfConsumption = userElectricityPrice * estimatedKwhOffset * 0.90;
+
+  // Each self-consumed kWh avoids buying a kWh at the full retail price. The
+  // MAX_AUTARKY cap above (not a flat efficiency haircut) is what keeps this
+  // below 100% of the bill.
+  const selfConsumption = userElectricityPrice * estimatedKwhOffset;
 
   // 2. Peak Shaving
   const REQUIRED_PS_CYCLES = 20;
@@ -99,8 +154,12 @@ const exportConstrainedPower =
   let epexCycles = technical.enableEpex === false ? 0 : 300;
   if (epexCycles > remainingCycles) epexCycles = remainingCycles;
   remainingCycles -= epexCycles;
-  
-  let epexArbitrage = epexCycles > 0 ? controllableCapacity * epexCycles * 0.10 * 0.90 : 0;
+
+  // Spot arbitrage = energy cycled × captured spread × round-trip efficiency,
+  // throttled by any grid bottleneck and substation line losses.
+  let epexArbitrage = epexCycles > 0
+    ? controllableCapacity * epexCycles * EPEX_SPREAD_EUR_PER_KWH * 0.90 * gridRevenueFactor
+    : 0;
 
   // 5. Load Shifting
   const dynamicTariff = financial.dynamicFeedInTariffCentsKwh ?? 0;
@@ -132,8 +191,11 @@ let srlPower = 0;
     prlPower = exportConstrainedPower;
   }
 
-let prl = prlPower * PRL_ANNUAL_EUR_PER_KW * prlCycleFulfillment;
-  let srlAfrr = srlPower * SRL_ANNUAL_EUR_PER_KW; // aFRR uses capacity, not heavy throughput
+// Larger fleets earn a higher effective balancing return; substation distance
+  // adds line losses. (Power is already bottleneck-limited via exportConstrainedPower.)
+  const balancingTier = balancingTierMultiplier(controllableCapacity);
+  let prl = prlPower * PRL_ANNUAL_EUR_PER_KW * prlCycleFulfillment * balancingTier * substationFactor;
+  let srlAfrr = srlPower * SRL_ANNUAL_EUR_PER_KW * balancingTier * substationFactor; // aFRR uses capacity, not heavy throughput
 
   // --- VPP Participation Optimization Lift ---
   const vppParticipation = 0; // Ensures no double-counting of base streams
@@ -159,18 +221,19 @@ let prl = prlPower * PRL_ANNUAL_EUR_PER_KW * prlCycleFulfillment;
   }
 
   const minSystemCost = currentBatteryCapacityKwh * minCostPerKwh;
-// CapEx Logic: Estimated cost is independent of client budget
+  // CapEx Logic: a real quote (actualSystemCostEur) always wins. Otherwise we
+  // fall back to the capacity-based estimate, floored by the physical minimum.
   const estimatedSystemCost = currentBatteryCapacityKwh * fallbackCostPerKwh;
-  let systemCost = estimatedSystemCost; 
+  let systemCost: number;
 
-  if ((financial.targetBudgetEur ?? 0) > 0) {
-     if ((financial.targetBudgetEur ?? 0) < minSystemCost) {
-         // Enforce the physical floor if the budget is impossibly low
-         systemCost = minSystemCost;
-     } else {
-         // The budget is healthy, but we do NOT artificially lower the actual system cost
-         systemCost = estimatedSystemCost; 
-     }
+  if ((financial.actualSystemCostEur ?? 0) > 0) {
+    systemCost = financial.actualSystemCostEur as number;
+  } else {
+    systemCost = estimatedSystemCost;
+    if ((financial.targetBudgetEur ?? 0) > 0 && (financial.targetBudgetEur ?? 0) < minSystemCost) {
+      // Enforce the physical floor if the budget is impossibly low
+      systemCost = minSystemCost;
+    }
   }
 
   const engineeringFee = systemCost * 0.038;
@@ -248,18 +311,21 @@ if (cumulative >= 0 && paybackYears === null) {
 let testRemainingCycles = 400;
     const testInverterPower = Math.min(actualInverterPower, testControllableCapacity); // 1C Limit
     
-    // NEW: Constrain sensitivity test power by grid export limits
-const testExportConstrainedPower = technical.gridExportLimitKw != null 
-      ? Math.min(testInverterPower, technical.gridExportLimitKw) 
+    // Constrain sensitivity test power by grid export limits (bottleneck) and
+    // derate grid-facing revenue by both the bottleneck and substation losses.
+    const testExportConstrainedPower = gridExportLimitKw != null
+      ? Math.min(testInverterPower, gridExportLimitKw)
       : testInverterPower;
+    const testGridThroughputFactor = testInverterPower > 0 ? testExportConstrainedPower / testInverterPower : 1;
+    const testGridRevenueFactor = testGridThroughputFactor * substationFactor;
 
     const testBaseOffset = testTotalCapacity * 250;
-    let testEstimatedKwhOffset = Math.min(testBaseOffset, maxConsumption * 0.8, maxPvYield * 0.8);
+    let testEstimatedKwhOffset = Math.min(testBaseOffset, maxConsumption * MAX_AUTARKY, maxPvYield * 0.8);
     let testScCyclesNeeded = testTotalCapacity > 0 ? (testEstimatedKwhOffset / testTotalCapacity) : 0;
     if (technical.enableSelfConsumption === false) { testScCyclesNeeded = 0; testEstimatedKwhOffset = 0; }
     if (testScCyclesNeeded > testRemainingCycles) { testScCyclesNeeded = testRemainingCycles; testEstimatedKwhOffset = testScCyclesNeeded * testTotalCapacity; }
     testRemainingCycles -= testScCyclesNeeded;
-    const testSelfConsumption = userElectricityPrice * testEstimatedKwhOffset * 0.90;
+    const testSelfConsumption = userElectricityPrice * testEstimatedKwhOffset;
 
 // Test Peak Shaving
     const testRequiredPsCycles = 20;
@@ -284,7 +350,7 @@ const testExportConstrainedPower = technical.gridExportLimitKw != null
     let testEpexCycles = technical.enableEpex === false ? 0 : 300;
     if (testEpexCycles > testRemainingCycles) testEpexCycles = testRemainingCycles;
     testRemainingCycles -= testEpexCycles;
-    let testEpexArbitrage = testEpexCycles > 0 ? testControllableCapacity * testEpexCycles * 0.10 * 0.90 : 0;
+    let testEpexArbitrage = testEpexCycles > 0 ? testControllableCapacity * testEpexCycles * EPEX_SPREAD_EUR_PER_KWH * 0.90 * testGridRevenueFactor : 0;
 
     let testLoadShiftingCycles = (technical.enableLoadShifting === false || loadShiftingProfitCents <= 0) ? 0 : 300;
     if (testLoadShiftingCycles > testRemainingCycles) testLoadShiftingCycles = testRemainingCycles;
@@ -302,8 +368,9 @@ let testSrlPower = 0;
       testPrlPower = testExportConstrainedPower;
     }
 
-    let testPrl = testPrlPower * PRL_ANNUAL_EUR_PER_KW * testPrlCycleFulfillment;
-    let testSrlAfrr = testSrlPower * SRL_ANNUAL_EUR_PER_KW;
+    const testBalancingTier = balancingTierMultiplier(testControllableCapacity);
+    let testPrl = testPrlPower * PRL_ANNUAL_EUR_PER_KW * testPrlCycleFulfillment * testBalancingTier * substationFactor;
+    let testSrlAfrr = testSrlPower * SRL_ANNUAL_EUR_PER_KW * testBalancingTier * substationFactor;
 
     if (financial.vppParticipationEnabled) {
       testEpexArbitrage *= VPP_BONUS_MULTIPLIER;
@@ -341,6 +408,9 @@ const sensitivityToBatterySize: SensitivityPoint[] = [0.5, 1, 1.5, 2].map(multip
     paybackYears,
     yearlyProjection,
     sensitivityToBatterySize,
-    autarkyPercent
+    autarkyPercent,
+    systemCost,
+    totalUpfrontCost,
+    bottleneckActive
   };
 }
