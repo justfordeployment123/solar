@@ -148,7 +148,11 @@ export default function Step3Page() {
                   {(() => {
                     // Safely convert the cent value (or default 35 cents) to euros before dividing
                     const estimatedConsumption = technical.annualConsumptionKwh || (financial.yearlyElectricityBillEur ? (financial.yearlyElectricityBillEur / (normalizeElectricityPriceCents(financial.currentElectricityPriceCentsKwh) / 100)) : 5000);
-                    const recommendedKwh = Math.max(10, Math.ceil(estimatedConsumption / 1000) * 1.5, Math.floor((financial.targetBudgetEur || 0) / 1000));
+                    // Recommended battery size is driven by consumption only.
+                    // It must NOT scale with the target-budget field — that
+                    // produces nonsensical sizes (e.g. 485 kWh for a 16,500 kWh
+                    // home just because the budget is €485k).
+                    const recommendedKwh = Math.max(10, Math.ceil(estimatedConsumption / 1000) * 1.5);
                     return `💡 Basierend auf Ihren Daten empfehlen wir eine großzügige Speichergröße von ca. ${recommendedKwh} kWh für maximale Autarkie.`;
                   })()}
                 </div>
@@ -222,7 +226,7 @@ export default function Step3Page() {
                     type="number"
                     step="0.1"
                     placeholder="30"
-                    tooltipText="Der höchste Preis in Ihrem dynamischen Stromtarif, zu dem Sie Strom nutzen möchten."
+                    tooltipText="Geben Sie den Preis ein, zu dem Sie den Strom liefern möchten. Wenn Sie nichts eingeben, verwenden wir historische Marktdaten."
                     value={financial.dynamicFeedInTariffCentsKwh ?? ''}
                     onChange={handleInputChange('dynamicFeedInTariffCentsKwh')}
                   />
