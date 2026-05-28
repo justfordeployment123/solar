@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import dynamic from "next/dynamic";
 import { useCalculatorStore } from "@/store/calculatorStore";
 import { RevenuePie } from "@/components/charts/revenue-pie";
 import { ProjectionChart } from "@/components/charts/projection-chart";
@@ -17,11 +16,6 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/comp
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
 
 import { useParams } from "next/navigation";
-
-const PDFDownloadLink = dynamic(
-  () => import("@react-pdf/renderer").then((mod) => mod.PDFDownloadLink),
-  { ssr: false }
-);
 
 function MetricCard({
   title,
@@ -81,8 +75,6 @@ export default function ResultsPage() {
   const formatCurrency = (val: number) => 
     new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(val);
 
-  const [pieChartImage, setPieChartImage] = useState<string>();
-  const [barChartImage, setBarChartImage] = useState<string>();
   const [isClient, setIsClient] = useState(false);
   const [isGeneratingImages, setIsGeneratingImages] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -128,19 +120,45 @@ export default function ResultsPage() {
     setTechnicalInputs({ currentBatteryCapacityKwh: parseFloat(e.target.value) });
   };
 
-  const generateImages = async () => {
+  // Single-click PDF flow: capture chart refs to PNG, render the PDF document
+  // to a blob, and trigger the download. Replaces the previous two-button
+  // generateImages -> PDFDownloadLink flow which was fragile (gated on isClient
+  // and both images being in state, with the dynamic-imported PDFDownloadLink
+  // sometimes failing silently — the client reported "PDF doesn't work").
+  const handleDownloadPdf = async () => {
+    if (!pieRef.current || !barRef.current || !derivedResults) return;
     setIsGeneratingImages(true);
     try {
-      if (pieRef.current) {
-        const pieDataUrl = await toPng(pieRef.current, { cacheBust: true, pixelRatio: 2 });
-        setPieChartImage(pieDataUrl);
-      }
-      if (barRef.current) {
-        const barDataUrl = await toPng(barRef.current, { cacheBust: true, pixelRatio: 2 });
-        setBarChartImage(barDataUrl);
-      }
+      const [pieDataUrl, barDataUrl] = await Promise.all([
+        toPng(pieRef.current, { cacheBust: true, pixelRatio: 2 }),
+        toPng(barRef.current, { cacheBust: true, pixelRatio: 2 }),
+      ]);
+
+      const { pdf } = await import("@react-pdf/renderer");
+      const blob = await pdf(
+        <ReportDocument
+          technical={technical}
+          financial={financial}
+          derivedResults={derivedResults}
+          pieChartImage={pieDataUrl}
+          barChartImage={barDataUrl}
+          activeLogo={activeInstaller?.logoUrl || "/solar-logo.png"}
+          companyName={activeInstaller?.companyName || ""}
+          autarkyPercent={autarkyPercent}
+        />
+      ).toBlob();
+
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "mein-solar-batterie-bericht.pdf";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
     } catch (err) {
-      console.error("Failed to generate images", err);
+      console.error("PDF generation failed", err);
+      alert("PDF-Erstellung fehlgeschlagen. Bitte versuchen Sie es erneut.");
     } finally {
       setIsGeneratingImages(false);
     }
@@ -498,36 +516,12 @@ export default function ResultsPage() {
             <Button
               variant="primary"
               fullWidth
-              onClick={generateImages}
+              onClick={handleDownloadPdf}
               disabled={isGeneratingImages}
             >
-              {isGeneratingImages ? "Bericht wird vorbereitet..." : "PDF-Bericht erstellen"}
+              <Download className="w-4 h-4" />
+              {isGeneratingImages ? "PDF wird erstellt..." : "PDF-Bericht herunterladen"}
             </Button>
-
-            {isClient && pieChartImage && barChartImage && (
-              <PDFDownloadLink
-                document={
-                  <ReportDocument
-                    technical={technical}
-                    financial={financial}
-                    derivedResults={derivedResults}
-                    pieChartImage={pieChartImage}
-                    barChartImage={barChartImage}
-                    activeLogo={activeInstaller?.logoUrl || "/solar-logo.png"}
-                    companyName={activeInstaller?.companyName || ""}
-                    autarkyPercent={autarkyPercent}
-                  />
-                }
-                fileName="mein-solar-batterie-bericht.pdf"
-              >
-                {({ loading }: any) => (
-                  <Button variant="outline" fullWidth>
-                    <Download className="w-4 h-4" />
-                    {loading ? "PDF wird generiert..." : "PDF herunterladen"}
-                  </Button>
-                )}
-              </PDFDownloadLink>
-            )}
           </div>
         </div>
       </div>

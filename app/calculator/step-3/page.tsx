@@ -136,7 +136,7 @@ export default function Step3Page() {
             />
             <div>
               <Input
-                label="Zielbudget (€)"
+                label="Investitionsvolumen (€)"
                 type="number"
                 placeholder="12500"
                 tooltipText="Ihr geplantes Budget für den neuen Batteriespeicher."
