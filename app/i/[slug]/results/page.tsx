@@ -125,20 +125,32 @@ export default function ResultsPage() {
   // client-bundle pitfalls that caused the previous `pdf().toBlob()` path to
   // fail silently for some users.
   const handleDownloadPdf = async () => {
-    if (!pieRef.current || !barRef.current || !derivedResults) return;
+    if (!derivedResults) {
+      alert("Keine Berechnungsdaten vorhanden.");
+      return;
+    }
     setIsGeneratingImages(true);
     try {
-      // Capture charts; tolerate failure so the PDF is still useful without them.
-      let pieChartImage: string | undefined;
-      let barChartImage: string | undefined;
-      try {
-        [pieChartImage, barChartImage] = await Promise.all([
-          toPng(pieRef.current, { cacheBust: true, pixelRatio: 2 }),
-          toPng(barRef.current, { cacheBust: true, pixelRatio: 2 }),
-        ]);
-      } catch (chartErr) {
-        console.warn("Chart capture failed; PDF will render without charts", chartErr);
-      }
+      // Capture charts with a per-chart timeout so a hung SVG conversion can't
+      // freeze the whole flow. A null ref or a failed capture is non-fatal —
+      // the PDF still renders without that chart. Previously the handler
+      // returned silently if either ref was null ("nothing happens").
+      const captureChart = async (el: HTMLDivElement | null): Promise<string | undefined> => {
+        if (!el) return undefined;
+        try {
+          return await Promise.race([
+            toPng(el, { cacheBust: true, pixelRatio: 2 }),
+            new Promise<undefined>((resolve) => setTimeout(() => resolve(undefined), 8000)),
+          ]);
+        } catch (e) {
+          console.warn("Chart capture failed", e);
+          return undefined;
+        }
+      };
+      const [pieChartImage, barChartImage] = await Promise.all([
+        captureChart(pieRef.current),
+        captureChart(barRef.current),
+      ]);
 
       const res = await fetch("/api/report", {
         method: "POST",
@@ -171,7 +183,10 @@ export default function ResultsPage() {
       URL.revokeObjectURL(url);
     } catch (err) {
       console.error("PDF generation failed", err);
-      alert("PDF-Erstellung fehlgeschlagen. Bitte versuchen Sie es erneut.");
+      alert(
+        "PDF-Erstellung fehlgeschlagen. Bitte versuchen Sie es erneut.\n\n" +
+        (err instanceof Error ? err.message : "Unbekannter Fehler.")
+      );
     } finally {
       setIsGeneratingImages(false);
     }
