@@ -17,10 +17,16 @@ const MAINTENANCE_YEAR = 10;
 // battery on a small load can realistically approach this. Tunable.
 const MAX_AUTARKY = 0.95;
 
-// Average captured intraday spread on the spot market (EPEX), €/kWh per full
-// cycle. Calibrated so a ~1,000 kWh system trading ~300 cycles yields the
-// €60–70k/yr range confirmed as realistic by the field team. Tunable.
-const EPEX_SPREAD_EUR_PER_KWH = 0.25;
+// Gross intraday spread (€/kWh per full cycle) on the EPEX spot market. The
+// per-kWh GRID FEE (Netzentgelt) is subtracted from this — German Netzentgelte
+// apply on the buy leg of arbitrage (the operator delivers electricity to the
+// storage only because the storage will consume it). Calibrated so that at a
+// typical 5 ct/kWh Netzentgelt the net spread (~€0.25) gives the €60–70k/yr
+// range the field team confirmed for a 1,000 kWh / 300-cycle system. Tunable.
+const EPEX_GROSS_SPREAD_EUR_PER_KWH = 0.30;
+// Fallback Netzentgelt (Cent/kWh) used when EPEX is enabled but the customer
+// hasn't entered their own. Chosen as a German low-voltage commercial baseline.
+const DEFAULT_EPEX_GRID_FEE_CENTS_KWH = 5;
 
 // Real German retail electricity is ~15–60 ct/kWh. The price field is in
 // Cent/kWh, but users frequently type the €/kWh figure (e.g. 0.35 instead of
@@ -155,10 +161,15 @@ const gridImportLimitKw = technical.gridImportLimitKw ?? 100;
   if (epexCycles > remainingCycles) epexCycles = remainingCycles;
   remainingCycles -= epexCycles;
 
-  // Spot arbitrage = energy cycled × captured spread × round-trip efficiency,
-  // throttled by any grid bottleneck and substation line losses.
+  // Spot arbitrage = energy cycled × NET spread × round-trip efficiency,
+  // throttled by any grid bottleneck and substation line losses. Grid fees
+  // (Netzentgelte) apply on the buy leg and are subtracted here. They do NOT
+  // apply to balancing energy (PRL/SRL), where the operator delivers free of
+  // fees because the storage is performing a service for the grid.
+  const epexGridFeeCentsKwh = financial.gridFeesCentsKwh ?? DEFAULT_EPEX_GRID_FEE_CENTS_KWH;
+  const epexNetSpread = Math.max(0, EPEX_GROSS_SPREAD_EUR_PER_KWH - epexGridFeeCentsKwh / 100);
   let epexArbitrage = epexCycles > 0
-    ? controllableCapacity * epexCycles * EPEX_SPREAD_EUR_PER_KWH * 0.90 * gridRevenueFactor
+    ? controllableCapacity * epexCycles * epexNetSpread * 0.90 * gridRevenueFactor
     : 0;
 
   // 5. Load Shifting
@@ -350,7 +361,7 @@ let testRemainingCycles = 400;
     let testEpexCycles = technical.enableEpex === false ? 0 : 300;
     if (testEpexCycles > testRemainingCycles) testEpexCycles = testRemainingCycles;
     testRemainingCycles -= testEpexCycles;
-    let testEpexArbitrage = testEpexCycles > 0 ? testControllableCapacity * testEpexCycles * EPEX_SPREAD_EUR_PER_KWH * 0.90 * testGridRevenueFactor : 0;
+    let testEpexArbitrage = testEpexCycles > 0 ? testControllableCapacity * testEpexCycles * epexNetSpread * 0.90 * testGridRevenueFactor : 0;
 
     let testLoadShiftingCycles = (technical.enableLoadShifting === false || loadShiftingProfitCents <= 0) ? 0 : 300;
     if (testLoadShiftingCycles > testRemainingCycles) testLoadShiftingCycles = testRemainingCycles;

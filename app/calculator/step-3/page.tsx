@@ -254,6 +254,26 @@ export default function Step3Page() {
               </div>
             )}
 
+            {technical.enableEpex && !technical.enablePeakShaving && !technical.enableLoadShifting && (
+              <div className="pt-6 mt-2 border-t border-[#e5e5e5]">
+                <div className="inline-flex items-center gap-2 mb-5">
+                  <span className="w-2 h-2 bg-[#e20613]" />
+                  <h4 className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#1a1a1a]">
+                    Energiehandel Daten
+                  </h4>
+                </div>
+                <Input
+                  label="Netzentgelte (Cent/kWh)"
+                  type="number"
+                  step="0.1"
+                  placeholder="5"
+                  tooltipText="Bitte geben Sie das Netzentgelt Ihres Netzbetreibers ein. Es wird bei der EPEX-Arbitrage von der Marge abgezogen, da Netzentgelte auf den Strombezug anfallen."
+                  value={financial.gridFeesCentsKwh ?? ''}
+                  onChange={handleInputChange('gridFeesCentsKwh')}
+                />
+              </div>
+            )}
+
             <label className="flex items-center gap-4 cursor-pointer mt-4 p-4 bg-[#fafafa] border border-[#e5e5e5] hover:border-[#e20613] transition-colors group">
               <div className="relative flex items-center justify-center shrink-0">
                 <input
