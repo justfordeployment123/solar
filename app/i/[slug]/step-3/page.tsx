@@ -245,7 +245,7 @@ useEffect(() => {
                       type="number"
                       step="0.1"
                       placeholder="12"
-                      tooltipText="Netzentgelte des Netzbetreibers, die beim Netzbezug anfallen."
+                      tooltipText="Bitte geben Sie das Netzentgelt Ihres Netzbetreibers ein."
                       value={financial.gridFeesCentsKwh ?? ''}
                       onChange={handleInputChange('gridFeesCentsKwh')}
                     />

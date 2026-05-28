@@ -88,27 +88,33 @@ export default function ResultsPage() {
   const pieRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
 
-  const [sliderMax, setSliderMax] = useState<number>(100);
-  const hasLockedMax = useRef(false);
+  // Capture the user's configured battery capacity on first render by reading
+  // the (zustand-persist) store directly. Previously sliderMax was initialized
+  // to 100 and a "lock effect" updated it only after _hasHydrated flipped — if
+  // the user dragged the slider in that window the value was clamped to 100
+  // and the lock then captured that small value, making it impossible to drag
+  // back up to the original size (the "1100 -> 100, can't move back" bug).
+  const [initialCapacity, setInitialCapacity] = useState<number>(() =>
+    typeof window !== 'undefined'
+      ? (useCalculatorStore.getState().technical.currentBatteryCapacityKwh ?? 0)
+      : 0
+  );
 
-  // Mark that we're on the client so the (client-only) PDF download link can
-  // render. Without this the "PDF herunterladen" button never appears.
   useEffect(() => {
+    // Client-only flag so the PDF download link can render.
     setIsClient(true);
   }, []);
 
+  // Fallback in case zustand-persist hadn't hydrated at first render.
   useEffect(() => {
-    // If your store uses _hasHydrated, wait for it to be true. 
-    // If it's undefined, we safely ignore it and proceed.
-    if (typeof _hasHydrated !== 'undefined' && !_hasHydrated) return;
-
-    // Lock the maximum slider value EXACTLY ONCE upon loading
-    if (!hasLockedMax.current) {
-      const initialCap = technical.currentBatteryCapacityKwh ?? 0;
-      setSliderMax(initialCap > 0 ? initialCap * 3 : 100);
-      hasLockedMax.current = true;
+    if (initialCapacity === 0 && _hasHydrated && (technical.currentBatteryCapacityKwh ?? 0) > 0) {
+      setInitialCapacity(technical.currentBatteryCapacityKwh ?? 0);
     }
-  }, [_hasHydrated, technical.currentBatteryCapacityKwh]);
+  }, [_hasHydrated, initialCapacity, technical.currentBatteryCapacityKwh]);
+
+  // Safety net via Math.max: the slider's max can never fall below the user's
+  // current value, so a drag can't clamp the value down and trap the user.
+  const sliderMax = Math.max(100, initialCapacity * 3, technical.currentBatteryCapacityKwh ?? 0);
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTechnicalInputs({ currentBatteryCapacityKwh: parseFloat(e.target.value) });
   };

@@ -98,7 +98,15 @@ export default function ResultsPage() {
   const pieRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
 
-  const [initialCapacity, setInitialCapacity] = useState<number | null>(null);
+  // Lazy-initialize from the (zustand-persist) store so we have the user's
+  // real configured size before the slider can be touched. Previously this
+  // started as null and only resolved after _hasHydrated flipped — a drag in
+  // that window clamped the value down and trapped the user (see main flow).
+  const [initialCapacity, setInitialCapacity] = useState<number | null>(() => {
+    if (typeof window === 'undefined') return null;
+    const cap = useCalculatorStore.getState().technical.currentBatteryCapacityKwh ?? 0;
+    return cap > 0 ? cap : null;
+  });
 
   useEffect(() => {
     setIsClient(true);
@@ -112,7 +120,9 @@ export default function ResultsPage() {
 
   const baseCapacity = initialCapacity !== null ? initialCapacity : (technical.currentBatteryCapacityKwh ?? 0);
   const sliderMin = 0;
-  const sliderMax = baseCapacity > 0 ? baseCapacity * 3 : 100;
+  // Math.max safety net: never let max fall below the current value, so a
+  // drag can't clamp the value down and trap the user.
+  const sliderMax = Math.max(100, baseCapacity * 3, technical.currentBatteryCapacityKwh ?? 0);
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setTechnicalInputs({ currentBatteryCapacityKwh: parseFloat(e.target.value) });
