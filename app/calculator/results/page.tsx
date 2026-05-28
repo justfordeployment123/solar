@@ -5,7 +5,6 @@ import { useCalculatorStore } from "@/store/calculatorStore";
 import { RevenuePie } from "@/components/charts/revenue-pie";
 import { ProjectionChart } from "@/components/charts/projection-chart";
 import { toPng } from "html-to-image";
-import { ReportDocument } from "@/components/pdf/report-document";
 import { LeadCaptureModal } from "@/components/modals/lead-capture-modal";
 import { ReferralModal } from "@/components/modals/referral-modal";
 import { RevenueAccordion } from "@/components/layout/revenue-accordion";
@@ -104,34 +103,49 @@ export default function ResultsPage() {
     setTechnicalInputs({ currentBatteryCapacityKwh: parseFloat(e.target.value) });
   };
 
-  // Single-click PDF flow: capture the chart refs to PNG, render the PDF
-  // document to a blob, and trigger the download. Replaces the previous
-  // two-button flow (generate images -> PDFDownloadLink) which was fragile —
-  // the download link only rendered after isClient + both images were set,
-  // and the dynamic-imported PDFDownloadLink sometimes failed silently.
+  // PDF flow: capture the chart refs to PNG, POST everything to the server
+  // route /api/report which renders the PDF with @react-pdf/renderer in Node,
+  // then trigger the download. The previous client-side `pdf().toBlob()` path
+  // failed silently for some users (React 19 + Next 16 + Turbopack bundling
+  // of @react-pdf/renderer). Server-side rendering avoids those bundler
+  // pitfalls and keeps the library out of the browser bundle entirely.
   const handleDownloadPdf = async () => {
     if (!pieRef.current || !barRef.current || !derivedResults) return;
     setIsGeneratingImages(true);
     try {
-      const [pieDataUrl, barDataUrl] = await Promise.all([
-        toPng(pieRef.current, { cacheBust: true, pixelRatio: 2 }),
-        toPng(barRef.current, { cacheBust: true, pixelRatio: 2 }),
-      ]);
+      // Capture charts; tolerate failure so the PDF is still useful without them.
+      let pieChartImage: string | undefined;
+      let barChartImage: string | undefined;
+      try {
+        [pieChartImage, barChartImage] = await Promise.all([
+          toPng(pieRef.current, { cacheBust: true, pixelRatio: 2 }),
+          toPng(barRef.current, { cacheBust: true, pixelRatio: 2 }),
+        ]);
+      } catch (chartErr) {
+        console.warn("Chart capture failed; PDF will render without charts", chartErr);
+      }
 
-      const { pdf } = await import("@react-pdf/renderer");
-      const blob = await pdf(
-        <ReportDocument
-          technical={technical}
-          financial={financial}
-          derivedResults={derivedResults}
-          pieChartImage={pieDataUrl}
-          barChartImage={barDataUrl}
-          activeLogo={activeInstaller?.logoUrl || "/solar-logo.png"}
-          companyName={activeInstaller?.companyName || ""}
-          autarkyPercent={autarkyPercent}
-        />
-      ).toBlob();
+      const res = await fetch("/api/report", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          technical,
+          financial,
+          derivedResults,
+          pieChartImage,
+          barChartImage,
+          activeLogo: activeInstaller?.logoUrl || "/solar-logo.png",
+          companyName: activeInstaller?.companyName || "",
+          autarkyPercent,
+        }),
+      });
 
+      if (!res.ok) {
+        const detail = await res.text().catch(() => "");
+        throw new Error(`Server ${res.status}: ${detail}`);
+      }
+
+      const blob = await res.blob();
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
