@@ -421,21 +421,21 @@ export default function ResultsPage() {
           Laden Sie sich unsere detaillierten Produktkataloge herunter.
         </p>
         <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button 
-            variant="outline" 
-            className="w-full sm:w-auto h-12 px-6"
-            onClick={() => window.open("https://neehkgiayqkpvnuwqcnu.supabase.co/storage/v1/object/public/Catalog%20Bucket/marketing-2.pdf", "_blank")}
-          >
-            <Download className="w-4 h-4 mr-2" /> 
-            Gesamtkatalog (39 Seiten)
-          </Button>
-          
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="w-full sm:w-auto h-12 px-6"
             onClick={() => window.open("https://neehkgiayqkpvnuwqcnu.supabase.co/storage/v1/object/public/Catalog%20Bucket/marketing-1.pdf", "_blank")}
           >
-            <Download className="w-4 h-4 mr-2" /> 
+            <Download className="w-4 h-4 mr-2" />
+            Gesamtkatalog (39 Seiten)
+          </Button>
+
+          <Button
+            variant="outline"
+            className="w-full sm:w-auto h-12 px-6"
+            onClick={() => window.open("https://neehkgiayqkpvnuwqcnu.supabase.co/storage/v1/object/public/Catalog%20Bucket/marketing-2.pdf", "_blank")}
+          >
+            <Download className="w-4 h-4 mr-2" />
             Broschüre Landwirtschaft
           </Button>
         </div>

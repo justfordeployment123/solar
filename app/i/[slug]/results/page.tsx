@@ -83,8 +83,8 @@ export default function ResultsPage() {
   const [isDownloadingCatalog, setIsDownloadingCatalog] = useState(false);
   const [isDownloadingAgri, setIsDownloadingAgri] = useState(false);
 
-  const SUPABASE_CATALOG_URL = "https://neehkgiayqkpvnuwqcnu.supabase.co/storage/v1/object/public/Catalog%20Bucket/marketing-2.pdf";
-  const SUPABASE_AGRI_URL = "https://neehkgiayqkpvnuwqcnu.supabase.co/storage/v1/object/public/Catalog%20Bucket/marketing-1.pdf";
+  const SUPABASE_CATALOG_URL = "https://neehkgiayqkpvnuwqcnu.supabase.co/storage/v1/object/public/Catalog%20Bucket/marketing-1.pdf";
+  const SUPABASE_AGRI_URL = "https://neehkgiayqkpvnuwqcnu.supabase.co/storage/v1/object/public/Catalog%20Bucket/marketing-2.pdf";
 
   const pieRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
@@ -234,13 +234,13 @@ export default function ResultsPage() {
 
       const config = isCatalog 
         ? {
-            // Document 1: 39-Page Catalog (marketing-2.pdf)
+            // Document 1: 39-Page Catalog (marketing-1.pdf)
             eraseBox: { x: 210  , y: 430, width: 250, height: 200 }, 
             logo: { x: 220, y: 570, maxWidth: 160, maxHeight: 60 },
             text: { x: 220, y: 530 } // Starting Y coordinate for the first line of text
           }
         : {
-            // Document 2: Agriculture Brochure (marketing-1.pdf)
+            // Document 2: Agriculture Brochure (marketing-2.pdf)
             eraseBox: { x: 180, y: 450, width: 400, height: 180 }, 
             logo: { x: 180, y: 560, maxWidth: 160, maxHeight: 60 },
             text: { x: 370, y: 600 }
