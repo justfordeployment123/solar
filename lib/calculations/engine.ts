@@ -1,32 +1,11 @@
 import { TechnicalInputs, FinancialInputs, DerivedResults, RevenueStreams, YearlyCashflow, SensitivityPoint } from '@/types/calculator';
+import { CalculatorSettings, DEFAULT_SETTINGS, pickTier } from '@/lib/calculator-settings';
 
 const REGIONAL_MULTIPLIERS = {
   North: 900,
   Central: 950,
   South: 1000,
 };
-
-const VPP_BONUS_MULTIPLIER = 1.12;
-const DEGRADATION_RATE = 0.02; // 2% annual degradation
-const MARKET_DECLINE_RATE = 0.02; // 2% annual market decline for traded services
-const INFLATION_RATE = 0.038; // 3.8% annual inflation for retail electricity prices
-const MAINTENANCE_YEAR = 10;
-
-// Maximum share of annual consumption a (well-sized) battery can self-supply.
-// Real systems never reach 100% (winter / multi-day clouds), but an oversized
-// battery on a small load can realistically approach this. Tunable.
-const MAX_AUTARKY = 0.95;
-
-// Gross intraday spread (€/kWh per full cycle) on the EPEX spot market. The
-// per-kWh GRID FEE (Netzentgelt) is subtracted from this — German Netzentgelte
-// apply on the buy leg of arbitrage (the operator delivers electricity to the
-// storage only because the storage will consume it). Calibrated so that at a
-// typical 5 ct/kWh Netzentgelt the net spread (~€0.25) gives the €60–70k/yr
-// range the field team confirmed for a 1,000 kWh / 300-cycle system. Tunable.
-const EPEX_GROSS_SPREAD_EUR_PER_KWH = 0.30;
-// Fallback Netzentgelt (Cent/kWh) used when EPEX is enabled but the customer
-// hasn't entered their own. Chosen as a German low-voltage commercial baseline.
-const DEFAULT_EPEX_GRID_FEE_CENTS_KWH = 5;
 
 // Real German retail electricity is ~15–60 ct/kWh. The price field is in
 // Cent/kWh, but users frequently type the €/kWh figure (e.g. 0.35 instead of
@@ -35,16 +14,6 @@ const DEFAULT_EPEX_GRID_FEE_CENTS_KWH = 5;
 export function normalizeElectricityPriceCents(raw: number | null | undefined): number {
   if (raw == null || !(raw > 0)) return 35; // sensible default
   return raw < 3 ? raw * 100 : raw;
-}
-
-// Balancing-market access scales with fleet size (N-Gen pools many storage
-// systems as a BSP), so larger storage earns a higher effective return. Applied
-// on top of the per-kW PRL/SRL rates. Tunable.
-function balancingTierMultiplier(capacityKwh: number): number {
-  if (capacityKwh >= 500) return 1.15;
-  if (capacityKwh >= 200) return 1.10;
-  if (capacityKwh >= 100) return 1.05;
-  return 1.0;
 }
 
 // Distance to the nearest substation drives line losses for grid-facing markets.
@@ -57,14 +26,34 @@ function substationLossFactor(km: number | null | undefined): number {
 
 export function calculateResults(
   technical: TechnicalInputs,
-  financial: FinancialInputs
+  financial: FinancialInputs,
+  settings: CalculatorSettings = DEFAULT_SETTINGS
 ): DerivedResults {
+  // --- Admin-tunable values for this calculation ---
+  // Tier is chosen by battery capacity; all other knobs come from settings.global.
+  // The fallback to DEFAULT_SETTINGS keeps the engine usable in pure unit tests
+  // and in browser code that hasn't yet hydrated the admin overrides.
+  const VPP_BONUS_MULTIPLIER = settings.global.vppBonusMultiplier;
+  const DEGRADATION_RATE = settings.global.degradationRatePercent / 100;
+  const MARKET_DECLINE_RATE = settings.global.marketDeclineRatePercent / 100;
+  const INFLATION_RATE = settings.global.inflationRatePercent / 100;
+  const MAINTENANCE_YEAR = settings.global.maintenanceYear;
+  const MAINTENANCE_COST_FRACTION = settings.global.maintenanceCostPercent / 100;
+  const MAX_AUTARKY = settings.global.maxAutarkyPercent / 100;
+  const ADJUSTMENT_FACTOR = 1 + settings.global.adjustmentPercent / 100;
+  const ENGINEERING_FEE_FRACTION = settings.global.engineeringFeePercent / 100;
+
   // --- Graceful Fallbacks & Initialization ---
   const currentBatteryCapacityKwh = technical.currentBatteryCapacityKwh ?? 0;
   const existingBatteryCapacityKwh = technical.existingBatteryCapacityKwh ?? 0;
   const totalCapacity = existingBatteryCapacityKwh + currentBatteryCapacityKwh;
   const isNGen = technical.existingBatteryManufacturer === 'NGen';
   const controllableCapacity = currentBatteryCapacityKwh + (isNGen ? existingBatteryCapacityKwh : 0);
+
+  const tier = pickTier(settings, currentBatteryCapacityKwh);
+  const EPEX_GROSS_SPREAD_EUR_PER_KWH = tier.epexGrossSpreadEurPerKwh;
+  const DEFAULT_EPEX_GRID_FEE_CENTS_KWH = tier.defaultGridFeeCentsKwh;
+  const balancingTier = tier.balancingMultiplier;
 
 const gridImportLimitKw = technical.gridImportLimitKw ?? 100;
   const pvSize = technical.pvSizeKwp ?? 0;
@@ -185,10 +174,10 @@ const gridImportLimitKw = technical.gridImportLimitKw ?? 100;
   const loadShifting = loadShiftingCycles > 0 ? controllableCapacity * loadShiftingCycles * 0.90 * (loadShiftingProfitCents / 100) : 0;
 
   // --- Grid Services Power Allocation (Physics Enforced) ---
-  // Formula: 2350 €/MW/week = 2.35 €/kW/week * 52 = ~122.2 €/kW/year
-  const PRL_ANNUAL_EUR_PER_KW = (2350 / 1000) * 52; 
-  const SRL_ANNUAL_EUR_PER_KW = 150; 
-  
+  // PRL/SRL annual rates per kW now come from the tier configuration so the
+  // admin can recalibrate without code changes.
+  const PRL_ANNUAL_EUR_PER_KW = tier.prlAnnualEurPerKw;
+  const SRL_ANNUAL_EUR_PER_KW = tier.srlAnnualEurPerKw;
 
 let srlPower = 0;
   let prlPower = 0;
@@ -202,9 +191,9 @@ let srlPower = 0;
     prlPower = exportConstrainedPower;
   }
 
-// Larger fleets earn a higher effective balancing return; substation distance
-  // adds line losses. (Power is already bottleneck-limited via exportConstrainedPower.)
-  const balancingTier = balancingTierMultiplier(controllableCapacity);
+// Larger fleets earn a higher effective balancing return (balancingTier comes
+  // from the tier picked up top); substation distance adds line losses. (Power
+  // is already bottleneck-limited via exportConstrainedPower.)
   let prl = prlPower * PRL_ANNUAL_EUR_PER_KW * prlCycleFulfillment * balancingTier * substationFactor;
   let srlAfrr = srlPower * SRL_ANNUAL_EUR_PER_KW * balancingTier * substationFactor; // aFRR uses capacity, not heavy throughput
 
@@ -216,20 +205,11 @@ let srlPower = 0;
     srlAfrr *= VPP_BONUS_MULTIPLIER;
   }
 
-  // --- Fix Budget Exploit & CapEx Logic ---
-  let minCostPerKwh = 700;
-  let fallbackCostPerKwh = 900;
-  
-  if (currentBatteryCapacityKwh >= 500) {
-    minCostPerKwh = 200;
-    fallbackCostPerKwh = 300;
-  } else if (currentBatteryCapacityKwh >= 100) {
-    minCostPerKwh = 350;
-    fallbackCostPerKwh = 500;
-  } else if (currentBatteryCapacityKwh >= 30) {
-    minCostPerKwh = 450;
-    fallbackCostPerKwh = 700;
-  }
+  // --- CapEx Logic ---
+  // Per-kWh installed cost varies with system size and is now tier-driven so
+  // the admin can recalibrate without code changes.
+  const minCostPerKwh = tier.minCostPerKwh;
+  const fallbackCostPerKwh = tier.fallbackCostPerKwh;
 
   const minSystemCost = currentBatteryCapacityKwh * minCostPerKwh;
   // CapEx Logic: a real quote (actualSystemCostEur) always wins. Otherwise we
@@ -247,7 +227,7 @@ let srlPower = 0;
     }
   }
 
-  const engineeringFee = systemCost * 0.038;
+  const engineeringFee = systemCost * ENGINEERING_FEE_FRACTION;
   const totalUpfrontCost = systemCost + engineeringFee;
 
   const annualRevenueByStream: RevenueStreams = {
@@ -260,7 +240,9 @@ let srlPower = 0;
     loadShifting
   };
 
-  const baseAnnualRevenue = Object.values(annualRevenueByStream).reduce((sum, val) => sum + val, 0);
+  // Headline "average annual revenue" matches the cashflow line above by also
+  // applying the admin global adjustment factor.
+  const baseAnnualRevenue = Object.values(annualRevenueByStream).reduce((sum, val) => sum + val, 0) * ADJUSTMENT_FACTOR;
 
   // --- 15-Year Financial Projection ---
   const yearlyProjection: YearlyCashflow[] = [];
@@ -286,8 +268,11 @@ let srlPower = 0;
     const inflationFactor = Math.pow(1 + INFLATION_RATE, year - 1);
     const localRevenue = (annualRevenueByStream.selfConsumption + annualRevenueByStream.peakShaving) * inflationFactor;
 
-    const yearRevenue = (tradedRevenue + localRevenue) * degradationFactor;
-    let yearCost = (year === MAINTENANCE_YEAR) ? systemCost * 0.1 : 0;
+    // Apply the admin global adjustment as a final multiplier on revenue. This
+    // lets the operator nudge the final result up/down by a configurable %
+    // without touching the underlying model.
+    const yearRevenue = (tradedRevenue + localRevenue) * degradationFactor * ADJUSTMENT_FACTOR;
+    let yearCost = (year === MAINTENANCE_YEAR) ? systemCost * MAINTENANCE_COST_FRACTION : 0;
 
     const cashflow = yearRevenue - yearCost;
     cumulative += cashflow;
@@ -379,9 +364,11 @@ let testSrlPower = 0;
       testPrlPower = testExportConstrainedPower;
     }
 
-    const testBalancingTier = balancingTierMultiplier(testControllableCapacity);
-    let testPrl = testPrlPower * PRL_ANNUAL_EUR_PER_KW * testPrlCycleFulfillment * testBalancingTier * substationFactor;
-    let testSrlAfrr = testSrlPower * SRL_ANNUAL_EUR_PER_KW * testBalancingTier * substationFactor;
+    // Sensitivity scenarios may straddle tier boundaries, so look up the tier
+    // and per-kW rates for each test capacity rather than reusing the base tier.
+    const testTier = pickTier(settings, testControllableCapacity);
+    let testPrl = testPrlPower * testTier.prlAnnualEurPerKw * testPrlCycleFulfillment * testTier.balancingMultiplier * substationFactor;
+    let testSrlAfrr = testSrlPower * testTier.srlAnnualEurPerKw * testTier.balancingMultiplier * substationFactor;
 
     if (financial.vppParticipationEnabled) {
       testEpexArbitrage *= VPP_BONUS_MULTIPLIER;

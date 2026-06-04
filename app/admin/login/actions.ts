@@ -9,8 +9,16 @@ export async function loginAction(state: any, formData: FormData) {
 
   if (username === 'admin@mysolar-pv.de' && password === 'changethislater123') {
     const cookieStore = await cookies();
-    cookieStore.set('admin_token', 'true', { secure: true, httpOnly: true });
-    redirect('/admin/installers');
+    // `secure: true` is only honored over HTTPS, so the cookie silently fails
+    // on plain-HTTP localhost and the user bounces back to the login page.
+    // Toggle it by environment instead.
+    cookieStore.set('admin_token', 'true', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+    redirect('/admin/calculator');
   } else {
     return { error: 'Invalid username or password' };
   }

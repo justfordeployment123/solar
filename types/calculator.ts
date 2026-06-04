@@ -143,6 +143,11 @@ export interface CalculatorState {
   installerProfile: InstallerProfileDraft;
   activeInstaller: ActiveInstaller | null;
   
+  // Admin-tunable calculator settings (loaded from server on app start).
+  // null until the first /api/calculator-settings response lands; the engine
+  // falls back to DEFAULT_SETTINGS in the meantime.
+  calculatorSettings: import('@/lib/calculator-settings').CalculatorSettings | null;
+
   // Progress/Hydration Flags
   _hasHydrated: boolean;
   stepCompletion: {
@@ -155,6 +160,7 @@ export interface CalculatorState {
 
 export interface CalculatorActions {
   setHasHydrated: (state: boolean) => void;
+  setCalculatorSettings: (settings: import('@/lib/calculator-settings').CalculatorSettings) => void;
   setPersona: (persona: Persona) => void;
   setGoals: (goals: Partial<QuestionnaireGoals>) => void;
   setTechnicalInputs: (inputs: Partial<TechnicalInputs>) => void;

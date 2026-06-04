@@ -2,6 +2,7 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 import { CalculatorState, CalculatorActions, CalculatorStore } from '@/types/calculator';
 import { calculateResults } from '@/lib/calculations/engine';
+import { DEFAULT_SETTINGS } from '@/lib/calculator-settings';
 
 const initialState: CalculatorState = {
   persona: null,
@@ -55,6 +56,7 @@ const initialState: CalculatorState = {
     phone: '',
   },
   activeInstaller: null,
+  calculatorSettings: null,
   _hasHydrated: false,
   stepCompletion: {
     step1: false,
@@ -88,22 +90,33 @@ export const useCalculatorStore = create<CalculatorStore>()(
             enableLoadShifting: allGoals.includes('Load Shifting')
           };
           
-          const derivedResults = calculateResults(newTechnical, state.financial);
+          const derivedResults = calculateResults(newTechnical, state.financial, state.calculatorSettings ?? DEFAULT_SETTINGS);
           return { goals: newGoals, technical: newTechnical, derivedResults };
         }),
         
       setTechnicalInputs: (inputs) =>
         set((state) => {
           const newTechnical = { ...state.technical, ...inputs };
-          const derivedResults = calculateResults(newTechnical, state.financial);
+          const derivedResults = calculateResults(newTechnical, state.financial, state.calculatorSettings ?? DEFAULT_SETTINGS);
           return { technical: newTechnical, derivedResults };
         }),
-        
+
       setFinancialInputs: (inputs) =>
         set((state) => {
           const newFinancial = { ...state.financial, ...inputs };
-          const derivedResults = calculateResults(state.technical, newFinancial);
+          const derivedResults = calculateResults(state.technical, newFinancial, state.calculatorSettings ?? DEFAULT_SETTINGS);
           return { financial: newFinancial, derivedResults };
+        }),
+
+      // Called by the SettingsHydrator on app startup once /api/calculator-settings
+      // has responded. Re-derives results with the freshly-loaded admin overrides
+      // so the in-memory derivedResults stays consistent with the displayed UI.
+      setCalculatorSettings: (settings) =>
+        set((state) => {
+          const derivedResults = state.derivedResults
+            ? calculateResults(state.technical, state.financial, settings)
+            : state.derivedResults;
+          return { calculatorSettings: settings, derivedResults };
         }),
         
       setCsvMetadata: (metadata) =>
@@ -137,8 +150,10 @@ export const useCalculatorStore = create<CalculatorStore>()(
         if (state) state.setHasHydrated(true);
       },
       partialize: (state) => {
-        // Exclude transient states like _hasHydrated from persistence
-        const { _hasHydrated, ...persistedState } = state;
+        // Exclude transient states from persistence. calculatorSettings is
+        // re-fetched from the server on every app load so the admin's latest
+        // tuning takes effect immediately, even on returning sessions.
+        const { _hasHydrated, calculatorSettings, ...persistedState } = state;
         return persistedState;
       },
     }

@@ -1,4 +1,4 @@
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createServerSupabaseClient, isSupabaseConfigured } from '@/lib/supabase/server';
 import { ToggleStatus } from './ToggleStatus';
 import { PaymentStatusDropdown } from './PaymentStatusDropdown';
 import Link from 'next/link';
@@ -7,6 +7,16 @@ import { ExternalLink } from 'lucide-react';
 export const revalidate = 0; // Disable caching for this page
 
 export default async function InstallersPage() {
+  if (!isSupabaseConfigured()) {
+    return (
+      <div className="p-8">
+        <h1 className="text-2xl font-bold text-brand-dark-gray mb-4">Installers</h1>
+        <div className="bg-brand-white border border-brand-lighter-gray rounded-lg p-6 text-sm text-brand-light-gray">
+          Supabase is not configured in this environment. Set <code>NEXT_PUBLIC_SUPABASE_URL</code> and <code>SUPABASE_SERVICE_ROLE_KEY</code> in <code>.env.local</code> to enable the installer list.
+        </div>
+      </div>
+    );
+  }
   const supabase = createServerSupabaseClient();
   const { data: installers, error } = await supabase
     .from('installers')

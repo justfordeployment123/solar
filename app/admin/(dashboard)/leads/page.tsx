@@ -1,8 +1,18 @@
-import { createServerSupabaseClient } from '@/lib/supabase/server';
+import { createServerSupabaseClient, isSupabaseConfigured } from '@/lib/supabase/server';
 
 export const revalidate = 0; // Disable caching for this page
 
 export default async function LeadsPage() {
+  if (!isSupabaseConfigured()) {
+    return (
+      <div className="p-8">
+        <h1 className="text-2xl font-bold text-brand-dark-gray mb-4">Leads</h1>
+        <div className="bg-brand-white border border-brand-lighter-gray rounded-lg p-6 text-sm text-brand-light-gray">
+          Supabase is not configured in this environment. Set <code>NEXT_PUBLIC_SUPABASE_URL</code> and <code>SUPABASE_SERVICE_ROLE_KEY</code> in <code>.env.local</code> to enable the leads list.
+        </div>
+      </div>
+    );
+  }
   const supabase = createServerSupabaseClient();
   const { data: leads, error } = await supabase
     .from('leads')

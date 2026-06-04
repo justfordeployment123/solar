@@ -36,7 +36,7 @@ useEffect(() => {
   const handleNext = (e: React.MouseEvent) => {
     e.preventDefault();
     if (technical.enablePeakShaving && (financial.gridFeesCentsKwh === null || financial.gridFeesCentsKwh === undefined)) {
-      alert("Bitte geben Sie die Netzentgelte an, da Peak Shaving aktiviert ist.");
+      alert("Bitte geben Sie das Netzentgelt an, da Peak Shaving aktiviert ist.");
       return;
     }
     markStepComplete('step3', true);
@@ -185,10 +185,10 @@ useEffect(() => {
                 </div>
                 <div className="space-y-4">
                   <Input
-                    label="Netzentgelte (Cent/kWh)"
+                    label="Netzentgelt (Cent/kWh)"
                     type="number"
                     placeholder="8.5"
-                    tooltipText="Netzentgelte des Netzbetreibers. Zwingend erforderlich für Peak Shaving."
+                    tooltipText="Bitte geben Sie das Netzentgelt Ihres Netzbetreibers ein."
                     value={financial.gridFeesCentsKwh ?? ''}
                     onChange={handleInputChange('gridFeesCentsKwh')}
                   />
@@ -241,7 +241,7 @@ useEffect(() => {
                   />
                   {!technical.enablePeakShaving && (
                     <Input
-                      label="Netzentgelte (Cent/kWh)"
+                      label="Netzentgelt (Cent/kWh)"
                       type="number"
                       step="0.1"
                       placeholder="12"
@@ -263,11 +263,11 @@ useEffect(() => {
                   </h4>
                 </div>
                 <Input
-                  label="Netzentgelte (Cent/kWh)"
+                  label="Netzentgelt (Cent/kWh)"
                   type="number"
                   step="0.1"
                   placeholder="5"
-                  tooltipText="Bitte geben Sie das Netzentgelt Ihres Netzbetreibers ein. Es wird bei der EPEX-Arbitrage von der Marge abgezogen, da Netzentgelte auf den Strombezug anfallen."
+                  tooltipText="Bitte geben Sie das Netzentgelt Ihres Netzbetreibers ein. Es wird bei der EPEX-Arbitrage von der Marge abgezogen, da Netzentgelte beim Strombezug anfallen."
                   value={financial.gridFeesCentsKwh ?? ''}
                   onChange={handleInputChange('gridFeesCentsKwh')}
                 />

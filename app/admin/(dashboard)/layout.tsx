@@ -1,4 +1,4 @@
-import { Users, FileText, LogOut } from 'lucide-react';
+import { Users, FileText, LogOut, Sliders } from 'lucide-react';
 import Link from 'next/link';
 import { logoutAction } from '../login/actions';
 
@@ -23,12 +23,19 @@ export default function DashboardLayout({
             <Users className="w-5 h-5" />
             <span className="font-medium">Installers</span>
           </Link>
-          <Link 
-            href="/admin/leads" 
+          <Link
+            href="/admin/leads"
             className="flex items-center gap-3 px-3 py-2 rounded-md text-brand-light-gray hover:text-brand-red hover:bg-brand-lighter-gray transition-colors"
           >
             <FileText className="w-5 h-5" />
             <span className="font-medium">Leads</span>
+          </Link>
+          <Link
+            href="/admin/calculator"
+            className="flex items-center gap-3 px-3 py-2 rounded-md text-brand-light-gray hover:text-brand-red hover:bg-brand-lighter-gray transition-colors"
+          >
+            <Sliders className="w-5 h-5" />
+            <span className="font-medium">Calculator Settings</span>
           </Link>
         </nav>
 

@@ -10,11 +10,11 @@ export function middleware(request: NextRequest) {
   }
 
   if (token && isLoginPage) {
-    return NextResponse.redirect(new URL('/admin/installers', request.url));
+    return NextResponse.redirect(new URL('/admin/calculator', request.url));
   }
 
   if (token && request.nextUrl.pathname === '/admin') {
-    return NextResponse.redirect(new URL('/admin/installers', request.url));
+    return NextResponse.redirect(new URL('/admin/calculator', request.url));
   }
 
   return NextResponse.next();

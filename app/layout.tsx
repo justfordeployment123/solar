@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Open_Sans } from "next/font/google";
 import "./globals.css";
 import { GlobalFooter } from "@/components/global-footer";
+import { SettingsHydrator } from "@/components/settings-hydrator";
 
 const openSans = Open_Sans({
   variable: "--font-openSans",
@@ -28,6 +29,7 @@ export default function RootLayout({
       className={`${openSans.variable} h-full antialiased light`}
     >
       <body className="bg-white min-h-screen flex flex-col">
+        <SettingsHydrator />
         {children}
         <GlobalFooter />
       </body>
