@@ -7,6 +7,8 @@ import { ProjectionChart } from "@/components/charts/projection-chart";
 import { toPng } from "html-to-image";
 import { LeadCaptureModal } from "@/components/modals/lead-capture-modal";
 import { ReferralModal } from "@/components/modals/referral-modal";
+import { EvUpsellModal } from "@/components/modals/ev-upsell-modal";
+import { CommunityUpsellModal } from "@/components/modals/community-upsell-modal";
 import { RevenueAccordion } from "@/components/layout/revenue-accordion";
 import Link from "next/link";
 import { ArrowLeft, Download, Battery, Zap, Euro, TrendingUp, Share2, Info } from "lucide-react";
@@ -78,6 +80,8 @@ export default function ResultsPage() {
   const [isGeneratingImages, setIsGeneratingImages] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
+  const [isEvModalOpen, setIsEvModalOpen] = useState(false);
+  const [isCommunityModalOpen, setIsCommunityModalOpen] = useState(false);
 
   // --- CATALOG DOWNLOAD STATE ---
   const [isDownloadingCatalog, setIsDownloadingCatalog] = useState(false);
@@ -108,6 +112,25 @@ export default function ResultsPage() {
       setInitialCapacity(technical.currentBatteryCapacityKwh ?? 0);
     }
   }, [_hasHydrated, initialCapacity, technical.currentBatteryCapacityKwh]);
+
+  // Phase-2 upsell triggers (mirrors the public results page). Show each prompt
+  // once per session; namespace the keys so dev and prod can't collide.
+  useEffect(() => {
+    if (!derivedResults) return;
+    const battery = technical.currentBatteryCapacityKwh ?? 0;
+    const pv = technical.pvSizeKwp ?? 0;
+    const evTrigger = battery > 100 || (pv > 20 && battery > 60);
+    const communityTrigger = pv > 50;
+
+    if (evTrigger && !financial.evChargingEnabled && !sessionStorage.getItem('upsell:ev:i')) {
+      sessionStorage.setItem('upsell:ev:i', '1');
+      setIsEvModalOpen(true);
+    } else if (communityTrigger && !financial.communityEnabled && !sessionStorage.getItem('upsell:community:i')) {
+      sessionStorage.setItem('upsell:community:i', '1');
+      setIsCommunityModalOpen(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [derivedResults != null]);
 
   const baseCapacity = initialCapacity !== null ? initialCapacity : (technical.currentBatteryCapacityKwh ?? 0);
   const sliderMin = 0;
@@ -384,20 +407,36 @@ export default function ResultsPage() {
             <span className="w-2 h-2 bg-[#d2d700]" /> Batteriegröße-Simulator
           </label>
           <div className="flex items-center gap-4">
-<input
-  type="range"
-  min={0}
-  max={sliderMax}
-  step="1"
-  value={technical.currentBatteryCapacityKwh ?? 0}
-  onChange={handleSliderChange}
-  className="w-full h-2 bg-[#e5e5e5] appearance-none cursor-pointer accent-[#e20613]"
-/>
-            <span className="font-bold text-xl text-[#1a1a1a] tabular-nums w-16 text-right">
+            <input
+              type="range"
+              min={0}
+              max={sliderMax}
+              step="1"
+              value={technical.currentBatteryCapacityKwh ?? 0}
+              onChange={handleSliderChange}
+              className="w-full h-2 bg-[#e5e5e5] appearance-none cursor-pointer accent-[#e20613] transition-all duration-150"
+            />
+            <span className="font-bold text-xl text-[#1a1a1a] tabular-nums w-20 text-right transition-all duration-200">
               {technical.currentBatteryCapacityKwh || 0}
               <span className="text-xs font-semibold text-[#5a5859] ml-1">kWh</span>
             </span>
           </div>
+          {baseCapacity > 0 && (
+            <div className="mt-2 flex items-center justify-between text-[0.65rem] font-bold uppercase tracking-[0.18em]">
+              <span className="text-[#5a5859]">−100%</span>
+              <span
+                className={
+                  (technical.currentBatteryCapacityKwh ?? 0) >= baseCapacity
+                    ? 'text-[#1a8a1a]'
+                    : 'text-[#e20613]'
+                }
+              >
+                {((((technical.currentBatteryCapacityKwh ?? 0) - baseCapacity) / baseCapacity) * 100 >= 0 ? '+' : '')}
+                {Math.round((((technical.currentBatteryCapacityKwh ?? 0) - baseCapacity) / baseCapacity) * 100)}% gegenüber Empfehlung
+              </span>
+              <span className="text-[#5a5859]">+200%</span>
+            </div>
+          )}
 
           <div className="mt-6 pt-6 border-t border-[#e5e5e5] space-y-4">
             <label className="flex items-center gap-3 cursor-pointer group">
@@ -460,6 +499,18 @@ export default function ResultsPage() {
             Ihre Speicherleistung ({technical.inverterPowerKw ?? '–'} kW) übersteigt Ihr Netzeinspeise-Limit ({technical.gridExportLimitKw} kW).
             Die netzdienlichen Erträge (Arbitrage & Regelenergie) wurden entsprechend auf die tatsächlich
             nutzbare Anschlussleistung gedrosselt. Ein stärkerer Netzanschluss würde die Erträge erhöhen.
+          </p>
+        </div>
+      )}
+
+      {/* Energy Community Battery Upgrade Suggestion */}
+      {derivedResults.recommendedBatteryUpgradeKwh != null && derivedResults.recommendedBatteryUpgradeKwh > 0 && (
+        <div className="bg-[#eef7ff] border-l-4 border-[#0066cc] p-6 shadow-sm">
+          <h3 className="text-lg font-bold text-[#0066cc] mb-2">Empfehlung: Speicher vergrößern</h3>
+          <p className="text-sm md:text-base text-[#1a1a1a] leading-relaxed">
+            Der Strombedarf Ihrer Energiegemeinschaft übersteigt die tägliche PV-Erzeugung.
+            Mit ca. <strong>+{derivedResults.recommendedBatteryUpgradeKwh} kWh</strong> zusätzlicher Speicherkapazität
+            können Sie mittags günstig nachladen und die Lücke schließen.
           </p>
         </div>
       )}
@@ -628,6 +679,8 @@ export default function ResultsPage() {
 
       <LeadCaptureModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
       <ReferralModal isOpen={isReferralModalOpen} onClose={() => setIsReferralModalOpen(false)} />
+      <EvUpsellModal isOpen={isEvModalOpen} onClose={() => setIsEvModalOpen(false)} />
+      <CommunityUpsellModal isOpen={isCommunityModalOpen} onClose={() => setIsCommunityModalOpen(false)} />
     </div>
   );
 }

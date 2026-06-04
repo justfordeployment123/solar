@@ -53,6 +53,22 @@ export interface FinancialInputs {
   gridFeesCentsKwh?: number | null;
   demandChargeEurPerKw?: number | null;
   peakShavingReductionPercentage?: number | null;
+
+  // EV Charging upsell (Phase 2). Revenue from on-site EV chargers powered by
+  // the system. Triggered when storage > 100 kWh or PV > 20 kW with battery
+  // > 60 kWh.
+  evChargingEnabled?: boolean | null;
+  evNumChargers?: number | null;
+  evPowerKw?: number | null;
+  evDailyHours?: number | null;
+  evSellPriceCentsKwh?: number | null;
+
+  // Energy Community upsell (Phase 2). Revenue from selling electricity to
+  // co-located consumers. Triggered when PV > 50 kW.
+  communityEnabled?: boolean | null;
+  communityNumParties?: number | null;
+  communityKwhPerParty?: number | null;
+  communitySellPriceCentsKwh?: number | null;
 }
 
 export interface CsvMetadata {
@@ -72,6 +88,8 @@ export interface RevenueStreams {
   peakShaving: number;
   vppParticipation: number;
   loadShifting: number;
+  evCharging: number;
+  communitySupply: number;
 }
 
 export interface YearlyCashflow {
@@ -99,6 +117,9 @@ export interface DerivedResults {
   totalUpfrontCost: number;
   // True when storage power exceeds the grid connection limit (output throttled)
   bottleneckActive: boolean;
+  // Suggested extra battery capacity (kWh) when an enabled energy community
+  // outstrips the available PV mid-day. null when no upgrade is needed.
+  recommendedBatteryUpgradeKwh?: number | null;
 }
 
 export interface LeadFormDraft {

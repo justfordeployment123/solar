@@ -230,6 +230,58 @@ let srlPower = 0;
   const engineeringFee = systemCost * ENGINEERING_FEE_FRACTION;
   const totalUpfrontCost = systemCost + engineeringFee;
 
+  // --- EV Charging Upsell Revenue ---
+  // Margin per kWh = sell price - retail electricity cost. Annual throughput
+  // capped at #chargers × kW × hours × 365. Customers can switch off the
+  // upsell entirely with evChargingEnabled=false.
+  let evCharging = 0;
+  if (
+    financial.evChargingEnabled &&
+    (financial.evNumChargers ?? 0) > 0 &&
+    (financial.evPowerKw ?? 0) > 0 &&
+    (financial.evDailyHours ?? 0) > 0 &&
+    (financial.evSellPriceCentsKwh ?? 0) > 0
+  ) {
+    const numChargers = financial.evNumChargers as number;
+    const powerKw = financial.evPowerKw as number;
+    const hours = Math.min(financial.evDailyHours as number, 24);
+    const sellPriceEurPerKwh = (financial.evSellPriceCentsKwh as number) / 100;
+    const retailEurPerKwh = normalizeElectricityPriceCents(financial.currentElectricityPriceCentsKwh) / 100;
+    const marginEurPerKwh = Math.max(0, sellPriceEurPerKwh - retailEurPerKwh);
+    const annualKwhDelivered = numChargers * powerKw * hours * 365;
+    evCharging = annualKwhDelivered * marginEurPerKwh;
+  }
+
+  // --- Energy Community Upsell Revenue ---
+  // Revenue = supplied kWh × (sell price - retail cost). The supplied kWh is
+  // capped at the PV's annual yield so we don't claim revenue beyond what the
+  // system can physically deliver. recommendedBatteryUpgradeKwh surfaces a
+  // 1-day-of-shortfall buffer if total demand exceeds PV yield.
+  let communitySupply = 0;
+  let recommendedBatteryUpgradeKwh: number | null = null;
+  if (
+    financial.communityEnabled &&
+    (financial.communityNumParties ?? 0) > 0 &&
+    (financial.communityKwhPerParty ?? 0) > 0
+  ) {
+    const parties = financial.communityNumParties as number;
+    const kwhPerParty = financial.communityKwhPerParty as number;
+    const sellPriceEurPerKwh = ((financial.communitySellPriceCentsKwh ?? 30) as number) / 100;
+    const retailEurPerKwh = normalizeElectricityPriceCents(financial.currentElectricityPriceCentsKwh) / 100;
+    const marginEurPerKwh = Math.max(0, sellPriceEurPerKwh - retailEurPerKwh);
+
+    const totalDemandKwh = parties * kwhPerParty;
+    const suppliedKwh = Math.min(totalDemandKwh, maxPvYield);
+    communitySupply = suppliedKwh * marginEurPerKwh;
+
+    if (totalDemandKwh > maxPvYield) {
+      // Round up to the nearest 10 kWh so the suggestion is realistic to
+      // procure rather than oddly-precise.
+      const shortfallPerDay = (totalDemandKwh - maxPvYield) / 365;
+      recommendedBatteryUpgradeKwh = Math.ceil(shortfallPerDay / 10) * 10;
+    }
+  }
+
   const annualRevenueByStream: RevenueStreams = {
     selfConsumption,
     prl,
@@ -237,7 +289,9 @@ let srlPower = 0;
     epexArbitrage,
     peakShaving,
     vppParticipation,
-    loadShifting
+    loadShifting,
+    evCharging,
+    communitySupply,
   };
 
   // Headline "average annual revenue" matches the cashflow line above by also
@@ -409,6 +463,7 @@ const sensitivityToBatterySize: SensitivityPoint[] = [0.5, 1, 1.5, 2].map(multip
     autarkyPercent,
     systemCost,
     totalUpfrontCost,
-    bottleneckActive
+    bottleneckActive,
+    recommendedBatteryUpgradeKwh,
   };
 }
