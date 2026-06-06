@@ -9,6 +9,13 @@ interface ProjectionChartProps {
   data: YearlyCashflow[];
 }
 
+type TooltipParam = {
+  name?: string;
+  seriesName: string;
+  color: string;
+  value: number;
+};
+
 export function ProjectionChart({ data }: ProjectionChartProps) {
   const option = useMemo(() => {
     if (!data || data.length === 0) return {};
@@ -26,9 +33,10 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
         textStyle: { color: '#363636' },
         borderRadius: 16,
         padding: [16, 20],
-        extraCssText: 'box-: 0 8px 32px rgba(0,0,0,0.08); backdrop-filter: blur(12px);',
-        formatter: function (params: any) {
-          let str = `<div style="font-weight: bold; margin-bottom: 8px;">${params[0].name}</div>`;
+extraCssText: 'box-shadow: 0 8px 32px rgba(0,0,0,0.08); backdrop-filter: blur(12px);',
+	formatter: function (params: TooltipParam | TooltipParam[]) {
+	          if (!Array.isArray(params) || params.length === 0) return '';
+          let str = `<div style="font-weight: bold; margin-bottom: 8px;">${params[0]?.name || ''}</div>`;
           params.forEach((param: any) => {
             str += `
               <div style="display: flex; justify-content: space-between; gap: 24px; margin-bottom: 4px;">
@@ -86,7 +94,7 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
           data: cashflows,
           itemStyle: {
             color: new graphic.LinearGradient(0, 0, 0, 1, [
-              { offset: 0, color: '#dfdfdf' }, // Apple Green
+              { offset: 0, color: '#dfdfdf' },
               { offset: 1, color: '#dfdfdf44' }
             ]),
             borderRadius: [6, 6, 0, 0]
@@ -103,7 +111,7 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
           smooth: true,
           symbolSize: 8,
           symbol: 'circle',
-          itemStyle: { color: '#e12029', borderWidth: 3, borderColor: '#ffffff' }, // Apple Blue
+          itemStyle: { color: '#e12029', borderWidth: 3, borderColor: '#ffffff' },
           lineStyle: { width: 4, shadowColor: 'rgba(225, 32, 41, 0.4)', shadowBlur: 14, shadowOffsetY: 6 },
           z: 10,
           animationEasing: 'elasticOut',
@@ -113,15 +121,15 @@ export function ProjectionChart({ data }: ProjectionChartProps) {
     };
   }, [data]);
 
-  if (!data || data.length === 0) {
-    return <div className="flex items-center justify-center h-[350px] text-[#565656] font-medium">Nein Prognosedaten verfügbar</div>;
+if (!data || data.length === 0) {
+    return <div className="flex items-center justify-center h-[350px] text-[#565656] font-medium">Keine Prognosedaten verfügbar</div>;
   }
 
-  return (
+return (
     <ReactECharts 
       option={option} 
       style={{ height: '400px', width: '100%' }} 
-      className=" "
+      opts={{ renderer: 'svg' }}
     />
   );
 }

@@ -43,9 +43,10 @@ export function CsvUploader() {
     setRawFile(file);
     setIsProcessing(true);
 
-    Papa.parse(file, {
+Papa.parse(file, {
       header: true,
       skipEmptyLines: true,
+      worker: true, // FIX: Offload parsing to web worker so the UI doesn't freeze on large files
       complete: (fullResults) => {
         const data = fullResults.data as any[];
         if (data.length === 0) {
@@ -108,38 +109,41 @@ export function CsvUploader() {
 
     for (let i = 0; i < parsedData.length; i++) {
       const row = parsedData[i];
-      let valRaw = row[valCol];
-      
+      const valRaw = row[valCol];
+
       if (valRaw == null || valRaw === '') continue;
-      
-      if (typeof valRaw === 'string') {
-        valRaw = valRaw.replace(',', '.');
+
+      // FIX: Safely strip German thousands separators before parsing the decimal comma
+      const valRawClean = String(valRaw).trim().replace(/\./g, '').replace(',', '.');
+      const val = parseFloat(valRawClean);
+      // FIX (CSVU.1 CRITICAL): the old `if (!Number.isFinite(val))` branch
+      // was inverted — it processed INVALID values and silently skipped valid
+      // ones. The preview was always 0 kWh, and the user could apply an
+      // import that wiped their annualConsumptionKwh down to 0. Skip invalid
+      // rows and count the valid ones.
+      if (!Number.isFinite(val)) continue;
+      validCount++;
+      let powerKw = 0;
+      let energyKwh = 0;
+
+      if (isKwh) {
+        energyKwh = val;
+        powerKw = energyKwh / hoursPerInterval;
+      } else if (isKw) {
+        powerKw = val;
+        energyKwh = powerKw * hoursPerInterval;
+      } else if (isW) {
+        powerKw = val / 1000;
+        energyKwh = powerKw * hoursPerInterval;
       }
-      const val = parseFloat(valRaw);
 
-      if (!isNaN(val)) {
-        validCount++;
-        let powerKw = 0;
-        let energyKwh = 0;
-
-        if (isKwh) {
-          energyKwh = val;
-          powerKw = energyKwh / hoursPerInterval;
-        } else if (isKw) {
-          powerKw = val;
-          energyKwh = powerKw * hoursPerInterval;
-        } else if (isW) {
-          powerKw = val / 1000;
-          energyKwh = powerKw * hoursPerInterval;
-        }
-
-        total += energyKwh;
-        if (powerKw > maxKw) maxKw = powerKw;
-      }
+      total += energyKwh;
+      if (powerKw > maxKw) maxKw = powerKw;
     }
 
     if (validCount === 0) {
-      setMappingError("Konnte Nein numerischen Werte in der gewählten Verbrauchs-Spalte finden.");
+      // FIX (CSVU.2): was "Konnte Nein numerischen Werte…" — broken German.
+      setMappingError("Konnte keine numerischen Werte in der gewählten Verbrauchs-Spalte finden.");
       setPreviewStats(null);
     } else {
       setMappingError(null);
@@ -152,19 +156,24 @@ export function CsvUploader() {
     }
   }, [parsedData, valCol, unit, interval, isModalOpen]);
 
+  // FIX (CSVU.7): single source of truth for the "< 350 days → annualize" rule.
+  // The same formula is used by both the live preview footer and the apply
+  // handler — if the rule ever changes, only this helper needs editing.
+  const annualizeIfShort = (totalKwh: number, days: number) =>
+    days > 0 && days < 350 ? (totalKwh / days) * 365 : totalKwh;
+
   const handleApply = () => {
     if (!previewStats || mappingError) return;
 
-    // Scale up to 365 days if the data is shorter (optional smarts, here we just use the raw total if it's close, 
+    // Scale up to 365 days if the data is shorter (optional smarts, here we just use the raw total if it's close,
     // but to be safe and accurate, let's extrapolate to an annual value if it's less than a year)
-    let annualizedConsumption = previewStats.totalConsumptionKwh;
-    if (previewStats.days > 0 && previewStats.days < 350) {
-       annualizedConsumption = (previewStats.totalConsumptionKwh / previewStats.days) * 365;
-    }
+    const annualizedConsumption = annualizeIfShort(previewStats.totalConsumptionKwh, previewStats.days);
 
+    // FIX (CSVU.3): the engine never reads `gridImportLimitKw` (T1) and the
+    // step-2 input's tooltip is now honest about it being reserved. Don't
+    // persist a number that has no effect on the calculation.
     store.setTechnicalInputs({
       annualConsumptionKwh: Math.round(annualizedConsumption),
-      gridImportLimitKw: Math.ceil(previewStats.maxPeakKw)
     });
 
     store.setCsvMetadata({
@@ -318,7 +327,7 @@ export function CsvUploader() {
                     <div className="flex justify-between items-center text-sm border-b border-[#e5e5e5] pb-2">
                       <span className="text-[#5a5859]">Hochgerechneter Jahresverbrauch:</span>
                       <span className="font-semibold text-[#1a1a1a]">
-                        {Math.round((previewStats.days > 0 && previewStats.days < 350) ? (previewStats.totalConsumptionKwh / previewStats.days) * 365 : previewStats.totalConsumptionKwh).toLocaleString()} kWh
+                        {Math.round(annualizeIfShort(previewStats.totalConsumptionKwh, previewStats.days)).toLocaleString()} kWh
                       </span>
                     </div>
                     <div className="flex justify-between items-center text-sm">

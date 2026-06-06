@@ -117,6 +117,17 @@ export interface DerivedResults {
   totalUpfrontCost: number;
   // True when storage power exceeds the grid connection limit (output throttled)
   bottleneckActive: boolean;
+  effectiveInverterPowerKw: number;
+  effectiveGridExportPowerKw: number;
+  calculationAssumptions: {
+    degradationRatePercent: number;
+    inflationRatePercent: number;
+    marketDeclineRatePercent: number;
+    maintenanceYear: number;
+    maintenanceYears: number[];
+    maintenanceCostPercent: number;
+    engineeringFeePercent: number;
+  };
   // Suggested extra battery capacity (kWh) when an enabled energy community
   // outstrips the available PV mid-day. null when no upgrade is needed.
   recommendedBatteryUpgradeKwh?: number | null;

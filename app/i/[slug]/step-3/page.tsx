@@ -14,9 +14,9 @@ import { InfoModal } from '@/components/modals/info-modal';
 export default function Step3Page() {
   const router = useRouter();
   const params = useParams() as { slug: string };
-  const [mounted, setMounted] = useState(false);
   const [isRegelenergieModalOpen, setIsRegelenergieModalOpen] = useState(false);
 
+  const hasHydrated = useCalculatorStore((state) => state._hasHydrated);
   const stepCompletion = useCalculatorStore((state) => state.stepCompletion);
   const markStepComplete = useCalculatorStore((state) => state.markStepComplete);
   const financial = useCalculatorStore((state) => state.financial);
@@ -24,19 +24,15 @@ export default function Step3Page() {
   const setFinancialInputs = useCalculatorStore((state) => state.setFinancialInputs);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-
-useEffect(() => {
-    if (mounted && !stepCompletion.step2) {
+    if (hasHydrated && !stepCompletion.step2) {
       router.replace(`/i/${params.slug}/step-2`); // <--- FIX: Keeps them in the installer funnel
     }
-  }, [mounted, stepCompletion.step2, router, params.slug]);
+  }, [hasHydrated, stepCompletion.step2, router, params.slug]);
 
   const handleNext = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (technical.enablePeakShaving && (financial.gridFeesCentsKwh === null || financial.gridFeesCentsKwh === undefined)) {
-      alert("Bitte geben Sie das Netzentgelt an, da Peak Shaving aktiviert ist.");
+    if (technical.enablePeakShaving && (financial.demandChargeEurPerKw === null || financial.demandChargeEurPerKw === undefined)) {
+      alert("Bitte geben Sie den Leistungspreis an, da Peak Shaving aktiviert ist.");
       return;
     }
     markStepComplete('step3', true);
@@ -47,12 +43,19 @@ useEffect(() => {
     if (e.target.type === 'checkbox') {
       setFinancialInputs({ [field]: e.target.checked });
     } else {
-      const value = e.target.value === '' ? null : Number(e.target.value);
-      setFinancialInputs({ [field]: value });
+      if (e.target.value === '') {
+        setFinancialInputs({ [field]: null });
+        return;
+      }
+      const parsed = Math.max(0, Number(e.target.value.replace(',', '.')));
+      const val = field === 'peakShavingReductionPercentage' ? Math.min(100, parsed) : parsed;
+      if (Number.isFinite(val)) {
+        setFinancialInputs({ [field]: val });
+      }
     }
   };
-
-  if (!mounted || !stepCompletion.step2) return null;
+  
+  if (!hasHydrated || !stepCompletion.step2) return null;
 
   return (
     <div className="px-6 lg:px-12 pt-10 max-w-4xl mx-auto flex flex-col min-h-full">
@@ -82,10 +85,11 @@ useEffect(() => {
           </div>
 
           <div className="space-y-6 max-w-md">
-            <Input
-              label="Aktueller Strompreis (Cent/kWh)"
-              type="number"
-              step="0.1"
+              <Input
+                label="Aktueller Strompreis (Cent/kWh)"
+                type="number"
+                min="0"
+                step="0.1"
               placeholder="35"
               tooltipText="Ihr aktueller Arbeitspreis für Strombezug in Cent pro kWh."
               value={financial.currentElectricityPriceCentsKwh ?? ''}
@@ -95,6 +99,7 @@ useEffect(() => {
               <Input
                 label="Jährliche Stromkosten (€)"
                 type="number"
+                min="0"
                 placeholder="2400"
                 tooltipText="Ihre geschätzten Stromkosten pro Jahr. Dient als Alternative zur direkten Eingabe des Verbrauchs."
                 value={financial.yearlyElectricityBillEur ?? ''}
@@ -112,14 +117,15 @@ useEffect(() => {
                     </div>
                   );
                 }
-                if (technical.annualConsumptionKwh && rawPrice && financial.yearlyElectricityBillEur) {
-                  const expected = technical.annualConsumptionKwh * (normalizeElectricityPriceCents(rawPrice) / 100);
+                if (technical.annualConsumptionKwh && rawPrice != null && financial.yearlyElectricityBillEur) {
+                  const normalizedPrice = normalizeElectricityPriceCents(rawPrice);
+                  const expected = technical.annualConsumptionKwh * (normalizedPrice / 100);
                   const diff = Math.abs(expected - financial.yearlyElectricityBillEur);
                   const tolerance = expected * 0.2; // 20% tolerance
                   if (diff > tolerance) {
                     return (
                       <div className="mt-2 text-sm text-[#e20613] bg-[#fff5f5] p-3 rounded border border-[#ffcccc]">
-                        ⚠️ <strong>Achtung:</strong> Die eingegebenen Stromkosten ({financial.yearlyElectricityBillEur} €) passen nicht zum angegebenen Verbrauch ({technical.annualConsumptionKwh} kWh) und Strompreis ({rawPrice} Cent). Rechnerisch müssten diese bei ca. {Math.round(expected)} € liegen.
+                        ⚠️ <strong>Achtung:</strong> Die eingegebenen Stromkosten ({financial.yearlyElectricityBillEur} €) passen nicht zum angegebenen Verbrauch ({technical.annualConsumptionKwh} kWh) und Strompreis ({normalizedPrice} Cent). Rechnerisch müssten diese bei ca. {Math.round(expected)} € liegen.
                       </div>
                     );
                   }
@@ -130,6 +136,7 @@ useEffect(() => {
             <Input
               label="Tatsächliche Systemkosten (€)"
               type="number"
+              min="0"
               placeholder="z.B. 28500"
               tooltipText="Der tatsächliche Angebotspreis für den Speicher (CapEx). Wird – falls angegeben – direkt für ROI und Amortisation verwendet. Bei leerem Feld schätzt der Rechner die Kosten anhand der Kapazität."
               value={financial.actualSystemCostEur ?? ''}
@@ -139,6 +146,7 @@ useEffect(() => {
               <Input
                 label="Investitionsvolumen (€)"
                 type="number"
+                min="0"
                 placeholder="12500"
                 tooltipText="Ihr geplantes Budget für den neuen Batteriespeicher."
                 value={financial.targetBudgetEur ?? ''}
@@ -187,6 +195,7 @@ useEffect(() => {
                   <Input
                     label="Netzentgelt (Cent/kWh)"
                     type="number"
+                    min="0"
                     placeholder="8.5"
                     tooltipText="Bitte geben Sie das Netzentgelt Ihres Netzbetreibers ein."
                     value={financial.gridFeesCentsKwh ?? ''}
@@ -195,6 +204,7 @@ useEffect(() => {
                   <Input
                     label="Leistungspreis (€/kW)"
                     type="number"
+                    min="0"
                     step="0.1"
                     placeholder="45"
                     value={financial.demandChargeEurPerKw ?? ''}
@@ -203,6 +213,8 @@ useEffect(() => {
                   <Input
                     label="Einsparung (%)"
                     type="number"
+                    min="0"
+                    max="100"
                     step="1"
                     placeholder="75"
                     value={financial.peakShavingReductionPercentage ?? ''}
@@ -224,6 +236,7 @@ useEffect(() => {
                   <Input
                     label="Dynamischer Tarif (Cent/kWh)"
                     type="number"
+                    min="0"
                     step="0.1"
                     placeholder="30"
                     tooltipText="Geben Sie den Preis ein, zu dem Sie den Strom liefern möchten. Wenn Sie nichts eingeben, verwenden wir historische Marktdaten."
@@ -233,6 +246,7 @@ useEffect(() => {
                   <Input
                     label="Standard Tarif (Cent/kWh)"
                     type="number"
+                    min="0"
                     step="0.1"
                     placeholder="8"
                     tooltipText="Der Basispreis oder durchschnittliche Preis in Ihrem Stromtarif."
@@ -243,6 +257,7 @@ useEffect(() => {
                     <Input
                       label="Netzentgelt (Cent/kWh)"
                       type="number"
+                      min="0"
                       step="0.1"
                       placeholder="12"
                       tooltipText="Bitte geben Sie das Netzentgelt Ihres Netzbetreibers ein."
@@ -265,6 +280,7 @@ useEffect(() => {
                 <Input
                   label="Netzentgelt (Cent/kWh)"
                   type="number"
+                  min="0"
                   step="0.1"
                   placeholder="5"
                   tooltipText="Bitte geben Sie das Netzentgelt Ihres Netzbetreibers ein. Es wird bei der EPEX-Arbitrage von der Marge abgezogen, da Netzentgelte beim Strombezug anfallen."

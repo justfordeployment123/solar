@@ -20,13 +20,22 @@ export function EvUpsellModal({ isOpen, onClose }: EvUpsellModalProps) {
 
   if (!isOpen) return null;
 
+  // FIX (EV2): parseFloat("3,5") returns 3 (stops at the comma). Apply the
+  // same German decimal-comma swap the rest of the form uses so "3,5" reads
+  // as three-and-a-half rather than three.
+  const parseGermanFloat = (val: string) => {
+    const normalized = val.replace(',', '.');
+    const parsed = parseFloat(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
   const handleSave = () => {
     setFinancialInputs({
       evChargingEnabled: true,
-      evNumChargers: parseFloat(numChargers) || 0,
-      evPowerKw: parseFloat(powerKw) || 0,
-      evDailyHours: parseFloat(dailyHours) || 0,
-      evSellPriceCentsKwh: parseFloat(sellPrice) || 0,
+      evNumChargers: parseGermanFloat(numChargers),
+      evPowerKw: parseGermanFloat(powerKw),
+      evDailyHours: parseGermanFloat(dailyHours),
+      evSellPriceCentsKwh: parseGermanFloat(sellPrice),
     });
     onClose();
   };

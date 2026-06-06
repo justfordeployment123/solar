@@ -1,5 +1,6 @@
 import React from 'react';
-import { Document, Page, Text, View, StyleSheet, Image, Font } from '@react-pdf/renderer';
+import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
+import { DerivedResults, FinancialInputs, TechnicalInputs } from '@/types/calculator';
 
 const LABELS = {
   headerTitle: "Wirtschaftlichkeitsprognose",
@@ -11,21 +12,31 @@ const LABELS = {
   pvSize: "Installierte PV-Leistung:",
   annualConsumption: "Bisheriger Jahresverbrauch:",
   financialMetricsTitle: "Finanzielle Kennzahlen & Wirtschaftlichkeit",
-  roi: "Gesamtergebnis (15 Jahre):",
+  // FIX (P1.3): the previous label "Gesamtergebnis (15 Jahre):" was
+  // ambiguous — the same screen also shows a "ROI %" line below it, so
+  // readers could easily mistake the cumulative cashflow number for the
+  // percentage ROI. Disambiguate by labeling the currency value as Net
+  // Cashflow and keeping ROI % for the percentage.
+  roi: "Netto-Cashflow (15 Jahre):",
   breakEven: "Amortisationszeitpunkt (Break-Even):",
-  avgAnnualRevenue: "Durchschnittlicher Jahresertrag:",
+  avgAnnualRevenue: "Jahresertrag im 1. Jahr:",
   autarkyRate: "Autarkiegrad (Schätzung):",
   revenueSplitTitle: "Detaillierte Einnahmen-Aufschlüsselung",
   cashflowTitle: "Cashflow-Prognose über die Lebensdauer (15 Jahre)",
   disclaimer: "Wichtiger Hinweis: Finanzprognosen sind mathematische Schätzungen, die auf der konfigurierten Systemlogik basieren. Die tatsächlichen Ergebnisse können je nach lokalen Netzvorschriften, Spotmarktpreisen und realem Verbrauchsverhalten variieren. Alle Angaben ohne Gewähr.",
   yearLabel: "Jahr",
   na: "N/A",
-  detailsTitle: "Ertragsquellen Detailansicht (Erstes Betriebsjahr)",
+detailsTitle: "Ertragsquellen Detailansicht (Erstes Betriebsjahr)",
   epexArbitrage: "Intraday-Handel (EPEX Spot):",
   prl: "Primärregelleistung (PRL):",
   srlAfrr: "Sekundärregelleistung (aFRR):",
   selfConsumption: "Eigennutzung & Einsparungen:",
-  peakShaving: "Lastspitzenkappung (Peak Shaving):"
+  peakShaving: "Lastspitzenkappung (Peak Shaving):",
+  loadShifting: "Load Shifting:",
+  evCharging: "EV-Ladeinfrastruktur:",
+  communitySupply: "Energy Community:",
+  vppParticipation: "VPP-Optimierungsbonus:",
+  roiPercent: "ROI (Return on Investment):"
 };
 
 const styles = StyleSheet.create({
@@ -61,9 +72,9 @@ const styles = StyleSheet.create({
 });
 
 interface ReportDocumentProps {
-  derivedResults: any;
-  technical: any;
-  financial?: any;
+  derivedResults: DerivedResults;
+  technical: TechnicalInputs;
+  financial?: FinancialInputs;
   pieChartImage?: string;
   barChartImage?: string;
   letterheadImage?: string;
@@ -75,6 +86,13 @@ interface ReportDocumentProps {
 export const ReportDocument: React.FC<ReportDocumentProps> = ({ derivedResults, technical, financial, pieChartImage, barChartImage, letterheadImage, activeLogo, companyName, autarkyPercent = 75 }) => {
   const formatCurrency = (val: number) => 
     new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(Math.round(val));
+  const assumptions = derivedResults?.calculationAssumptions ?? {
+    degradationRatePercent: 2,
+    maintenanceYear: 10,
+    maintenanceYears: [10],
+  };
+  const formatPercent = (val: number) =>
+    val.toLocaleString('de-DE', { minimumFractionDigits: 1, maximumFractionDigits: 2 });
   
   return (
     <Document>
@@ -119,24 +137,37 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ derivedResults, 
               </View>
               <View style={styles.row}>
                 <Text style={styles.label}>Batterie-Degradation (Jährlich):</Text>
-                <Text style={styles.value}>2.00 %</Text>
+                <Text style={styles.value}>{formatPercent(assumptions.degradationRatePercent)} %</Text>
               </View>
               <View style={styles.row}>
                 <Text style={styles.label}>Hardware-Ersatzzyklus:</Text>
-                <Text style={styles.value}>Jahr 10</Text>
+                <Text style={styles.value}>
+                  {Array.isArray(assumptions.maintenanceYears) && assumptions.maintenanceYears.length > 0
+                    ? assumptions.maintenanceYears.map((y) => `Jahr ${y}`).join(', ')
+                    : assumptions.maintenanceYear
+                    ? `Jahr ${assumptions.maintenanceYear}`
+                    : 'N/A'}
+                </Text>
               </View>
             </View>
 
             <View style={styles.gridColumn}>
               <Text style={styles.title}>{LABELS.financialMetricsTitle}</Text>
-              <View style={styles.row}>
+<View style={styles.row}>
                 <Text style={styles.label}>{LABELS.roi}</Text>
                 <Text style={styles.highlightValue}>
                   {formatCurrency((derivedResults.yearlyProjection[derivedResults.yearlyProjection.length - 1]?.cumulative || 0))}
                 </Text>
-              </View>              <View style={styles.row}>
+              </View>
+              <View style={styles.row}>
+                <Text style={styles.label}>{LABELS.roiPercent}</Text>
+                <Text style={styles.highlightValue}>
+                  {derivedResults.roiPercent?.toFixed(1) || 0} %
+                </Text>
+              </View>
+              <View style={styles.row}>
                 <Text style={styles.label}>{LABELS.breakEven}</Text>
-                <Text style={styles.value}>{derivedResults.paybackYears !== null ? `${LABELS.yearLabel} ${Math.ceil(derivedResults.paybackYears)}` : "Nein Amortisation"}</Text>
+                <Text style={styles.value}>{derivedResults.paybackYears !== null ? `${LABELS.yearLabel} ${Math.ceil(derivedResults.paybackYears)}` : "Keine Amortisation"}</Text>
               </View>
               <View style={styles.row}>
                 <Text style={styles.label}>{LABELS.avgAnnualRevenue}</Text>
@@ -153,7 +184,7 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ derivedResults, 
             </View>
           </View>
 
-          <View style={styles.fullWidthSection}>
+<View style={styles.fullWidthSection}>
             <Text style={styles.title}>{LABELS.detailsTitle}</Text>
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
               <View style={{ width: '48%' }}>
@@ -165,6 +196,14 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ derivedResults, 
                   <Text style={styles.label}>{LABELS.srlAfrr}</Text>
                   <Text style={styles.value}>{formatCurrency(derivedResults.annualRevenueByStream.srlAfrr || 0)}</Text>
                 </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>{LABELS.peakShaving}</Text>
+                  <Text style={styles.value}>{formatCurrency(derivedResults.annualRevenueByStream.peakShaving || 0)}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>{LABELS.loadShifting}</Text>
+                  <Text style={styles.value}>{formatCurrency(derivedResults.annualRevenueByStream.loadShifting || 0)}</Text>
+                </View>
               </View>
               <View style={{ width: '48%' }}>
                 <View style={styles.row}>
@@ -175,8 +214,24 @@ export const ReportDocument: React.FC<ReportDocumentProps> = ({ derivedResults, 
                   <Text style={styles.label}>{LABELS.selfConsumption}</Text>
                   <Text style={styles.value}>{formatCurrency(derivedResults.annualRevenueByStream.selfConsumption || 0)}</Text>
                 </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>{LABELS.evCharging}</Text>
+                  <Text style={styles.value}>{formatCurrency(derivedResults.annualRevenueByStream.evCharging || 0)}</Text>
+                </View>
+                <View style={styles.row}>
+                  <Text style={styles.label}>{LABELS.communitySupply}</Text>
+                  <Text style={styles.value}>{formatCurrency(derivedResults.annualRevenueByStream.communitySupply || 0)}</Text>
+                </View>
               </View>
             </View>
+            {financial?.vppParticipationEnabled && (
+              <View style={{ marginTop: 6, paddingTop: 6, borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
+                <View style={styles.row}>
+                  <Text style={styles.label}>{LABELS.vppParticipation}</Text>
+                  <Text style={styles.highlightValue}>{formatCurrency(derivedResults.annualRevenueByStream.vppParticipation || 0)}</Text>
+                </View>
+              </View>
+            )}
           </View>
 
           {pieChartImage && (

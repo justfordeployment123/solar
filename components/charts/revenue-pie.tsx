@@ -8,19 +8,35 @@ interface RevenuePieProps {
   data: RevenueStreams;
 }
 
-const COLORS = ["#e12029", "#363636", "#565656", "#dfdfdf", "#868686", "#1d1d1d"];
+// FIX (Pie.1): 9 revenue streams were sharing a 6-color palette, so
+// EV-Laden / Energy Community / VPP all collided with PRL/SRL/PRL shades.
+// Expand to 9 distinct colors so each stream is visually separable.
+const COLORS = [
+  "#e12029", // Eigenverbrauch
+  "#363636", // PRL
+  "#565656", // SRL/aFRR
+  "#1d1d1d", // EPEX Arbitrage
+  "#868686", // Peak Shaving
+  "#d2d700", // Load Shifting
+  "#ffdb00", // EV-Laden
+  "#0066cc", // Energy Community
+  "#7a3e9d", // VPP
+];
 
 export function RevenuePie({ data }: RevenuePieProps) {
-  const chartData = [
-    { name: "Eigenverbrauch", value: data.selfConsumption },
-    { name: "PRL", value: data.prl },
-    { name: "SRL/aFRR", value: data.srlAfrr },
-    { name: "EPEX Arbitrage", value: data.epexArbitrage },
-    { name: "Peak Shaving", value: data.peakShaving },
-    { name: "VPP", value: data.vppParticipation },
-  ].filter(item => item.value > 0);
-
   const option = useMemo(() => {
+    const chartData = [
+      { name: "Eigenverbrauch", value: data.selfConsumption },
+      { name: "PRL", value: data.prl },
+      { name: "SRL/aFRR", value: data.srlAfrr },
+      { name: "EPEX Arbitrage", value: data.epexArbitrage },
+      { name: "Peak Shaving", value: data.peakShaving },
+      { name: "Load Shifting", value: data.loadShifting },
+      { name: "EV-Laden", value: data.evCharging },
+      { name: "Energy Community", value: data.communitySupply },
+      { name: "VPP", value: data.vppParticipation },
+    ].filter(item => item.value > 0);
+
     return {
       tooltip: {
         trigger: 'item',
@@ -30,7 +46,7 @@ export function RevenuePie({ data }: RevenuePieProps) {
         textStyle: { color: '#363636' },
         borderRadius: 16,
         padding: [12, 16],
-        extraCssText: 'box-: 0 4px 24px rgba(0,0,0,0.06); backdrop-filter: blur(8px);'
+        extraCssText: 'box-shadow: 0 4px 24px rgba(0,0,0,0.06); backdrop-filter: blur(8px);'
       },
       legend: {
         bottom: '0%',
@@ -83,10 +99,10 @@ export function RevenuePie({ data }: RevenuePieProps) {
         }
       ]
     };
-  }, [chartData]);
+  }, [data]);
 
-  if (chartData.length === 0) {
-    return <div className="flex items-center justify-center h-full text-[#565656] font-medium">Nein Einnahmedaten verfügbar</div>;
+  if (option.series[0].data.length === 0) {
+    return <div className="flex items-center justify-center h-full text-[#565656] font-medium">Keine Einnahmedaten verfügbar</div>;
   }
 
   return (

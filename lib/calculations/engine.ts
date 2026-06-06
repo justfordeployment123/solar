@@ -5,23 +5,50 @@ const REGIONAL_MULTIPLIERS = {
   North: 900,
   Central: 950,
   South: 1000,
-};
+} as const;
 
-// Real German retail electricity is ~15–60 ct/kWh. The price field is in
-// Cent/kWh, but users frequently type the €/kWh figure (e.g. 0.35 instead of
-// 35). Anything below 3 "cents" is implausible as a retail price and is treated
-// as €/kWh and scaled up. Exported so the input forms validate consistently.
 export function normalizeElectricityPriceCents(raw: number | null | undefined): number {
-  if (raw == null || !(raw > 0)) return 35; // sensible default
+  if (typeof raw !== 'number' || !Number.isFinite(raw) || !(raw > 0)) return 35;
   return raw < 3 ? raw * 100 : raw;
 }
 
-// Distance to the nearest substation drives line losses for grid-facing markets.
-// <=1 km is treated as effectively loss-free; beyond that ~1% loss per km, with a
-// floor so very remote sites still model a usable (if reduced) baseline. Tunable.
 function substationLossFactor(km: number | null | undefined): number {
-  if (km == null || km <= 1) return 1;
+  if (typeof km !== 'number' || !Number.isFinite(km) || km <= 1) return 1;
   return Math.max(0.85, 1 - 0.01 * (km - 1));
+}
+
+// FIX: Global defense-in-depth against NaN values coming from the UI
+function safeNum(val: unknown, fallback = 0): number {
+  return typeof val === 'number' && Number.isFinite(val) ? val : fallback;
+}
+
+function safeNonNegativeNum(val: unknown, fallback = 0): number {
+  return Math.max(0, safeNum(val, fallback));
+}
+
+function safePercentFraction(val: unknown, fallbackPercent = 0): number {
+  return Math.min(100, safeNonNegativeNum(val, fallbackPercent)) / 100;
+}
+
+function safeUnitFraction(val: unknown, fallback = 0.5): number {
+  if (typeof val !== 'number' || !Number.isFinite(val)) return fallback;
+  if (val < 0) return 0;
+  if (val > 1) return 1;
+  return val;
+}
+
+function scaleRevenueStreams(streams: RevenueStreams, factor: number): RevenueStreams {
+  return {
+    selfConsumption: streams.selfConsumption * factor,
+    prl: streams.prl * factor,
+    srlAfrr: streams.srlAfrr * factor,
+    epexArbitrage: streams.epexArbitrage * factor,
+    peakShaving: streams.peakShaving * factor,
+    vppParticipation: streams.vppParticipation * factor,
+    loadShifting: streams.loadShifting * factor,
+    evCharging: streams.evCharging * factor,
+    communitySupply: streams.communitySupply * factor,
+  };
 }
 
 export function calculateResults(
@@ -29,260 +56,266 @@ export function calculateResults(
   financial: FinancialInputs,
   settings: CalculatorSettings = DEFAULT_SETTINGS
 ): DerivedResults {
-  // --- Admin-tunable values for this calculation ---
-  // Tier is chosen by battery capacity; all other knobs come from settings.global.
-  // The fallback to DEFAULT_SETTINGS keeps the engine usable in pure unit tests
-  // and in browser code that hasn't yet hydrated the admin overrides.
-  const VPP_BONUS_MULTIPLIER = settings.global.vppBonusMultiplier;
-  const DEGRADATION_RATE = settings.global.degradationRatePercent / 100;
-  const MARKET_DECLINE_RATE = settings.global.marketDeclineRatePercent / 100;
-  const INFLATION_RATE = settings.global.inflationRatePercent / 100;
-  const MAINTENANCE_YEAR = settings.global.maintenanceYear;
-  const MAINTENANCE_COST_FRACTION = settings.global.maintenanceCostPercent / 100;
-  const MAX_AUTARKY = settings.global.maxAutarkyPercent / 100;
-  const ADJUSTMENT_FACTOR = 1 + settings.global.adjustmentPercent / 100;
-  const ENGINEERING_FEE_FRACTION = settings.global.engineeringFeePercent / 100;
+  const VPP_BONUS_MULTIPLIER = Math.max(1, safeNum(settings.global.vppBonusMultiplier, 1.12));
+  const DEGRADATION_RATE = safePercentFraction(settings.global.degradationRatePercent, 2);
+  const MARKET_DECLINE_RATE = safePercentFraction(settings.global.marketDeclineRatePercent, 2);
+  const INFLATION_RATE = safeNonNegativeNum(settings.global.inflationRatePercent, 3.8) / 100;
+  const MAINTENANCE_YEARS = Array.isArray(settings.global.maintenanceYears)
+    ? settings.global.maintenanceYears.filter((y) => Number.isFinite(y) && y > 0).map((y) => Math.trunc(y))
+    : [];
+  const MAINTENANCE_COST_FRACTION = safePercentFraction(settings.global.maintenanceCostPercent, 10);
+  const MAX_AUTARKY = safePercentFraction(settings.global.maxAutarkyPercent, 95);
+  const ADJUSTMENT_FACTOR = Math.max(0, 1 + safeNum(settings.global.adjustmentPercent, 0) / 100);
+  const ENGINEERING_FEE_FRACTION = safeNonNegativeNum(settings.global.engineeringFeePercent, 3.8) / 100;
+  const MAX_CYCLES_PER_YEAR = safeNonNegativeNum(settings.global.maxCyclesPerYear, 400);
+  const REQUIRED_PS_CYCLES = safeNonNegativeNum(settings.global.requiredPeakShavingCycles, 20);
+  const REQUIRED_PRL_CYCLES = safeNonNegativeNum(settings.global.requiredPrlCycles, 20);
+  const REQUESTED_EPEX_CYCLES = safeNonNegativeNum(settings.global.requestedEpexCycles, 300);
+  const REQUESTED_LOAD_SHIFTING_CYCLES = safeNonNegativeNum(settings.global.requestedLoadShiftingCycles, 300);
+  const PRL_POWER_SHARE = safeUnitFraction(settings.global.prlPowerShare, 0.5);
 
-  // --- Graceful Fallbacks & Initialization ---
-  const currentBatteryCapacityKwh = technical.currentBatteryCapacityKwh ?? 0;
-  const existingBatteryCapacityKwh = technical.existingBatteryCapacityKwh ?? 0;
+  const enableSelfConsumption = technical.enableSelfConsumption === true;
+  const enablePeakShaving = technical.enablePeakShaving === true;
+  const enableEpex = technical.enableEpex === true;
+  const enablePrl = technical.enablePrl === true;
+  const enableSrl = technical.enableSrl === true;
+  const enableLoadShifting = technical.enableLoadShifting === true;
+
+  const currentBatteryCapacityKwh = safeNonNegativeNum(technical.currentBatteryCapacityKwh, 0);
+  const existingBatteryCapacityKwh = safeNonNegativeNum(technical.existingBatteryCapacityKwh, 0);
   const totalCapacity = existingBatteryCapacityKwh + currentBatteryCapacityKwh;
   const isNGen = technical.existingBatteryManufacturer === 'NGen';
   const controllableCapacity = currentBatteryCapacityKwh + (isNGen ? existingBatteryCapacityKwh : 0);
 
-  const tier = pickTier(settings, currentBatteryCapacityKwh);
+  // FIX: Tier selection now uses controllableCapacity instead of ignoring existing batteries
+  const tier = pickTier(settings, controllableCapacity);
   const EPEX_GROSS_SPREAD_EUR_PER_KWH = tier.epexGrossSpreadEurPerKwh;
   const DEFAULT_EPEX_GRID_FEE_CENTS_KWH = tier.defaultGridFeeCentsKwh;
   const balancingTier = tier.balancingMultiplier;
 
-const gridImportLimitKw = technical.gridImportLimitKw ?? 100;
-  const pvSize = technical.pvSizeKwp ?? 0;
-  const fallbackInverterPower = pvSize > 0 ? pvSize * 1.2 : gridImportLimitKw;
-  const actualInverterPower = technical.inverterPowerKw ?? fallbackInverterPower;
+  const pvSize = safeNonNegativeNum(technical.pvSizeKwp, 0);
+  // FIX: Stop using gridImportLimitKw as a fallback for inverter power when PV=0
+  const fallbackInverterPower = pvSize > 0 ? pvSize * 1.2 : 50;
 
-  // --- Cycle Budget Allocation (Physics Enforced) ---
-  let remainingCycles = 400; // Absolute physical limit of equivalent full cycles per year for LFP
-  const safeInverterPower = Math.min(actualInverterPower, controllableCapacity); // 1C Cap Limit
+  const actualInverterPower = typeof technical.inverterPowerKw === 'number' && Number.isFinite(technical.inverterPowerKw)
+    ? Math.max(0, technical.inverterPowerKw)
+    : fallbackInverterPower;
 
-  // --- Bottleneck: a grid connection smaller than the storage power throttles
-  // everything that flows through the grid (arbitrage + balancing). When no grid
-  // limit is given we assume the connection is adequate. ---
-  const gridExportLimitKw = technical.gridExportLimitKw ?? null;
-  const exportConstrainedPower =
-    gridExportLimitKw != null
+  // FIX: safeInverterPower is purely a power value (kW). Previously it was
+  // min(actualInverterPower, controllableCapacity) which silently capped the
+  // inverter at the battery's kWh — a 50 kWh battery was treated like a 50 kW
+  // inverter regardless of what the user entered. Use the operator-declared
+  // inverter power directly and let downstream code apply its own physical
+  // caps (e.g. the grid-export limit on tradable services).
+  const safeInverterPower = Math.max(0, actualInverterPower);
+
+  const gridExportLimitKw = typeof technical.gridExportLimitKw === 'number' && Number.isFinite(technical.gridExportLimitKw)
+    ? Math.max(0, technical.gridExportLimitKw)
+    : null;
+
+  const exportConstrainedPower = gridExportLimitKw != null
       ? Math.min(safeInverterPower, gridExportLimitKw)
       : safeInverterPower;
   const bottleneckActive = gridExportLimitKw != null && gridExportLimitKw < safeInverterPower;
-  const gridThroughputFactor = safeInverterPower > 0 ? exportConstrainedPower / safeInverterPower : 1;
+  const gridThroughputFactor = safeInverterPower > 0 ? exportConstrainedPower / safeInverterPower : 0;
 
-  // Line losses to the nearest substation derate grid-facing revenue.
   const substationFactor = substationLossFactor(technical.substationDistanceKm);
-  // Combined derate applied to every grid-facing (traded) stream.
   const gridRevenueFactor = gridThroughputFactor * substationFactor;
 
-  // 1. Self-Consumption (Highest Priority)
-  // normalizeElectricityPriceCents tolerates a €/kWh value typed into the
-  // Cent/kWh field (e.g. 0.35 -> 35) so the result is never off by 100x.
   const priceInput = normalizeElectricityPriceCents(financial.currentElectricityPriceCentsKwh);
-  const userElectricityPrice = priceInput / 100; // cents -> euros
+  const userElectricityPrice = priceInput / 100;
   const baseOffset = totalCapacity * 250;
-  
-  // Safely determine consumption: prioritize explicit kWh, then bill, then default to 5000.
-// Safely determine consumption: prioritize explicit kWh, then bill (guarding against divide-by-zero), then default to 5000.
-  const derivedConsumption = financial.yearlyElectricityBillEur != null && userElectricityPrice > 0
-    ? (financial.yearlyElectricityBillEur / userElectricityPrice) 
-    : 5000;
-  const maxConsumption = technical.annualConsumptionKwh ?? derivedConsumption;
 
-// Use a type assertion or keyof check, but fallback safely
-  const regionKey = technical.region as keyof typeof REGIONAL_MULTIPLIERS;
-  const regionMultiplier = REGIONAL_MULTIPLIERS[regionKey] ?? 950;
-  // Use strictly the provided PV size, or 0 if none. No ghost arrays.
-  const maxPvYield = (technical.pvSizeKwp ?? 0) * regionMultiplier;
-  
-  // Self-consumption is capped by: (a) what the battery can shift annually,
-  // (b) the share of load a battery can realistically cover (MAX_AUTARKY — an
-  // oversized battery on a small load approaches near-full self-supply), and
-  // (c) what the PV array actually produces.
+  const yearlyBill = typeof financial.yearlyElectricityBillEur === 'number' && Number.isFinite(financial.yearlyElectricityBillEur) ? Math.max(0, financial.yearlyElectricityBillEur) : null;
+  const derivedConsumption = yearlyBill != null && userElectricityPrice > 0 ? (yearlyBill / userElectricityPrice) : 5000;
+  const maxConsumption = typeof technical.annualConsumptionKwh === 'number' && Number.isFinite(technical.annualConsumptionKwh)
+    ? Math.max(0, technical.annualConsumptionKwh)
+    : derivedConsumption;
+
+  // FIX: Don't pretend a null region is a valid key into REGIONAL_MULTIPLIERS.
+  // Region can legitimately be unset during step-2; fall through to the
+  // Central default explicitly.
+  const regionMultiplier = (technical.region && REGIONAL_MULTIPLIERS[technical.region]) ?? REGIONAL_MULTIPLIERS.Central;
+  const maxPvYield = pvSize * regionMultiplier;
+
   let estimatedKwhOffset = Math.min(baseOffset, maxConsumption * MAX_AUTARKY, maxPvYield * 0.8);
-
   let scCyclesNeeded = totalCapacity > 0 ? (estimatedKwhOffset / totalCapacity) : 0;
-  if (technical.enableSelfConsumption === false) {
+
+  if (!enableSelfConsumption) {
     scCyclesNeeded = 0;
     estimatedKwhOffset = 0;
   }
-  
+
+  let remainingCycles = MAX_CYCLES_PER_YEAR;
   if (scCyclesNeeded > remainingCycles) {
     scCyclesNeeded = remainingCycles;
     estimatedKwhOffset = scCyclesNeeded * totalCapacity;
   }
   remainingCycles -= scCyclesNeeded;
-
-  // Each self-consumed kWh avoids buying a kWh at the full retail price. The
-  // MAX_AUTARKY cap above (not a flat efficiency haircut) is what keeps this
-  // below 100% of the bill.
   const selfConsumption = userElectricityPrice * estimatedKwhOffset;
 
-  // 2. Peak Shaving
-  const REQUIRED_PS_CYCLES = 20;
-  let peakShavingCycles = technical.enablePeakShaving === false ? 0 : REQUIRED_PS_CYCLES;
+  let peakShavingCycles = enablePeakShaving ? REQUIRED_PS_CYCLES : 0;
   if (peakShavingCycles > remainingCycles) peakShavingCycles = remainingCycles;
   remainingCycles -= peakShavingCycles;
-  
-  // Scale revenue based on how much of the required budget was secured
+
   const psCycleFulfillment = REQUIRED_PS_CYCLES > 0 ? (peakShavingCycles / REQUIRED_PS_CYCLES) : 0;
-  
-  const demandChargeEurPerKw = financial.demandChargeEurPerKw ?? 0; 
-  const peakShavingReductionPercentage = financial.peakShavingReductionPercentage ?? 0;
-  const peakShaving = (technical.enablePeakShaving !== false && peakShavingCycles > 0)
-    ? safeInverterPower * demandChargeEurPerKw * (peakShavingReductionPercentage / 100) * psCycleFulfillment 
+
+  const demandChargeEurPerKw = safeNonNegativeNum(financial.demandChargeEurPerKw, 0);
+  const peakShavingReductionPercentage = Math.min(100, safeNonNegativeNum(financial.peakShavingReductionPercentage, 0));
+  // NOTE (bug 4): a real cap by actual peak demand kW is not currently
+  // collected in the UI. The reduction percentage is the only knob we have
+  // today, so we use the inverter power as the upper bound on the shaved
+  // kW (an inverter physically can't discharge more than its nameplate).
+  const peakShaving = (enablePeakShaving && peakShavingCycles > 0)
+    ? safeInverterPower * demandChargeEurPerKw * (peakShavingReductionPercentage / 100) * psCycleFulfillment
     : 0;
 
-// 3. Grid Services (PRL Micro-Cycling Penalty)
-  const REQUIRED_PRL_CYCLES = 20;
-  let prlMicroCycles = technical.enablePrl === false ? 0 : REQUIRED_PRL_CYCLES;
+  let prlMicroCycles = enablePrl ? REQUIRED_PRL_CYCLES : 0;
   if (prlMicroCycles > remainingCycles) prlMicroCycles = remainingCycles;
   remainingCycles -= prlMicroCycles;
-  
   const prlCycleFulfillment = REQUIRED_PRL_CYCLES > 0 ? (prlMicroCycles / REQUIRED_PRL_CYCLES) : 0;
-  // 4. EPEX Arbitrage
-  let epexCycles = technical.enableEpex === false ? 0 : 300;
-  if (epexCycles > remainingCycles) epexCycles = remainingCycles;
-  remainingCycles -= epexCycles;
 
-  // Spot arbitrage = energy cycled × NET spread × round-trip efficiency,
-  // throttled by any grid bottleneck and substation line losses. Grid fees
-  // (Netzentgelte) apply on the buy leg and are subtracted here. They do NOT
-  // apply to balancing energy (PRL/SRL), where the operator delivers free of
-  // fees because the storage is performing a service for the grid.
-  const epexGridFeeCentsKwh = financial.gridFeesCentsKwh ?? DEFAULT_EPEX_GRID_FEE_CENTS_KWH;
+  const epexGridFeeCentsKwh = typeof financial.gridFeesCentsKwh === 'number' && Number.isFinite(financial.gridFeesCentsKwh)
+    ? Math.max(0, financial.gridFeesCentsKwh)
+    : DEFAULT_EPEX_GRID_FEE_CENTS_KWH;
   const epexNetSpread = Math.max(0, EPEX_GROSS_SPREAD_EUR_PER_KWH - epexGridFeeCentsKwh / 100);
-  let epexArbitrage = epexCycles > 0
+
+  const dynamicTariff = safeNonNegativeNum(financial.dynamicFeedInTariffCentsKwh, 0);
+  const standardTariff = safeNonNegativeNum(financial.standardFeedInTariffCentsKwh, 0);
+  const loadShiftingGridFees = epexGridFeeCentsKwh;
+  const loadShiftingProfitSpread = Math.max(0, (dynamicTariff - standardTariff - loadShiftingGridFees) / 100);
+
+  const requestedEpex = enableEpex ? REQUESTED_EPEX_CYCLES : 0;
+  const requestedLoadShifting = (enableLoadShifting && loadShiftingProfitSpread > 0) ? REQUESTED_LOAD_SHIFTING_CYCLES : 0;
+
+  let epexCycles = 0;
+  let loadShiftingCycles = 0;
+
+  if (epexNetSpread >= loadShiftingProfitSpread) {
+    epexCycles = Math.min(requestedEpex, remainingCycles);
+    remainingCycles -= epexCycles;
+    loadShiftingCycles = Math.min(requestedLoadShifting, remainingCycles);
+    remainingCycles -= loadShiftingCycles;
+  } else {
+    loadShiftingCycles = Math.min(requestedLoadShifting, remainingCycles);
+    remainingCycles -= loadShiftingCycles;
+    epexCycles = Math.min(requestedEpex, remainingCycles);
+    remainingCycles -= epexCycles;
+  }
+
+  const epexArbitrage = epexCycles > 0
     ? controllableCapacity * epexCycles * epexNetSpread * 0.90 * gridRevenueFactor
     : 0;
 
-  // 5. Load Shifting
-  const dynamicTariff = financial.dynamicFeedInTariffCentsKwh ?? 0;
-  const standardTariff = financial.standardFeedInTariffCentsKwh ?? 0;
-  const gridFees = financial.gridFeesCentsKwh ?? 0;
-  const loadShiftingProfitCents = Math.max(0, dynamicTariff - standardTariff - gridFees);
-  
-  let loadShiftingCycles = (technical.enableLoadShifting === false || loadShiftingProfitCents <= 0) ? 0 : 300;
-  if (loadShiftingCycles > remainingCycles) loadShiftingCycles = remainingCycles;
-  remainingCycles -= loadShiftingCycles;
-  
-  const loadShifting = loadShiftingCycles > 0 ? controllableCapacity * loadShiftingCycles * 0.90 * (loadShiftingProfitCents / 100) : 0;
+  // FIX: Added gridRevenueFactor to Load Shifting for parity with EPEX Arbitrage
+  const loadShifting = loadShiftingCycles > 0
+    ? controllableCapacity * loadShiftingCycles * 0.90 * loadShiftingProfitSpread * gridRevenueFactor
+    : 0;
 
-  // --- Grid Services Power Allocation (Physics Enforced) ---
-  // PRL/SRL annual rates per kW now come from the tier configuration so the
-  // admin can recalibrate without code changes.
   const PRL_ANNUAL_EUR_PER_KW = tier.prlAnnualEurPerKw;
   const SRL_ANNUAL_EUR_PER_KW = tier.srlAnnualEurPerKw;
 
-let srlPower = 0;
+  let srlPower = 0;
   let prlPower = 0;
 
-  if (technical.enableSrl !== false && technical.enablePrl !== false) {
-    srlPower = exportConstrainedPower * 0.5;
-    prlPower = exportConstrainedPower * 0.5;
-  } else if (technical.enableSrl !== false) {
+  // FIX: PRL/SRL power split is now configurable. When both services are on,
+  // split according to prlPowerShare (0-1). When only one is on, it claims
+  // the full grid-constrained power.
+  if (enableSrl && enablePrl) {
+    prlPower = exportConstrainedPower * PRL_POWER_SHARE;
+    srlPower = exportConstrainedPower * (1 - PRL_POWER_SHARE);
+  } else if (enableSrl) {
     srlPower = exportConstrainedPower;
-  } else if (technical.enablePrl !== false) {
+  } else if (enablePrl) {
     prlPower = exportConstrainedPower;
   }
 
-// Larger fleets earn a higher effective balancing return (balancingTier comes
-  // from the tier picked up top); substation distance adds line losses. (Power
-  // is already bottleneck-limited via exportConstrainedPower.)
-  let prl = prlPower * PRL_ANNUAL_EUR_PER_KW * prlCycleFulfillment * balancingTier * substationFactor;
-  let srlAfrr = srlPower * SRL_ANNUAL_EUR_PER_KW * balancingTier * substationFactor; // aFRR uses capacity, not heavy throughput
+  const prl = prlPower * PRL_ANNUAL_EUR_PER_KW * prlCycleFulfillment * balancingTier * substationFactor;
+  // FIX: SRL (aFRR) is primarily a capacity reservation market. Unlike PRL,
+  // it does not mandate continuous heavy micro-cycling, so we do not penalize it with cycle fulfillment here.
+  const srlAfrr = srlPower * SRL_ANNUAL_EUR_PER_KW * balancingTier * substationFactor;
 
-  // --- VPP Participation Optimization Lift ---
-  const vppParticipation = 0; // Ensures no double-counting of base streams
+  let vppParticipation = 0;
   if (financial.vppParticipationEnabled) {
-    epexArbitrage *= VPP_BONUS_MULTIPLIER;
-    prl *= VPP_BONUS_MULTIPLIER;
-    srlAfrr *= VPP_BONUS_MULTIPLIER;
+    // FIX: Include LoadShifting in the VPP delta. VPP operators can also
+    // co-optimize load-shifting schedules, so a coordinated site earns a
+    // bonus on top of every grid-facing stream.
+    const epexBonus = epexArbitrage * (VPP_BONUS_MULTIPLIER - 1);
+    const prlBonus = prl * (VPP_BONUS_MULTIPLIER - 1);
+    const srlBonus = srlAfrr * (VPP_BONUS_MULTIPLIER - 1);
+    const loadShiftingBonus = loadShifting * (VPP_BONUS_MULTIPLIER - 1);
+    vppParticipation = epexBonus + prlBonus + srlBonus + loadShiftingBonus;
   }
 
-  // --- CapEx Logic ---
-  // Per-kWh installed cost varies with system size and is now tier-driven so
-  // the admin can recalibrate without code changes.
   const minCostPerKwh = tier.minCostPerKwh;
   const fallbackCostPerKwh = tier.fallbackCostPerKwh;
 
   const minSystemCost = currentBatteryCapacityKwh * minCostPerKwh;
-  // CapEx Logic: a real quote (actualSystemCostEur) always wins. Otherwise we
-  // fall back to the capacity-based estimate, floored by the physical minimum.
   const estimatedSystemCost = currentBatteryCapacityKwh * fallbackCostPerKwh;
   let systemCost: number;
 
-  if ((financial.actualSystemCostEur ?? 0) > 0) {
-    systemCost = financial.actualSystemCostEur as number;
+  const actualCost = typeof financial.actualSystemCostEur === 'number' && Number.isFinite(financial.actualSystemCostEur) ? Math.max(0, financial.actualSystemCostEur) : null;
+  const targetBudget = typeof financial.targetBudgetEur === 'number' && Number.isFinite(financial.targetBudgetEur) ? Math.max(0, financial.targetBudgetEur) : null;
+
+  if (actualCost != null && actualCost > 0) {
+    systemCost = actualCost;
+  } else if (targetBudget != null && targetBudget > 0) {
+    // FIX: When the user provides a target budget we honor it. If the budget
+    // is above the capacity-based estimate they are intentionally sizing up
+    // (e.g. for VPP-readiness) and the ROI must reflect their actual spend.
+    // If the budget is below, we still bump to the minSystemCost floor so
+    // we don't promise a system that physically can't be built at that price.
+    systemCost = Math.max(estimatedSystemCost, targetBudget);
+    if (systemCost < minSystemCost) systemCost = minSystemCost;
   } else {
-    systemCost = estimatedSystemCost;
-    if ((financial.targetBudgetEur ?? 0) > 0 && (financial.targetBudgetEur ?? 0) < minSystemCost) {
-      // Enforce the physical floor if the budget is impossibly low
-      systemCost = minSystemCost;
-    }
+    systemCost = Math.max(estimatedSystemCost, minSystemCost);
   }
 
   const engineeringFee = systemCost * ENGINEERING_FEE_FRACTION;
   const totalUpfrontCost = systemCost + engineeringFee;
 
-  // --- EV Charging Upsell Revenue ---
-  // Margin per kWh = sell price - retail electricity cost. Annual throughput
-  // capped at #chargers × kW × hours × 365. Customers can switch off the
-  // upsell entirely with evChargingEnabled=false.
   let evCharging = 0;
-  if (
-    financial.evChargingEnabled &&
-    (financial.evNumChargers ?? 0) > 0 &&
-    (financial.evPowerKw ?? 0) > 0 &&
-    (financial.evDailyHours ?? 0) > 0 &&
-    (financial.evSellPriceCentsKwh ?? 0) > 0
-  ) {
-    const numChargers = financial.evNumChargers as number;
-    const powerKw = financial.evPowerKw as number;
-    const hours = Math.min(financial.evDailyHours as number, 24);
-    const sellPriceEurPerKwh = (financial.evSellPriceCentsKwh as number) / 100;
-    const retailEurPerKwh = normalizeElectricityPriceCents(financial.currentElectricityPriceCentsKwh) / 100;
+  const evNumChargers = safeNonNegativeNum(financial.evNumChargers, 0);
+  const evPowerKw = safeNonNegativeNum(financial.evPowerKw, 0);
+  const evDailyHours = safeNonNegativeNum(financial.evDailyHours, 0);
+  const evSellPriceCentsKwh = safeNonNegativeNum(financial.evSellPriceCentsKwh, 0);
+
+  if (financial.evChargingEnabled && evNumChargers > 0 && evPowerKw > 0 && evDailyHours > 0 && evSellPriceCentsKwh > 0) {
+    const hours = Math.min(evDailyHours, 24);
+    const sellPriceEurPerKwh = evSellPriceCentsKwh / 100;
+    const retailEurPerKwh = priceInput / 100;
     const marginEurPerKwh = Math.max(0, sellPriceEurPerKwh - retailEurPerKwh);
-    const annualKwhDelivered = numChargers * powerKw * hours * 365;
+    const annualKwhDelivered = evNumChargers * evPowerKw * hours * 365;
     evCharging = annualKwhDelivered * marginEurPerKwh;
   }
 
-  // --- Energy Community Upsell Revenue ---
-  // Revenue = supplied kWh × (sell price - retail cost). The supplied kWh is
-  // capped at the PV's annual yield so we don't claim revenue beyond what the
-  // system can physically deliver. recommendedBatteryUpgradeKwh surfaces a
-  // 1-day-of-shortfall buffer if total demand exceeds PV yield.
   let communitySupply = 0;
   let recommendedBatteryUpgradeKwh: number | null = null;
-  if (
-    financial.communityEnabled &&
-    (financial.communityNumParties ?? 0) > 0 &&
-    (financial.communityKwhPerParty ?? 0) > 0
-  ) {
-    const parties = financial.communityNumParties as number;
-    const kwhPerParty = financial.communityKwhPerParty as number;
-    const sellPriceEurPerKwh = ((financial.communitySellPriceCentsKwh ?? 30) as number) / 100;
-    const retailEurPerKwh = normalizeElectricityPriceCents(financial.currentElectricityPriceCentsKwh) / 100;
-    const marginEurPerKwh = Math.max(0, sellPriceEurPerKwh - retailEurPerKwh);
 
-    const totalDemandKwh = parties * kwhPerParty;
-    const suppliedKwh = Math.min(totalDemandKwh, maxPvYield);
+  const communityNumParties = safeNonNegativeNum(financial.communityNumParties, 0);
+  const communityKwhPerParty = safeNonNegativeNum(financial.communityKwhPerParty, 0);
+  const communitySellPriceCentsKwh = typeof financial.communitySellPriceCentsKwh === 'number' && Number.isFinite(financial.communitySellPriceCentsKwh)
+    ? Math.max(0, financial.communitySellPriceCentsKwh)
+    : 30;
+
+  if (financial.communityEnabled && communityNumParties > 0 && communityKwhPerParty > 0) {
+    const sellPriceEurPerKwh = communitySellPriceCentsKwh / 100;
+    const opportunityCostEurPerKwh = (standardTariff > 0 ? standardTariff : 8) / 100;
+    const marginEurPerKwh = Math.max(0, sellPriceEurPerKwh - opportunityCostEurPerKwh);
+
+    const totalDemandKwh = communityNumParties * communityKwhPerParty;
+    const excessPvYield = Math.max(0, maxPvYield - estimatedKwhOffset);
+
+    const suppliedKwh = Math.min(totalDemandKwh, excessPvYield);
     communitySupply = suppliedKwh * marginEurPerKwh;
 
-    if (totalDemandKwh > maxPvYield) {
-      // Round up to the nearest 10 kWh so the suggestion is realistic to
-      // procure rather than oddly-precise.
-      const shortfallPerDay = (totalDemandKwh - maxPvYield) / 365;
+    if (totalDemandKwh > excessPvYield) {
+      const shortfallPerDay = (totalDemandKwh - excessPvYield) / 365;
       recommendedBatteryUpgradeKwh = Math.ceil(shortfallPerDay / 10) * 10;
     }
   }
 
-  const annualRevenueByStream: RevenueStreams = {
+  const rawAnnualRevenueByStream: RevenueStreams = {
     selfConsumption,
     prl,
     srlAfrr,
@@ -294,51 +327,44 @@ let srlPower = 0;
     communitySupply,
   };
 
-  // Headline "average annual revenue" matches the cashflow line above by also
-  // applying the admin global adjustment factor.
-  const baseAnnualRevenue = Object.values(annualRevenueByStream).reduce((sum, val) => sum + val, 0) * ADJUSTMENT_FACTOR;
+  const annualRevenueByStream = scaleRevenueStreams(rawAnnualRevenueByStream, ADJUSTMENT_FACTOR);
+  const baseAnnualRevenue = Object.values(annualRevenueByStream).reduce((sum, val) => sum + val, 0);
 
-  // --- 15-Year Financial Projection ---
   const yearlyProjection: YearlyCashflow[] = [];
   let cumulative = -totalUpfrontCost;
-  let totalRevenue15Years = 0;
+
+  let totalOperatingCashflow15Years = 0;
   let paybackYears: number | null = null;
 
-  yearlyProjection.push({
-    year: 0,
-    cashflow: -totalUpfrontCost,
-    cumulative: -totalUpfrontCost
-  });
+  yearlyProjection.push({ year: 0, cashflow: -totalUpfrontCost, cumulative: -totalUpfrontCost });
 
-  for (let year = 1; year <= 15; year++) {
-    // Battery degrades regardless of use case
+  // FIX: Use the 15-year cashflow horizon explicitly as a constant so the
+  // maintenance-year check below is obviously bounded.
+  const PROJECTION_YEARS = 15;
+
+  for (let year = 1; year <= PROJECTION_YEARS; year++) {
     const degradationFactor = Math.pow(1 - DEGRADATION_RATE, year - 1);
-    
-    // Grid traded markets decline due to saturation
     const marketDeclineFactor = Math.pow(1 - MARKET_DECLINE_RATE, year - 1);
-    const tradedRevenue = (annualRevenueByStream.prl + annualRevenueByStream.srlAfrr + annualRevenueByStream.epexArbitrage + annualRevenueByStream.vppParticipation + annualRevenueByStream.loadShifting) * marketDeclineFactor;
-    
-    // Local revenue increases as retail electricity becomes more expensive
-    const inflationFactor = Math.pow(1 + INFLATION_RATE, year - 1);
-    const localRevenue = (annualRevenueByStream.selfConsumption + annualRevenueByStream.peakShaving) * inflationFactor;
 
-    // Apply the admin global adjustment as a final multiplier on revenue. This
-    // lets the operator nudge the final result up/down by a configurable %
-    // without touching the underlying model.
+    const tradedRevenue = (rawAnnualRevenueByStream.prl + rawAnnualRevenueByStream.srlAfrr + rawAnnualRevenueByStream.epexArbitrage + rawAnnualRevenueByStream.vppParticipation + rawAnnualRevenueByStream.loadShifting) * marketDeclineFactor;
+    const inflationFactor = Math.pow(1 + INFLATION_RATE, year - 1);
+    const localRevenue = (rawAnnualRevenueByStream.selfConsumption + rawAnnualRevenueByStream.peakShaving + rawAnnualRevenueByStream.evCharging + rawAnnualRevenueByStream.communitySupply) * inflationFactor;
+
     const yearRevenue = (tradedRevenue + localRevenue) * degradationFactor * ADJUSTMENT_FACTOR;
-    let yearCost = (year === MAINTENANCE_YEAR) ? systemCost * MAINTENANCE_COST_FRACTION : 0;
+    // FIX: Support multiple maintenance events (e.g. battery-replacement at
+    // year 10 AND year 20). Years outside the 15-year projection are
+    // deliberately ignored — they exist for the data model but don't affect
+    // the displayed cashflow. Previously a single maintenanceYear > 15 was
+    // silently dropped.
+    const yearCost = MAINTENANCE_YEARS.includes(year) ? systemCost * MAINTENANCE_COST_FRACTION : 0;
 
     const cashflow = yearRevenue - yearCost;
     cumulative += cashflow;
-    totalRevenue15Years += cashflow;
+    totalOperatingCashflow15Years += cashflow;
 
-    yearlyProjection.push({
-      year,
-      cashflow,
-      cumulative
-    });
+    yearlyProjection.push({ year, cashflow, cumulative });
 
-if (cumulative >= 0 && paybackYears === null) {
+    if (cumulative >= 0 && paybackYears === null) {
       if (cashflow > 0) {
         const previousCumulative = cumulative - cashflow;
         paybackYears = year - 1 + (-previousCumulative / cashflow);
@@ -348,109 +374,117 @@ if (cumulative >= 0 && paybackYears === null) {
     }
   }
 
-  // ROI: Net Cumulative Profit (Revenue - Maintenance) / Day 1 CapEx
-  // Guard against division by zero for 0 kWh test scenarios
-  const roiPercent = totalUpfrontCost > 0 ? (totalRevenue15Years / totalUpfrontCost) * 100 : 0;
+  const roiPercent = totalUpfrontCost > 0 ? ((totalOperatingCashflow15Years - totalUpfrontCost) / totalUpfrontCost) * 100 : 0;
 
-  // --- Sensitivity Analysis ---
   const calculateTestRevenue = (testSize: number) => {
     if (testSize === 0) return 0;
     const testTotalCapacity = existingBatteryCapacityKwh + testSize;
     const testControllableCapacity = testSize + (isNGen ? existingBatteryCapacityKwh : 0);
-    
-let testRemainingCycles = 400;
-    const testInverterPower = Math.min(actualInverterPower, testControllableCapacity); // 1C Limit
-    
-    // Constrain sensitivity test power by grid export limits (bottleneck) and
-    // derate grid-facing revenue by both the bottleneck and substation losses.
+
+    let testRemainingCycles = MAX_CYCLES_PER_YEAR;
+    // FIX: same unit fix as the main path — the test inverter is purely kW.
+    const testInverterPower = Math.max(0, actualInverterPower);
+
     const testExportConstrainedPower = gridExportLimitKw != null
       ? Math.min(testInverterPower, gridExportLimitKw)
       : testInverterPower;
-    const testGridThroughputFactor = testInverterPower > 0 ? testExportConstrainedPower / testInverterPower : 1;
+    const testGridThroughputFactor = testInverterPower > 0 ? testExportConstrainedPower / testInverterPower : 0;
     const testGridRevenueFactor = testGridThroughputFactor * substationFactor;
 
     const testBaseOffset = testTotalCapacity * 250;
     let testEstimatedKwhOffset = Math.min(testBaseOffset, maxConsumption * MAX_AUTARKY, maxPvYield * 0.8);
     let testScCyclesNeeded = testTotalCapacity > 0 ? (testEstimatedKwhOffset / testTotalCapacity) : 0;
-    if (technical.enableSelfConsumption === false) { testScCyclesNeeded = 0; testEstimatedKwhOffset = 0; }
+    if (!enableSelfConsumption) { testScCyclesNeeded = 0; testEstimatedKwhOffset = 0; }
     if (testScCyclesNeeded > testRemainingCycles) { testScCyclesNeeded = testRemainingCycles; testEstimatedKwhOffset = testScCyclesNeeded * testTotalCapacity; }
     testRemainingCycles -= testScCyclesNeeded;
     const testSelfConsumption = userElectricityPrice * testEstimatedKwhOffset;
 
-// Test Peak Shaving
-    const testRequiredPsCycles = 20;
-    let testPeakShavingCycles = technical.enablePeakShaving === false ? 0 : testRequiredPsCycles;
+    let testPeakShavingCycles = enablePeakShaving ? REQUIRED_PS_CYCLES : 0;
     if (testPeakShavingCycles > testRemainingCycles) testPeakShavingCycles = testRemainingCycles;
     testRemainingCycles -= testPeakShavingCycles;
-    
-    const testPsCycleFulfillment = testRequiredPsCycles > 0 ? (testPeakShavingCycles / testRequiredPsCycles) : 0;
-    const testPeakShaving = (technical.enablePeakShaving !== false && testPeakShavingCycles > 0) 
-      ? testInverterPower * demandChargeEurPerKw * (peakShavingReductionPercentage / 100) * testPsCycleFulfillment 
+
+    const testPsCycleFulfillment = REQUIRED_PS_CYCLES > 0 ? (testPeakShavingCycles / REQUIRED_PS_CYCLES) : 0;
+    const testPeakShaving = (enablePeakShaving && testPeakShavingCycles > 0)
+      ? testInverterPower * demandChargeEurPerKw * (peakShavingReductionPercentage / 100) * testPsCycleFulfillment
       : 0;
 
-    // Test PRL Micro-Cycles
-    const testRequiredPrlCycles = 20;
-    let testPrlMicroCycles = technical.enablePrl === false ? 0 : testRequiredPrlCycles;
+    let testPrlMicroCycles = enablePrl ? REQUIRED_PRL_CYCLES : 0;
     if (testPrlMicroCycles > testRemainingCycles) testPrlMicroCycles = testRemainingCycles;
     testRemainingCycles -= testPrlMicroCycles;
-    
-    const testPrlCycleFulfillment = testRequiredPrlCycles > 0 ? (testPrlMicroCycles / testRequiredPrlCycles) : 0;
-    
 
-    let testEpexCycles = technical.enableEpex === false ? 0 : 300;
-    if (testEpexCycles > testRemainingCycles) testEpexCycles = testRemainingCycles;
-    testRemainingCycles -= testEpexCycles;
-    let testEpexArbitrage = testEpexCycles > 0 ? testControllableCapacity * testEpexCycles * epexNetSpread * 0.90 * testGridRevenueFactor : 0;
+    const testPrlCycleFulfillment = REQUIRED_PRL_CYCLES > 0 ? (testPrlMicroCycles / REQUIRED_PRL_CYCLES) : 0;
 
-    let testLoadShiftingCycles = (technical.enableLoadShifting === false || loadShiftingProfitCents <= 0) ? 0 : 300;
-    if (testLoadShiftingCycles > testRemainingCycles) testLoadShiftingCycles = testRemainingCycles;
-    testRemainingCycles -= testLoadShiftingCycles;
-    const testLoadShifting = testLoadShiftingCycles > 0 ? testControllableCapacity * testLoadShiftingCycles * 0.90 * (loadShiftingProfitCents / 100) : 0;
+    const testTier = pickTier(settings, testControllableCapacity);
+    const testEpexGridFeeCentsKwh = typeof financial.gridFeesCentsKwh === 'number' && Number.isFinite(financial.gridFeesCentsKwh)
+      ? Math.max(0, financial.gridFeesCentsKwh)
+      : testTier.defaultGridFeeCentsKwh;
+    const testEpexNetSpread = Math.max(0, testTier.epexGrossSpreadEurPerKwh - testEpexGridFeeCentsKwh / 100);
 
-let testSrlPower = 0;
+    let testEpexCycles = 0;
+    let testLoadShiftingCycles = 0;
+
+    if (testEpexNetSpread >= loadShiftingProfitSpread) {
+      testEpexCycles = Math.min(requestedEpex, testRemainingCycles);
+      testRemainingCycles -= testEpexCycles;
+      testLoadShiftingCycles = Math.min(requestedLoadShifting, testRemainingCycles);
+      testRemainingCycles -= testLoadShiftingCycles;
+    } else {
+      testLoadShiftingCycles = Math.min(requestedLoadShifting, testRemainingCycles);
+      testRemainingCycles -= testLoadShiftingCycles;
+      testEpexCycles = Math.min(requestedEpex, testRemainingCycles);
+      testRemainingCycles -= testEpexCycles;
+    }
+
+    const testEpexArbitrage = testEpexCycles > 0 ? testControllableCapacity * testEpexCycles * testEpexNetSpread * 0.90 * testGridRevenueFactor : 0;
+    const testLoadShifting = testLoadShiftingCycles > 0 ? testControllableCapacity * testLoadShiftingCycles * 0.90 * loadShiftingProfitSpread * testGridRevenueFactor : 0;
+
+    let testSrlPower = 0;
     let testPrlPower = 0;
-    if (technical.enableSrl !== false && technical.enablePrl !== false) {
-      testSrlPower = testExportConstrainedPower * 0.5;
-      testPrlPower = testExportConstrainedPower * 0.5;
-    } else if (technical.enableSrl !== false) {
+    if (enableSrl && enablePrl) {
+      testPrlPower = testExportConstrainedPower * PRL_POWER_SHARE;
+      testSrlPower = testExportConstrainedPower * (1 - PRL_POWER_SHARE);
+    } else if (enableSrl) {
       testSrlPower = testExportConstrainedPower;
-    } else if (technical.enablePrl !== false) {
+    } else if (enablePrl) {
       testPrlPower = testExportConstrainedPower;
     }
 
-    // Sensitivity scenarios may straddle tier boundaries, so look up the tier
-    // and per-kW rates for each test capacity rather than reusing the base tier.
-    const testTier = pickTier(settings, testControllableCapacity);
-    let testPrl = testPrlPower * testTier.prlAnnualEurPerKw * testPrlCycleFulfillment * testTier.balancingMultiplier * substationFactor;
-    let testSrlAfrr = testSrlPower * testTier.srlAnnualEurPerKw * testTier.balancingMultiplier * substationFactor;
+    const testPrl = testPrlPower * testTier.prlAnnualEurPerKw * testPrlCycleFulfillment * testTier.balancingMultiplier * substationFactor;
+    const testSrlAfrr = testSrlPower * testTier.srlAnnualEurPerKw * testTier.balancingMultiplier * substationFactor;
 
+    let testVppParticipation = 0;
     if (financial.vppParticipationEnabled) {
-      testEpexArbitrage *= VPP_BONUS_MULTIPLIER;
-      testPrl *= VPP_BONUS_MULTIPLIER;
-      testSrlAfrr *= VPP_BONUS_MULTIPLIER;
+      // FIX: mirror the main path — include load-shifting in the VPP bonus.
+      testVppParticipation = (testEpexArbitrage + testPrl + testSrlAfrr + testLoadShifting) * (VPP_BONUS_MULTIPLIER - 1);
     }
-    
-    return testSelfConsumption + testPeakShaving + testEpexArbitrage + testLoadShifting + testPrl + testSrlAfrr;
+
+    let testCommunitySupply = 0;
+    if (financial.communityEnabled && communityNumParties > 0 && communityKwhPerParty > 0) {
+      const sellPriceEurPerKwh = communitySellPriceCentsKwh / 100;
+      const opportunityCostEurPerKwh = (standardTariff > 0 ? standardTariff : 8) / 100;
+      const marginEurPerKwh = Math.max(0, sellPriceEurPerKwh - opportunityCostEurPerKwh);
+
+      const totalDemandKwh = communityNumParties * communityKwhPerParty;
+      const testExcessPvYield = Math.max(0, maxPvYield - testEstimatedKwhOffset);
+
+      const testSuppliedKwh = Math.min(totalDemandKwh, testExcessPvYield);
+      testCommunitySupply = testSuppliedKwh * marginEurPerKwh;
+    }
+
+    // FIX: Applied ADJUSTMENT_FACTOR to sensitivity output to mirror baseAnnualRevenue
+    return (testSelfConsumption + testPeakShaving + testEpexArbitrage + testLoadShifting + testPrl + testSrlAfrr + testVppParticipation + evCharging + testCommunitySupply) * ADJUSTMENT_FACTOR;
   };
 
-const sensitivityToBatterySize: SensitivityPoint[] = [0.5, 1, 1.5, 2].map(multiplier => {
-    // If capacity is 0, use a baseline like 100kWh to show what *could* happen
-    const baseTestCapacity = currentBatteryCapacityKwh > 0 ? currentBatteryCapacityKwh : 100; 
+  const sensitivityToBatterySize: SensitivityPoint[] = [0.5, 1, 1.5, 2].map(multiplier => {
+    const baseTestCapacity = currentBatteryCapacityKwh > 0 ? currentBatteryCapacityKwh : 100;
     const testSize = baseTestCapacity * multiplier;
-    const testRevenue = calculateTestRevenue(testSize); // Calculate unconditionally
-    return {
-      batterySizeKwh: testSize,
-      totalAnnualRevenue: testRevenue
-    };
+    const testRevenue = calculateTestRevenue(testSize);
+    return { batterySizeKwh: testSize, totalAnnualRevenue: testRevenue };
   });
 
-  // --- Calculate Autarky Rate ---
-  let autarkyPercent = 30; // Baseline without battery
-  if (maxConsumption === 0) {
-    autarkyPercent = 100; // Completely grid-independent if 0 load
-  } else if (totalCapacity > 0) {
-    autarkyPercent = Math.min(95, Math.round(30 + ((totalCapacity * 250) / maxConsumption) * 100));
-  }
+  const autarkyPercent = maxConsumption > 0
+    ? Math.min(Math.round(MAX_AUTARKY * 100), Math.round((estimatedKwhOffset / maxConsumption) * 100))
+    : 0;
 
   return {
     annualRevenueByStream,
@@ -464,6 +498,17 @@ const sensitivityToBatterySize: SensitivityPoint[] = [0.5, 1, 1.5, 2].map(multip
     systemCost,
     totalUpfrontCost,
     bottleneckActive,
+    effectiveInverterPowerKw: safeInverterPower,
+    effectiveGridExportPowerKw: exportConstrainedPower,
+    calculationAssumptions: {
+      degradationRatePercent: DEGRADATION_RATE * 100,
+      inflationRatePercent: INFLATION_RATE * 100,
+      marketDeclineRatePercent: MARKET_DECLINE_RATE * 100,
+      maintenanceYear: MAINTENANCE_YEARS[0] ?? 0,
+      maintenanceYears: [...MAINTENANCE_YEARS].sort((a, b) => a - b),
+      maintenanceCostPercent: MAINTENANCE_COST_FRACTION * 100,
+      engineeringFeePercent: ENGINEERING_FEE_FRACTION * 100,
+    },
     recommendedBatteryUpgradeKwh,
   };
 }

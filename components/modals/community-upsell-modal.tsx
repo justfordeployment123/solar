@@ -19,12 +19,21 @@ export function CommunityUpsellModal({ isOpen, onClose }: CommunityUpsellModalPr
 
   if (!isOpen) return null;
 
+  // FIX (Com2): parseFloat("3,5") returns 3 (stops at the comma). Apply the
+  // same German decimal-comma swap the rest of the form uses so "3,5" reads
+  // as three-and-a-half rather than three.
+  const parseGermanFloat = (val: string) => {
+    const normalized = val.replace(',', '.');
+    const parsed = parseFloat(normalized);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+
   const handleSave = () => {
     setFinancialInputs({
       communityEnabled: true,
-      communityNumParties: parseFloat(parties) || 0,
-      communityKwhPerParty: parseFloat(kwhPerParty) || 0,
-      communitySellPriceCentsKwh: parseFloat(sellPrice) || 0,
+      communityNumParties: parseGermanFloat(parties),
+      communityKwhPerParty: parseGermanFloat(kwhPerParty),
+      communitySellPriceCentsKwh: parseGermanFloat(sellPrice),
     });
     onClose();
   };
@@ -35,7 +44,7 @@ export function CommunityUpsellModal({ isOpen, onClose }: CommunityUpsellModalPr
   };
 
   // Sufficiency preview (purely informational — the engine recomputes on save)
-  const totalDemand = (parseFloat(parties) || 0) * (parseFloat(kwhPerParty) || 0);
+  const totalDemand = parseGermanFloat(parties) * parseGermanFloat(kwhPerParty);
 
   return (
     <div

@@ -64,10 +64,19 @@ export function SettingsForm({ initialSettings }: { initialSettings: CalculatorS
           <NumberField label="Battery degradation (%/yr)" value={settings.global.degradationRatePercent} onChange={(v) => updateGlobal({ degradationRatePercent: v })} step={0.1} />
           <NumberField label="Inflation rate (%/yr)" value={settings.global.inflationRatePercent} onChange={(v) => updateGlobal({ inflationRatePercent: v })} step={0.1} />
           <NumberField label="Market decline (%/yr)" value={settings.global.marketDeclineRatePercent} onChange={(v) => updateGlobal({ marketDeclineRatePercent: v })} step={0.1} />
-          <NumberField label="Maintenance year" value={settings.global.maintenanceYear} onChange={(v) => updateGlobal({ maintenanceYear: v })} step={1} />
+          <MaintenanceYearsField
+            value={settings.global.maintenanceYears}
+            onChange={(years) => updateGlobal({ maintenanceYears: years })}
+          />
           <NumberField label="Maintenance cost (%)" value={settings.global.maintenanceCostPercent} onChange={(v) => updateGlobal({ maintenanceCostPercent: v })} step={1} />
           <NumberField label="VPP bonus (×)" value={settings.global.vppBonusMultiplier} onChange={(v) => updateGlobal({ vppBonusMultiplier: v })} step={0.01} />
           <NumberField label="Max autarky (%)" value={settings.global.maxAutarkyPercent} onChange={(v) => updateGlobal({ maxAutarkyPercent: v })} step={1} />
+          <NumberField label="Max cycles/year" value={settings.global.maxCyclesPerYear} onChange={(v) => updateGlobal({ maxCyclesPerYear: v })} step={10} />
+          <NumberField label="Required PS cycles" value={settings.global.requiredPeakShavingCycles} onChange={(v) => updateGlobal({ requiredPeakShavingCycles: v })} step={1} />
+          <NumberField label="Required PRL cycles" value={settings.global.requiredPrlCycles} onChange={(v) => updateGlobal({ requiredPrlCycles: v })} step={1} />
+          <NumberField label="Requested EPEX cycles" value={settings.global.requestedEpexCycles} onChange={(v) => updateGlobal({ requestedEpexCycles: v })} step={10} />
+          <NumberField label="Requested LoadShift cycles" value={settings.global.requestedLoadShiftingCycles} onChange={(v) => updateGlobal({ requestedLoadShiftingCycles: v })} step={10} />
+          <NumberField label="PRL power share (0–1)" value={settings.global.prlPowerShare} onChange={(v) => updateGlobal({ prlPowerShare: v })} step={0.05} />
         </div>
       </section>
 
@@ -164,5 +173,27 @@ function CellInput({ value, onChange, step }: { value: number; onChange: (v: num
       onChange={(e) => onChange(parseFloat(e.target.value) || 0)}
       className="w-24 px-2 py-1 border border-brand-lighter-gray rounded text-right tabular-nums focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red"
     />
+  );
+}
+
+function MaintenanceYearsField({ value, onChange }: { value: number[]; onChange: (v: number[]) => void }) {
+  // Comma-separated input so the admin can list multiple battery-replacement
+  // years (e.g. "10, 20"). Empty / non-numeric tokens are dropped silently.
+  return (
+    <div>
+      <label className="block text-xs font-semibold text-brand-dark-gray mb-1">Maintenance years (comma-sep)</label>
+      <input
+        type="text"
+        value={value.join(', ')}
+        onChange={(e) => {
+          const years = e.target.value
+            .split(',')
+            .map((s) => parseInt(s.trim(), 10))
+            .filter((n) => Number.isFinite(n) && n > 0);
+          onChange(years);
+        }}
+        className="w-full px-3 py-2 border border-brand-lighter-gray rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-brand-red/30 focus:border-brand-red"
+      />
+    </div>
   );
 }

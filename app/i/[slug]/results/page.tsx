@@ -11,7 +11,7 @@ import { EvUpsellModal } from "@/components/modals/ev-upsell-modal";
 import { CommunityUpsellModal } from "@/components/modals/community-upsell-modal";
 import { RevenueAccordion } from "@/components/layout/revenue-accordion";
 import Link from "next/link";
-import { ArrowLeft, Download, Battery, Zap, Euro, TrendingUp, Share2, Info } from "lucide-react";
+import { ArrowLeft, Download, Battery, Zap, Euro, TrendingUp, Share2, Info, type LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { PDFDocument, rgb, StandardFonts } from 'pdf-lib';
@@ -29,7 +29,7 @@ function MetricCard({
   title: string;
   value: string;
   subtitle: string;
-  icon: any;
+  icon: LucideIcon;
   accent: string;
   tooltipText?: string;
 }) {
@@ -115,7 +115,7 @@ export default function ResultsPage() {
 
   // Phase-2 upsell triggers (mirrors the public results page). Show each prompt
   // once per session; namespace the keys so dev and prod can't collide.
-  useEffect(() => {
+useEffect(() => {
     if (!derivedResults) return;
     const battery = technical.currentBatteryCapacityKwh ?? 0;
     const pv = technical.pvSizeKwp ?? 0;
@@ -125,22 +125,68 @@ export default function ResultsPage() {
     if (evTrigger && !financial.evChargingEnabled && !sessionStorage.getItem('upsell:ev:i')) {
       sessionStorage.setItem('upsell:ev:i', '1');
       setIsEvModalOpen(true);
-    } else if (communityTrigger && !financial.communityEnabled && !sessionStorage.getItem('upsell:community:i')) {
+    }
+    if (communityTrigger && !financial.communityEnabled && !sessionStorage.getItem('upsell:community:i')) {
       sessionStorage.setItem('upsell:community:i', '1');
       setIsCommunityModalOpen(true);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [derivedResults != null]);
+  }, [
+    derivedResults,
+    technical.currentBatteryCapacityKwh,
+    technical.pvSizeKwp,
+    financial.evChargingEnabled,
+    financial.communityEnabled
+  ]);
 
   const baseCapacity = initialCapacity !== null ? initialCapacity : (technical.currentBatteryCapacityKwh ?? 0);
-  const sliderMin = 0;
   // Math.max safety net: never let max fall below the current value, so a
   // drag can't clamp the value down and trap the user.
   const sliderMax = Math.max(100, baseCapacity * 3, technical.currentBatteryCapacityKwh ?? 0);
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setTechnicalInputs({ currentBatteryCapacityKwh: parseFloat(e.target.value) });
+    const val = parseFloat(e.target.value);
+    if (Number.isFinite(val)) {
+      setTechnicalInputs({ currentBatteryCapacityKwh: Math.max(0, val) });
+    }
   };
+
+  if (!derivedResults) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-[60vh] px-8 text-center space-y-8">
+        <div className="w-20 h-20 bg-[#e20613] flex items-center justify-center text-white">
+          <Battery size={40} strokeWidth={1.75} />
+        </div>
+        <div className="space-y-4 max-w-md">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-[#1a1a1a]">
+            Daten nicht verfügbar
+          </h2>
+          <p className="text-base text-[#5a5859] leading-relaxed">
+            Wir konnten Ihre Berechnungsdaten nicht finden. Bitte konfigurieren Sie Ihre
+            Systemeinstellungen.
+          </p>
+        </div>
+        {isClient && (
+          <Link prefetch={false} href={`/i/${params.slug}/step-1`}>
+            <Button variant="primary">Rechner starten</Button>
+          </Link>
+        )}
+      </div>
+    );
+  }
+
+  // FIX: Move autarky declaration above handleDownloadPdf to prevent TDZ closure crash
+  const autarkyPercent = derivedResults.autarkyPercent;
+  const assumptions = derivedResults.calculationAssumptions ?? {
+    degradationRatePercent: 2,
+    inflationRatePercent: 3.8,
+    marketDeclineRatePercent: 2,
+    maintenanceYear: 10,
+    maintenanceYears: [10],
+    maintenanceCostPercent: 10,
+    engineeringFeePercent: 3.8,
+  };
+  const formatPercent = (value: number) =>
+    value.toLocaleString('de-DE', { maximumFractionDigits: 1 });
 
   // PDF flow: capture chart refs to PNG, POST everything to /api/report which
   // renders the PDF with @react-pdf/renderer in Node, then trigger the
@@ -347,32 +393,6 @@ export default function ResultsPage() {
     }
   };
 
-  if (!derivedResults) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[60vh] px-8 text-center space-y-8">
-        <div className="w-20 h-20 bg-[#e20613] flex items-center justify-center text-white">
-          <Battery size={40} strokeWidth={1.75} />
-        </div>
-        <div className="space-y-4 max-w-md">
-          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-[#1a1a1a]">
-            Daten nicht verfügbar
-          </h2>
-          <p className="text-base text-[#5a5859] leading-relaxed">
-            Wir konnten Ihre Berechnungsdaten nicht finden. Bitte konfigurieren Sie Ihre
-            Systemeinstellungen.
-          </p>
-        </div>
-        {isClient && (
-          <Link prefetch={false} href={`/i/${params.slug}/step-1`}>
-            <Button variant="primary">Rechner starten</Button>
-          </Link>
-        )}
-      </div>
-    );
-  }
-
-  const autarkyPercent = derivedResults.autarkyPercent;
-
   return (
     <div className="container mx-auto px-6 py-10 sm:px-8 space-y-10">
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
@@ -443,7 +463,7 @@ export default function ResultsPage() {
               <input
                 type="checkbox"
                 className="w-4 h-4 accent-[#e20613]"
-                checked={technical.enablePrl !== false}
+                checked={technical.enablePrl === true || technical.enableSrl === true}
                 onChange={(e) => setTechnicalInputs({ enablePrl: e.target.checked, enableSrl: e.target.checked })}
               />
               <span className="text-sm font-semibold text-[#1a1a1a] group-hover:text-[#e20613] transition-colors">
@@ -454,7 +474,7 @@ export default function ResultsPage() {
               <input
                 type="checkbox"
                 className="w-4 h-4 accent-[#e20613]"
-                checked={technical.enableEpex !== false}
+                checked={technical.enableEpex === true}
                 onChange={(e) => setTechnicalInputs({ enableEpex: e.target.checked })}
               />
               <span className="text-sm font-semibold text-[#1a1a1a] group-hover:text-[#e20613] transition-colors">
@@ -496,7 +516,7 @@ export default function ResultsPage() {
         <div className="bg-[#fffbe6] border-l-4 border-[#d2a800] p-6 shadow-sm">
           <h3 className="text-lg font-bold text-[#8a6d00] mb-2">Hinweis: Netzanschluss-Engpass (Bottleneck)</h3>
           <p className="text-sm md:text-base text-[#1a1a1a] leading-relaxed">
-            Ihre Speicherleistung ({technical.inverterPowerKw ?? '–'} kW) übersteigt Ihr Netzeinspeise-Limit ({technical.gridExportLimitKw} kW).
+            Ihre nutzbare Speicherleistung ({derivedResults.effectiveInverterPowerKw.toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW) übersteigt Ihr Netzeinspeise-Limit ({(technical.gridExportLimitKw ?? 0).toLocaleString('de-DE', { maximumFractionDigits: 1 })} kW).
             Die netzdienlichen Erträge (Arbitrage & Regelenergie) wurden entsprechend auf die tatsächlich
             nutzbare Anschlussleistung gedrosselt. Ein stärkerer Netzanschluss würde die Erträge erhöhen.
           </p>
@@ -522,7 +542,7 @@ export default function ResultsPage() {
           <div>
             <h3 className="text-sm font-bold text-[#1a1a1a] mb-1">Hinweis zur Berechnung</h3>
             <p className="text-sm text-[#5a5859] leading-relaxed">
-              Für die Berechnung der Eigenverbrauchsoptimierung wurde eine Strompreissteigerungsrate (konservativ betrachtet und historisch belegbar) von <strong>3,8 % pro Jahr</strong> angenommen.
+              Für die Berechnung der Eigenverbrauchsoptimierung wurde eine Strompreissteigerungsrate von <strong>{formatPercent(assumptions.inflationRatePercent)} % pro Jahr</strong> angenommen.
             </p>
           </div>
         </div>
@@ -536,10 +556,10 @@ export default function ResultsPage() {
           subtitle="Gesamtergebnis nach 15 Jahren"
           icon={TrendingUp}
           accent="#1a1a1a"
-          tooltipText="Beinhaltet 3,8% Engineering-Gebühr für die genaue Erfassung von Ist-Daten und Infrastruktur. (Fördermittel möglich)."
+          tooltipText={`Beinhaltet ${formatPercent(assumptions.engineeringFeePercent)}% Engineering-Gebühr für die genaue Erfassung von Ist-Daten und Infrastruktur. (Fördermittel möglich).`}
         />
         <MetricCard
-          title="Durchschn. Jahresertrag"
+          title="Jahresertrag Jahr 1"
           value={formatCurrency(derivedResults.totalAnnualRevenue)}
           subtitle="Einnahmen & Einsparungen"
           icon={Euro}
@@ -606,7 +626,10 @@ export default function ResultsPage() {
       </div>
 
       <div className="pt-4">
-        <RevenueAccordion />
+        <RevenueAccordion
+          inflationRatePercent={assumptions.inflationRatePercent}
+          sensitivityToBatterySize={derivedResults.sensitivityToBatterySize}
+        />
       </div>
 
       {/* NEW: White-Label Catalog Downloads */}

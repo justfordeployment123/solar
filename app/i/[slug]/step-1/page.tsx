@@ -4,7 +4,7 @@ import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { useCalculatorStore } from '@/store/calculatorStore';
 import { ProgressHeader } from '@/components/layout/progress-header';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Goal } from '@/types/calculator';
 import { RadioCard } from '@/components/ui/radio-card';
 import { Button } from '@/components/ui/button';
@@ -14,16 +14,12 @@ import { InfoModal } from '@/components/modals/info-modal';
 export default function Step1Page() {
   const router = useRouter();
   const params = useParams() as { slug: string };
-  const [mounted, setMounted] = useState(false);
   const [isRegelenergieModalOpen, setIsRegelenergieModalOpen] = useState(false);
 
+  const hasHydrated = useCalculatorStore((state) => state._hasHydrated);
   const goals = useCalculatorStore((state) => state.goals);
   const setGoals = useCalculatorStore((state) => state.setGoals);
   const markStepComplete = useCalculatorStore((state) => state.markStepComplete);
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   const GOAL_OPTIONS: { id: Goal & string; title: string; description: string; disclaimer?: string; onInfoClick?: (e: React.MouseEvent) => void }[] = [
     { id: 'Self-Consumption', title: 'Eigenverbrauch', description: 'Priorisieren Sie die lokale Nutzung von Solarenergie, um die Abhängigkeit von externen Anbietern zu verringern.' },
@@ -79,7 +75,7 @@ export default function Step1Page() {
     router.push(`/i/${params.slug}/step-2`);
   };
 
-  if (!mounted) return null;
+  if (!hasHydrated) return null;
 
   const selectedCount =
     (goals.primaryGoal ? 1 : 0) + goals.secondaryGoals.length;

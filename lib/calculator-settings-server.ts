@@ -61,12 +61,26 @@ export async function saveSettings(next: CalculatorSettings): Promise<void> {
     const { error } = await supabase
       .from('app_settings')
       .upsert({ key: SETTINGS_KEY, value: withTimestamp }, { onConflict: 'key' });
-    if (error) throw new Error(`Supabase save failed: ${error.message}`);
+    if (error) {
+      // FIX (SS1): the previous code threw *after* potentially having
+      // partially written the row, but kept the stale in-memory cache. The
+      // next `loadSettings` would return stale data while the DB had the
+      // new value. Invalidate the cache so the next read re-fetches truth.
+      cached = null;
+      throw new Error(`Supabase save failed: ${error.message}`);
+    }
     cached = withTimestamp;
     return;
   }
 
-  await fs.mkdir(path.dirname(SETTINGS_FILE), { recursive: true });
-  await fs.writeFile(SETTINGS_FILE, JSON.stringify(withTimestamp, null, 2), 'utf-8');
-  cached = withTimestamp;
+  try {
+    await fs.mkdir(path.dirname(SETTINGS_FILE), { recursive: true });
+    await fs.writeFile(SETTINGS_FILE, JSON.stringify(withTimestamp, null, 2), 'utf-8');
+    cached = withTimestamp;
+  } catch (err) {
+    // Mirror the Supabase branch: on a failed file write, force a re-read on
+    // the next call instead of silently serving a stale value.
+    cached = null;
+    throw err;
+  }
 }

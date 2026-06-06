@@ -21,6 +21,12 @@ const initialState: CalculatorState = {
     gridImportLimitKw: null,
     gridExportLimitKw: null,
     substationDistanceKm: null,
+    enableSelfConsumption: false,
+    enablePeakShaving: false,
+    enableEpex: false,
+    enablePrl: false,
+    enableSrl: false,
+    enableLoadShifting: false,
   },
   financial: {
     currentElectricityPriceCentsKwh: null,
@@ -88,17 +94,23 @@ export const useCalculatorStore = create<CalculatorStore>()(
         set((state) => {
           const newGoals = { ...state.goals, ...goalsPayload };
           const allGoals = [newGoals.primaryGoal, ...newGoals.secondaryGoals];
-          
+
+          // FIX: Z2 — the technical `enable*` flags are also toggled from the
+          // results page directly. We treat them as the source of truth for
+          // what revenue streams are active and only ADD a flag when a goal
+          // implies it. A user who has explicitly toggled PRL ON in the
+          // results page no longer gets it silently disabled when they later
+          // re-pick a goal in step-1.
           const newTechnical = {
             ...state.technical,
-            enableSelfConsumption: allGoals.includes('Self-Consumption'),
-            enablePeakShaving: allGoals.includes('Peak Shaving'),
-            enableEpex: allGoals.includes('EPEX Arbitrage'),
-            enablePrl: allGoals.includes('Grid Services (VPP/Balancing)'),
-            enableSrl: allGoals.includes('Grid Services (VPP/Balancing)'),
-            enableLoadShifting: allGoals.includes('Load Shifting')
+            enableSelfConsumption: state.technical.enableSelfConsumption === true || allGoals.includes('Self-Consumption'),
+            enablePeakShaving: state.technical.enablePeakShaving === true || allGoals.includes('Peak Shaving'),
+            enableEpex: state.technical.enableEpex === true || allGoals.includes('EPEX Arbitrage'),
+            enablePrl: state.technical.enablePrl === true || allGoals.includes('Grid Services (VPP/Balancing)'),
+            enableSrl: state.technical.enableSrl === true || allGoals.includes('Grid Services (VPP/Balancing)'),
+            enableLoadShifting: state.technical.enableLoadShifting === true || allGoals.includes('Load Shifting')
           };
-          
+
           const derivedResults = calculateResults(newTechnical, state.financial, state.calculatorSettings ?? DEFAULT_SETTINGS);
           return { goals: newGoals, technical: newTechnical, derivedResults };
         }),
@@ -120,11 +132,15 @@ export const useCalculatorStore = create<CalculatorStore>()(
       // Called by the SettingsHydrator on app startup once /api/calculator-settings
       // has responded. Re-derives results with the freshly-loaded admin overrides
       // so the in-memory derivedResults stays consistent with the displayed UI.
+      // FIX (Z1): always recompute. The old `state.derivedResults && ...` guard
+      // meant that on a hard reload — when partialize has just stripped
+      // `derivedResults` and the user hasn't touched any input yet — the
+      // engine was never re-run, leaving the user staring at the
+      // "Daten nicht verfügbar" empty state. Recomputing on every settings
+      // update is cheap and idempotent.
       setCalculatorSettings: (settings) =>
         set((state) => {
-          const derivedResults = state.derivedResults
-            ? calculateResults(state.technical, state.financial, settings)
-            : state.derivedResults;
+          const derivedResults = calculateResults(state.technical, state.financial, settings);
           return { calculatorSettings: settings, derivedResults };
         }),
         
@@ -158,11 +174,10 @@ export const useCalculatorStore = create<CalculatorStore>()(
       onRehydrateStorage: () => (state) => {
         if (state) state.setHasHydrated(true);
       },
-      partialize: (state) => {
-        // Exclude transient states from persistence. calculatorSettings is
-        // re-fetched from the server on every app load so the admin's latest
-        // tuning takes effect immediately, even on returning sessions.
-        const { _hasHydrated, calculatorSettings, ...persistedState } = state;
+partialize: (state) => {
+        // FIX: Exclude derivedResults so returning users never see stale calculations
+        // while the app is hydrating the latest admin settings.
+        const { _hasHydrated, calculatorSettings, derivedResults, ...persistedState } = state;
         return persistedState;
       },
     }

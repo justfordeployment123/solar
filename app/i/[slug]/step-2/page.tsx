@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ProgressHeader } from '@/components/layout/progress-header';
@@ -8,29 +8,25 @@ import { Input } from '@/components/ui/input';
 import { Select } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { useCalculatorStore } from '@/store/calculatorStore';
+import type { TechnicalInputs } from '@/types/calculator';
 import { ArrowLeft, ChevronRight, Zap, Database } from 'lucide-react';
 import { CsvUploader } from '@/components/forms/csv-uploader';
 
 export default function Step2Page() {
   const router = useRouter();
   const params = useParams() as { slug: string };
-  const [mounted, setMounted] = useState(false);
 
+  const hasHydrated = useCalculatorStore((state) => state._hasHydrated);
   const stepCompletion = useCalculatorStore((state) => state.stepCompletion);
   const markStepComplete = useCalculatorStore((state) => state.markStepComplete);
   const technical = useCalculatorStore((state) => state.technical);
   const setTechnicalInputs = useCalculatorStore((state) => state.setTechnicalInputs);
-  const persona = useCalculatorStore((state) => state.persona);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
-  
-  useEffect(() => {
-    if (mounted && !stepCompletion.step1) {
+    if (hasHydrated && !stepCompletion.step1) {
       router.replace(`/i/${params.slug}/step-1`);
     }
-  }, [mounted, stepCompletion.step1, router, params.slug]);
+  }, [hasHydrated, stepCompletion.step1, router, params.slug]);
 
   const handleNext = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -39,11 +35,24 @@ export default function Step2Page() {
   };
 
   const handleInputChange = (field: keyof typeof technical) => (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value === '' ? null : Number(e.target.value);
-    setTechnicalInputs({ [field]: value });
+    if (e.target.value === '') {
+      setTechnicalInputs({ [field]: null });
+      return;
+    }
+    const val = Math.max(0, Number(e.target.value.replace(',', '.')));
+    if (Number.isFinite(val)) {
+      setTechnicalInputs({ [field]: val });
+    }
   };
 
-  if (!mounted || !stepCompletion.step1) return null;
+  const handleRegionChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const value = e.target.value;
+    setTechnicalInputs({
+      region: value === '' ? null : (value as NonNullable<TechnicalInputs['region']>),
+    });
+  };
+
+  if (!hasHydrated || !stepCompletion.step1) return null;
 
   return (
     <div className="px-6 lg:px-12 pt-10 max-w-5xl mx-auto flex flex-col min-h-full">
@@ -82,7 +91,7 @@ export default function Step2Page() {
                 { value: 'South', label: 'Süddeutschland' },
               ]}
               value={technical.region || ''}
-              onChange={(e) => setTechnicalInputs({ region: (e.target.value === '' ? null : e.target.value) as any })}
+              onChange={handleRegionChange}
             />
             <div className="grid grid-cols-2 gap-4">
               <Input
@@ -131,23 +140,36 @@ export default function Step2Page() {
             <Input
               label="Geplante zusätzliche Batteriekapazität (kWh)"
               type="number"
+              min="0"
               placeholder="0"
               tooltipText="Die Speicherkapazität, die Sie neu anschaffen möchten."
               value={technical.currentBatteryCapacityKwh ?? ''}
               onChange={handleInputChange('currentBatteryCapacityKwh')}
             />
+            <Input
+              label="Wechselrichterleistung (kW)"
+              type="number"
+              min="0"
+              step="0.1"
+              placeholder={technical.pvSizeKwp ? String(Math.round(technical.pvSizeKwp * 1.2)) : "50"}
+              tooltipText="Maximale Lade- und Entladeleistung des Batteriesystems. Wenn leer, schätzt der Rechner die Leistung aus der PV-Größe."
+              value={technical.inverterPowerKw ?? ''}
+              onChange={handleInputChange('inverterPowerKw')}
+            />
             <div className="grid grid-cols-2 gap-4">
               <Input
                 label="Netzbezug Limit (kW)"
                 type="number"
+                min="0"
                 placeholder="100"
-                tooltipText="Maximale Strombezugsgrenze aus dem Netz (relevant für Peak Shaving & Inverter-Größe)."
+                tooltipText="Derzeit ohne Auswirkung auf die Berechnung — Feld ist für eine kommende Peak-Shaving-Erweiterung reserviert."
                 value={technical.gridImportLimitKw ?? ''}
                 onChange={handleInputChange('gridImportLimitKw')}
               />
               <Input
                 label="Netzeinspeisung Limit (kW)"
                 type="number"
+                min="0"
                 placeholder="100"
                 tooltipText="Maximale Einspeisegrenze in das öffentliche Netz (limitiert Netzstabilitäts-Erträge)."
                 value={technical.gridExportLimitKw ?? ''}
@@ -157,6 +179,7 @@ export default function Step2Page() {
             <Input
               label="Entfernung zum nächsten Umspannwerk (km)"
               type="number"
+              min="0"
               step="0.1"
               placeholder="z.B. 0,3"
               tooltipText="Entfernung zum nächsten Umspannwerk. Kürzere Distanzen bedeuten geringere Netzverluste bei Handels- und Regelenergieerträgen. Optional."
