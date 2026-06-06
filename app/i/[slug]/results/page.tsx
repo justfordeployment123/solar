@@ -93,40 +93,40 @@ export default function ResultsPage() {
   const pieRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
 
-  // Lazy-initialize from the (zustand-persist) store so we have the user's
-  // real configured size before the slider can be touched. Previously this
-  // started as null and only resolved after _hasHydrated flipped — a drag in
-  // that window clamped the value down and trapped the user (see main flow).
-  const [initialCapacity, setInitialCapacity] = useState<number | null>(() => {
-    if (typeof window === 'undefined') return null;
-    const cap = useCalculatorStore.getState().technical.currentBatteryCapacityKwh ?? 0;
-    return cap > 0 ? cap : null;
-  });
+  const evTriggered = useRef(false);
+  const communityTriggered = useRef(false);
+
+  const [initialCapacity, setInitialCapacity] = useState<number | null>(null);
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
   useEffect(() => {
-    if (_hasHydrated && initialCapacity === null) {
+    // only lock the capacity once after zustand finishes hydrating
+    if (_hasHydrated && initialCapacity === null && (technical.currentBatteryCapacityKwh ?? 0) > 0) {
       setInitialCapacity(technical.currentBatteryCapacityKwh ?? 0);
     }
   }, [_hasHydrated, initialCapacity, technical.currentBatteryCapacityKwh]);
 
   // Phase-2 upsell triggers (mirrors the public results page). Show each prompt
   // once per session; namespace the keys so dev and prod can't collide.
-useEffect(() => {
-    if (!derivedResults) return;
+  useEffect(() => {
+    if (!derivedResults || !_hasHydrated) return;
+  
     const battery = technical.currentBatteryCapacityKwh ?? 0;
     const pv = technical.pvSizeKwp ?? 0;
+    
     const evTrigger = battery > 100 || (pv > 20 && battery > 60);
     const communityTrigger = pv > 50;
 
-    if (evTrigger && !financial.evChargingEnabled && !sessionStorage.getItem('upsell:ev:i')) {
+    if (evTrigger && !financial.evChargingEnabled && !sessionStorage.getItem('upsell:ev:i') && !evTriggered.current) {
+      evTriggered.current = true;
       sessionStorage.setItem('upsell:ev:i', '1');
       setIsEvModalOpen(true);
     }
-    if (communityTrigger && !financial.communityEnabled && !sessionStorage.getItem('upsell:community:i')) {
+    if (communityTrigger && !financial.communityEnabled && !sessionStorage.getItem('upsell:community:i') && !communityTriggered.current) {
+      communityTriggered.current = true;
       sessionStorage.setItem('upsell:community:i', '1');
       setIsCommunityModalOpen(true);
     }
@@ -135,13 +135,14 @@ useEffect(() => {
     technical.currentBatteryCapacityKwh,
     technical.pvSizeKwp,
     financial.evChargingEnabled,
-    financial.communityEnabled
+    financial.communityEnabled,
+    _hasHydrated
   ]);
 
-  const baseCapacity = initialCapacity !== null ? initialCapacity : (technical.currentBatteryCapacityKwh ?? 0);
+  const safeInitial = initialCapacity ?? 0;
   // Math.max safety net: never let max fall below the current value, so a
   // drag can't clamp the value down and trap the user.
-  const sliderMax = Math.max(100, baseCapacity * 3, technical.currentBatteryCapacityKwh ?? 0);
+  const sliderMax = Math.max(100, safeInitial * 3, technical.currentBatteryCapacityKwh ?? 0);
 
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value);
@@ -441,18 +442,18 @@ useEffect(() => {
               <span className="text-xs font-semibold text-[#5a5859] ml-1">kWh</span>
             </span>
           </div>
-          {baseCapacity > 0 && (
+          {(initialCapacity !== null && initialCapacity > 0) && (
             <div className="mt-2 flex items-center justify-between text-[0.65rem] font-bold uppercase tracking-[0.18em]">
               <span className="text-[#5a5859]">−100%</span>
               <span
                 className={
-                  (technical.currentBatteryCapacityKwh ?? 0) >= baseCapacity
+                  (technical.currentBatteryCapacityKwh ?? 0) >= initialCapacity
                     ? 'text-[#1a8a1a]'
                     : 'text-[#e20613]'
                 }
               >
-                {((((technical.currentBatteryCapacityKwh ?? 0) - baseCapacity) / baseCapacity) * 100 >= 0 ? '+' : '')}
-                {Math.round((((technical.currentBatteryCapacityKwh ?? 0) - baseCapacity) / baseCapacity) * 100)}% gegenüber Empfehlung
+                {((((technical.currentBatteryCapacityKwh ?? 0) - initialCapacity) / initialCapacity) * 100 >= 0 ? '+' : '')}
+                {Math.round((((technical.currentBatteryCapacityKwh ?? 0) - initialCapacity) / initialCapacity) * 100)}% gegenüber Empfehlung
               </span>
               <span className="text-[#5a5859]">+200%</span>
             </div>

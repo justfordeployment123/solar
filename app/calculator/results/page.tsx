@@ -81,22 +81,29 @@ export default function ResultsPage() {
   const pieRef = useRef<HTMLDivElement>(null);
   const barRef = useRef<HTMLDivElement>(null);
 
+  const evTriggered = useRef(false);
+  const communityTriggered = useRef(false);
+
   // Phase-2 upsell triggers per the client's brief. We show each prompt once
   // per session so it doesn't nag returning users; sessionStorage keys are
   // namespaced to keep dev vs. prod cleanly separated.
-useEffect(() => {
-    if (!derivedResults) return;
+  useEffect(() => {
+    if (!derivedResults || !_hasHydrated) return;
+
     const battery = technical.currentBatteryCapacityKwh ?? 0;
     const pv = technical.pvSizeKwp ?? 0;
+    
     const evTrigger = battery > 100 || (pv > 20 && battery > 60);
     const communityTrigger = pv > 50;
 
-if (evTrigger && !financial.evChargingEnabled && !sessionStorage.getItem('upsell:ev')) {
+    if (evTrigger && !financial.evChargingEnabled && !sessionStorage.getItem('upsell:ev') && !evTriggered.current) {
+      evTriggered.current = true;
       sessionStorage.setItem('upsell:ev', '1');
       setIsEvModalOpen(true);
     } 
-    // FIX: Removed 'else' so both modals can trigger independently in the same session
-    if (communityTrigger && !financial.communityEnabled && !sessionStorage.getItem('upsell:community')) {
+    
+    if (communityTrigger && !financial.communityEnabled && !sessionStorage.getItem('upsell:community') && !communityTriggered.current) {
+      communityTriggered.current = true;
       sessionStorage.setItem('upsell:community', '1');
       setIsCommunityModalOpen(true);
     }
@@ -105,31 +112,23 @@ if (evTrigger && !financial.evChargingEnabled && !sessionStorage.getItem('upsell
     technical.currentBatteryCapacityKwh, 
     technical.pvSizeKwp, 
     financial.evChargingEnabled, 
-    financial.communityEnabled
+    financial.communityEnabled,
+    _hasHydrated
   ]);
 
-  // Capture the user's configured battery capacity on first render by reading
-  // the (zustand-persist) store directly. Previously sliderMax was initialized
-  // to 100 and a "lock effect" updated it only after _hasHydrated flipped — if
-  // the user dragged the slider in that window the value was clamped to 100
-  // and the lock then captured that small value, making it impossible to drag
-  // back up to the original size (the "1100 -> 100, can't move back" bug).
-  const [initialCapacity, setInitialCapacity] = useState<number>(() =>
-    typeof window !== 'undefined'
-      ? (useCalculatorStore.getState().technical.currentBatteryCapacityKwh ?? 0)
-      : 0
-  );
+  const [initialCapacity, setInitialCapacity] = useState<number | null>(null);
 
-  // Fallback in case zustand-persist hadn't hydrated at first render.
   useEffect(() => {
-    if (initialCapacity === 0 && _hasHydrated && (technical.currentBatteryCapacityKwh ?? 0) > 0) {
+    // only lock the capacity once after zustand finishes hydrating
+    if (_hasHydrated && initialCapacity === null && (technical.currentBatteryCapacityKwh ?? 0) > 0) {
       setInitialCapacity(technical.currentBatteryCapacityKwh ?? 0);
     }
   }, [_hasHydrated, initialCapacity, technical.currentBatteryCapacityKwh]);
 
-  // Safety net via Math.max: the slider's max can never fall below the user's
-  // current value, so a drag can't clamp the value down and trap the user.
-  const sliderMax = Math.max(100, initialCapacity * 3, technical.currentBatteryCapacityKwh ?? 0);
+  // safely calculate max using the hydrated state
+  const safeInitial = initialCapacity ?? 0;
+  const sliderMax = Math.max(100, safeInitial * 3, technical.currentBatteryCapacityKwh ?? 0);
+
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value);
     if (Number.isFinite(val)) {
@@ -297,7 +296,7 @@ if (evTrigger && !financial.evChargingEnabled && !sessionStorage.getItem('upsell
               <span className="text-xs font-semibold text-[#5a5859] ml-1">kWh</span>
             </span>
           </div>
-          {initialCapacity > 0 && (
+          {(initialCapacity !== null && initialCapacity > 0) && (
             <div className="mt-2 flex items-center justify-between text-[0.65rem] font-bold uppercase tracking-[0.18em]">
               <span className="text-[#5a5859]">−100%</span>
               <span
