@@ -113,5 +113,9 @@ export function mergeWithDefaults(input: Record<string, unknown>): CalculatorSet
       global.maintenanceYears = DEFAULT_SETTINGS.global.maintenanceYears;
     }
   }
-  return { tiers, global, updatedAt: input?.updatedAt ?? DEFAULT_SETTINGS.updatedAt };
+  return {
+    tiers: tiers as TierSettings[],
+    global: global as GlobalSettings,
+    updatedAt: (typeof input?.updatedAt === 'string' ? input.updatedAt : DEFAULT_SETTINGS.updatedAt)
+  };
 }
