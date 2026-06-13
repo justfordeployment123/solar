@@ -9,7 +9,7 @@ const REGIONAL_MULTIPLIERS = {
 
 export function normalizeElectricityPriceCents(raw: number | null | undefined): number {
   if (typeof raw !== 'number' || !Number.isFinite(raw) || !(raw > 0)) return 35;
-  return raw < 3 ? raw * 100 : raw;
+  return raw < 1 ? raw * 100 : raw;
 }
 
 function substationLossFactor(km: number | null | undefined): number {
@@ -124,7 +124,7 @@ export function calculateResults(
 
   const priceInput = normalizeElectricityPriceCents(financial.currentElectricityPriceCentsKwh);
   const userElectricityPrice = priceInput / 100;
-  const baseOffset = totalCapacity * 250;
+  const baseOffset = totalCapacity * MAX_CYCLES_PER_YEAR;
 
   const yearlyBill = typeof financial.yearlyElectricityBillEur === 'number' && Number.isFinite(financial.yearlyElectricityBillEur) ? Math.max(0, financial.yearlyElectricityBillEur) : null;
   const derivedConsumption = yearlyBill != null && userElectricityPrice > 0 ? (yearlyBill / userElectricityPrice) : 5000;
@@ -260,13 +260,7 @@ export function calculateResults(
   if (actualCost != null && actualCost > 0) {
     systemCost = actualCost;
   } else if (targetBudget != null && targetBudget > 0) {
-    // FIX: When the user provides a target budget we honor it. If the budget
-    // is above the capacity-based estimate they are intentionally sizing up
-    // (e.g. for VPP-readiness) and the ROI must reflect their actual spend.
-    // If the budget is below, we still bump to the minSystemCost floor so
-    // we don't promise a system that physically can't be built at that price.
-    systemCost = Math.max(estimatedSystemCost, targetBudget);
-    if (systemCost < minSystemCost) systemCost = minSystemCost;
+    systemCost = Math.max(minSystemCost, targetBudget);
   } else {
     systemCost = Math.max(estimatedSystemCost, minSystemCost);
   }
@@ -299,7 +293,7 @@ export function calculateResults(
     : 30;
 
   if (financial.communityEnabled && communityNumParties > 0 && communityKwhPerParty > 0) {
-    const sellPriceEurPerKwh = communitySellPriceCentsKwh / 100;
+    const sellPriceEurPerKwh = evSellPriceCentsKwh / 100;
     const opportunityCostEurPerKwh = (standardTariff > 0 ? standardTariff : 8) / 100;
     const marginEurPerKwh = Math.max(0, sellPriceEurPerKwh - opportunityCostEurPerKwh);
 
@@ -309,9 +303,11 @@ export function calculateResults(
     const suppliedKwh = Math.min(totalDemandKwh, excessPvYield);
     communitySupply = suppliedKwh * marginEurPerKwh;
 
-    if (totalDemandKwh > excessPvYield) {
-      const shortfallPerDay = (totalDemandKwh - excessPvYield) / 365;
-      recommendedBatteryUpgradeKwh = Math.ceil(shortfallPerDay / 10) * 10;
+if (totalDemandKwh > excessPvYield) {
+      recommendedBatteryUpgradeKwh = null; // Battery cannot generate energy for a PV shortfall
+    } else if (totalDemandKwh > estimatedKwhOffset) {
+      const shiftShortfallKwh = (totalDemandKwh - estimatedKwhOffset) / 365;
+      recommendedBatteryUpgradeKwh = Math.ceil(shiftShortfallKwh / 10) * 10;
     }
   }
 
@@ -382,8 +378,8 @@ export function calculateResults(
     const testControllableCapacity = testSize + (isNGen ? existingBatteryCapacityKwh : 0);
 
     let testRemainingCycles = MAX_CYCLES_PER_YEAR;
-    // FIX: same unit fix as the main path — the test inverter is purely kW.
-    const testInverterPower = Math.max(0, actualInverterPower);
+    const baseTestCapacity = currentBatteryCapacityKwh > 0 ? currentBatteryCapacityKwh : 100;
+    const testInverterPower = Math.max(0, actualInverterPower * (testSize / baseTestCapacity));
 
     const testExportConstrainedPower = gridExportLimitKw != null
       ? Math.min(testInverterPower, gridExportLimitKw)
@@ -472,7 +468,7 @@ export function calculateResults(
     }
 
     // FIX: Applied ADJUSTMENT_FACTOR to sensitivity output to mirror baseAnnualRevenue
-    return (testSelfConsumption + testPeakShaving + testEpexArbitrage + testLoadShifting + testPrl + testSrlAfrr + testVppParticipation + evCharging + testCommunitySupply) * ADJUSTMENT_FACTOR;
+    return (testSelfConsumption + testPeakShaving + testEpexArbitrage + testLoadShifting + testPrl + testSrlAfrr + testVppParticipation + testCommunitySupply) * ADJUSTMENT_FACTOR;
   };
 
   const sensitivityToBatterySize: SensitivityPoint[] = [0.5, 1, 1.5, 2].map(multiplier => {

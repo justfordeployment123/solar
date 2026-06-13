@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useLayoutEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCalculatorStore } from '@/store/calculatorStore';
@@ -9,10 +9,16 @@ import { X, BatteryCharging } from 'lucide-react';
 export function GlobalFooter() {
   const activeInstaller = useCalculatorStore((state) => state.activeInstaller);
   const [modalOpen, setModalOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const pathname = usePathname();
   const isLandingPage = pathname === '/' || pathname === '';
 
-  const homeLink = activeInstaller && activeInstaller.websiteUrl
+  useLayoutEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
+  }, []);
+
+  const homeLink = isMounted && activeInstaller && activeInstaller.websiteUrl
     ? activeInstaller.websiteUrl
     : "https://www.mysolar-pv.de";
 
@@ -24,6 +30,47 @@ export function GlobalFooter() {
   };
 
   if (isLandingPage) return null;
+
+  if (!isMounted) {
+    return (
+      <footer className="w-full bg-[#1a1a1a] text-white mt-auto z-10 pb-24 lg:pb-0">
+        <div className="max-w-7xl mx-auto px-6 md:px-12 py-10 flex flex-col md:flex-row justify-between items-center gap-6">
+          <div className="flex items-center gap-3">
+            <img
+              src="/solar-logo.svg"
+              alt="MySolar PV Logo"
+              className="h-10 md:h-12 w-auto object-contain"
+            />
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="w-8 h-[3px] bg-[#e20613]" />
+            <span className="w-8 h-[3px] bg-[#d2d700]" />
+            <span className="w-8 h-[3px] bg-[#ffdb00]" />
+          </div>
+          <div className="flex gap-6 md:gap-8 items-center text-[0.7rem] font-bold uppercase tracking-[0.18em] text-white/70">
+            <Link
+              prefetch={false}
+              href={homeLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[#ffdb00] transition-colors"
+            >
+              Homepage
+            </Link>
+            <Link
+              prefetch={false}
+              href="https://www.mysolar-pv.de/impressum.html"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-[#ffdb00] transition-colors"
+            >
+              Impressum
+            </Link>
+          </div>
+        </div>
+      </footer>
+    );
+  }
 
   return (
     <>

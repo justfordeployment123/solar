@@ -90,13 +90,14 @@ export function pickTier(settings: CalculatorSettings, capacityKwh: number): Tie
 
 // Merge an incoming (possibly older / partial) settings blob with defaults so a
 // schema addition doesn't crash the engine on first read.
-export function mergeWithDefaults(input: any): CalculatorSettings {
+export function mergeWithDefaults(input: Record<string, unknown>): CalculatorSettings {
   const tiers = Array.isArray(input?.tiers)
-    ? input.tiers.map((t: any) => {
+    ? (input.tiers as unknown[]).map((t: unknown) => {
+        const tier = t as Record<string, unknown>;
         // Look up the original default tier by ID to ensure missing keys are populated safely.
         // If it's a completely new tier created by an admin, use the first default tier as a structural fallback.
-        const baseTier = DEFAULT_SETTINGS.tiers.find((dt) => dt.id === t?.id) ?? DEFAULT_SETTINGS.tiers[0];
-        return { ...baseTier, ...t };
+        const baseTier = DEFAULT_SETTINGS.tiers.find((dt) => dt.id === tier?.id) ?? DEFAULT_SETTINGS.tiers[0];
+        return { ...baseTier, ...tier };
       })
     : DEFAULT_SETTINGS.tiers;
 
@@ -105,8 +106,9 @@ export function mergeWithDefaults(input: any): CalculatorSettings {
   // integer instead of the `maintenanceYears` array. Migrate on read so
   // pre-schema-bump admins still get a maintenance event in the cashflow.
   if (!Array.isArray(global.maintenanceYears) || global.maintenanceYears.length === 0) {
-    if (typeof (input?.global as any)?.maintenanceYear === 'number' && (input.global as any).maintenanceYear > 0) {
-      global.maintenanceYears = [(input.global as any).maintenanceYear];
+    const globalInput = input?.global as Record<string, unknown>;
+    if (typeof globalInput?.maintenanceYear === 'number' && (globalInput.maintenanceYear as number) > 0) {
+      global.maintenanceYears = [globalInput.maintenanceYear as number];
     } else {
       global.maintenanceYears = DEFAULT_SETTINGS.global.maintenanceYears;
     }

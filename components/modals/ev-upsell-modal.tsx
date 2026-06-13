@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import { X, Zap } from "lucide-react";
 import { useCalculatorStore } from "@/store/calculatorStore";
 
@@ -12,13 +12,52 @@ interface EvUpsellModalProps {
 export function EvUpsellModal({ isOpen, onClose }: EvUpsellModalProps) {
   const setFinancialInputs = useCalculatorStore((s) => s.setFinancialInputs);
   const financial = useCalculatorStore((s) => s.financial);
+  const [isMounted, setIsMounted] = useState(false);
 
-  const [numChargers, setNumChargers] = useState<string>(financial.evNumChargers?.toString() ?? "2");
-  const [powerKw, setPowerKw] = useState<string>(financial.evPowerKw?.toString() ?? "22");
-  const [dailyHours, setDailyHours] = useState<string>(financial.evDailyHours?.toString() ?? "4");
-  const [sellPrice, setSellPrice] = useState<string>(financial.evSellPriceCentsKwh?.toString() ?? "55");
+  useLayoutEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
+  }, []);
+
+  const [numChargers, setNumChargers] = useState<string>("2");
+  const [powerKw, setPowerKw] = useState<string>("22");
+  const [dailyHours, setDailyHours] = useState<string>("4");
+  const [sellPrice, setSellPrice] = useState<string>("55");
+
+  useEffect(() => {
+    if (isMounted && isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setNumChargers(financial.evNumChargers?.toString() ?? "2");
+      setPowerKw(financial.evPowerKw?.toString() ?? "22");
+      setDailyHours(financial.evDailyHours?.toString() ?? "4");
+      setSellPrice(financial.evSellPriceCentsKwh?.toString() ?? "55");
+    }
+  }, [isMounted, isOpen, financial]);
 
   if (!isOpen) return null;
+
+  if (!isMounted) {
+    return (
+      <div
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#363636]/60 backdrop-blur-sm"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div className="relative w-full max-w-xl bg-white shadow-2xl border border-[#dfdfdf] max-h-[90vh] overflow-y-auto">
+          <div className="p-8 space-y-4">
+            <div className="h-8 bg-[#f4f4f4] animate-pulse rounded w-1/3" />
+            <div className="h-4 bg-[#f4f4f4] animate-pulse rounded w-1/2" />
+            <div className="h-4 bg-[#f4f4f4] animate-pulse rounded w-3/4" />
+            <div className="grid grid-cols-2 gap-4">
+              {[...Array(4)].map((_, i) => (
+                <div key={i} className="h-24 bg-[#f4f4f4] animate-pulse rounded border border-[#e5e5e5]" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // FIX (EV2): parseFloat("3,5") returns 3 (stops at the comma). Apply the
   // same German decimal-comma swap the rest of the form uses so "3,5" reads

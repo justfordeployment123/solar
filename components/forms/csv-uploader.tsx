@@ -23,7 +23,7 @@ export function CsvUploader() {
   // Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [rawFile, setRawFile] = useState<File | null>(null);
-  const [parsedData, setParsedData] = useState<any[]>([]);
+  const [parsedData, setParsedData] = useState<Record<string, string>[]>([]);
   const [headers, setHeaders] = useState<string[]>([]);
 
   // Mapping Config
@@ -48,7 +48,7 @@ Papa.parse(file, {
       skipEmptyLines: true,
       worker: true, // FIX: Offload parsing to web worker so the UI doesn't freeze on large files
       complete: (fullResults) => {
-        const data = fullResults.data as any[];
+        const data = fullResults.data as Record<string, string>[];
         if (data.length === 0) {
           store.setCsvMetadata({
             hasErrors: true,
@@ -143,6 +143,7 @@ Papa.parse(file, {
 
     if (validCount === 0) {
       // FIX (CSVU.2): was "Konnte Nein numerischen Werte…" — broken German.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMappingError("Konnte keine numerischen Werte in der gewählten Verbrauchs-Spalte finden.");
       setPreviewStats(null);
     } else {
@@ -240,7 +241,7 @@ Papa.parse(file, {
       {store.csvMetadata.fileName && store.csvMetadata.isConfigured && !store.csvMetadata.hasErrors && (
         <div className="mt-4 flex items-center gap-3 text-sm font-medium text-emerald-700 bg-emerald-50 px-4 py-3 rounded-md border border-emerald-200">
           <CheckCircle2 className="w-5 h-5 flex-shrink-0" />
-          <span className="truncate break-all">"{store.csvMetadata.fileName}" erfolgreich importiert.</span>
+          <span className="truncate break-all">&quot;{store.csvMetadata.fileName}&quot; erfolgreich importiert.</span>
         </div>
       )}
 

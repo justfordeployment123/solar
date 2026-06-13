@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { ProgressHeader } from '@/components/layout/progress-header';
@@ -14,8 +14,13 @@ import { InfoModal } from '@/components/modals/info-modal';
 export default function Step3Page() {
   const router = useRouter();
   const [isRegelenergieModalOpen, setIsRegelenergieModalOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
-  const hasHydrated = useCalculatorStore((state) => state._hasHydrated);
+  useLayoutEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
+  }, []);
+
   const stepCompletion = useCalculatorStore((state) => state.stepCompletion);
   const markStepComplete = useCalculatorStore((state) => state.markStepComplete);
   const financial = useCalculatorStore((state) => state.financial);
@@ -23,10 +28,10 @@ export default function Step3Page() {
   const setFinancialInputs = useCalculatorStore((state) => state.setFinancialInputs);
 
   useEffect(() => {
-    if (hasHydrated && !stepCompletion.step2) {
+    if (isMounted && !stepCompletion.step2) {
       router.replace('/calculator/step-2');
     }
-  }, [hasHydrated, stepCompletion.step2, router]);
+  }, [isMounted, stepCompletion.step2, router]);
 
   const handleNext = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -46,15 +51,51 @@ export default function Step3Page() {
         setFinancialInputs({ [field]: null });
         return;
       }
-      const parsed = Math.max(0, Number(e.target.value.replace(',', '.')));
-      const val = field === 'peakShavingReductionPercentage' ? Math.min(100, parsed) : parsed;
+const parsed = Math.max(0, Number(e.target.value.replace(',', '.')));
+      const isPercentageField = field.toLowerCase().includes('percentage');
+      const val = isPercentageField ? Math.min(100, parsed) : parsed;
       if (Number.isFinite(val)) {
         setFinancialInputs({ [field]: val });
       }
     }
   };
 
-  if (!hasHydrated || !stepCompletion.step2) return null;
+  if (!isMounted) {
+    return (
+      <div className="px-6 lg:px-12 pt-10 max-w-4xl mx-auto flex flex-col min-h-full">
+        <ProgressHeader
+          currentStep={3}
+          totalSteps={3}
+          title="Finanzielle Kennzahlen"
+          description="Konfigurieren Sie die finanziellen Parameter Ihres Batteriespeichersystems, um Ihren potenziellen ROI zu berechnen."
+        />
+        <div className="mb-12 flex-grow">
+          <section className="bg-white border border-[#e5e5e5] p-8 lg:p-12 relative">
+            <span className="absolute top-0 left-0 right-0 h-[3px] bg-[#e20613]" />
+            <div className="space-y-6 max-w-md">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="h-12 bg-[#f4f4f4] animate-pulse rounded border border-[#e5e5e5]" />
+              ))}
+            </div>
+          </section>
+        </div>
+        <footer className="mt-auto pb-10 flex justify-between items-center py-6 border-t border-[#e5e5e5] w-full">
+          <Link
+            prefetch={false}
+            href="/calculator/step-2"
+            className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#5a5859] flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" /> Zurück
+          </Link>
+          <Button variant="primary" disabled>
+            <Calculator className="w-5 h-5" /> Ergebnisse berechnen
+          </Button>
+        </footer>
+      </div>
+    );
+  }
+
+  if (!stepCompletion.step2) return null;
 
   return (
     <div className="px-6 lg:px-12 pt-10 max-w-4xl mx-auto flex flex-col min-h-full">
@@ -154,14 +195,18 @@ export default function Step3Page() {
               {financial.targetBudgetEur && (
                 <div className="mt-3 text-sm text-[#0066cc] bg-[#eef2ff] p-3 rounded border border-[#bbd4ff]">
                   {(() => {
-                    // Safely convert the cent value (or default 35 cents) to euros before dividing
                     const estimatedConsumption = technical.annualConsumptionKwh || (financial.yearlyElectricityBillEur ? (financial.yearlyElectricityBillEur / (normalizeElectricityPriceCents(financial.currentElectricityPriceCentsKwh) / 100)) : 5000);
-                    // Recommended battery size is driven by consumption only.
-                    // It must NOT scale with the target-budget field — that
-                    // produces nonsensical sizes (e.g. 485 kWh for a 16,500 kWh
-                    // home just because the budget is €485k).
-                    const recommendedKwh = Math.max(10, Math.ceil(estimatedConsumption / 1000) * 1.5);
-                    return `💡 Basierend auf Ihren Daten empfehlen wir eine großzügige Speichergröße von ca. ${recommendedKwh} kWh für maximale Autarkie.`;
+                    
+                    let recommendedKwh = Math.max(10, Math.ceil(estimatedConsumption / 1000) * 1.5);
+                    
+                    const hasTrading = technical.enableEpex || technical.enablePrl || technical.enableSrl || technical.enableLoadShifting;
+                    if (hasTrading) {
+                      recommendedKwh = Math.max(50, Math.ceil((recommendedKwh * 4) / 10) * 10);
+                    }
+
+                    const benefitText = hasTrading ? " und optimale Teilnahme an den Energiemärkten" : " für maximale Autarkie";
+                    
+                    return `💡 Basierend auf Ihren Daten empfehlen wir eine Speichergröße von mindestens ${recommendedKwh} kWh${benefitText}.`;
                   })()}
                 </div>
               )}

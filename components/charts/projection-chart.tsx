@@ -37,7 +37,7 @@ extraCssText: 'box-shadow: 0 8px 32px rgba(0,0,0,0.08); backdrop-filter: blur(12
 	formatter: function (params: TooltipParam | TooltipParam[]) {
 	          if (!Array.isArray(params) || params.length === 0) return '';
           let str = `<div style="font-weight: bold; margin-bottom: 8px;">${params[0]?.name || ''}</div>`;
-          params.forEach((param: any) => {
+          params.forEach((param: TooltipParam) => {
             str += `
               <div style="display: flex; justify-content: space-between; gap: 24px; margin-bottom: 4px;">
                 <span style="color: #565656;">

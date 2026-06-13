@@ -234,7 +234,7 @@ export default function LandingPage() {
                 href="#how"
                 className="inline-flex items-center gap-3 bg-transparent border border-[#e5e5e5] text-[#1a1a1a] font-bold uppercase tracking-[0.18em] text-xs md:text-sm px-7 py-4 hover:border-[#1a1a1a] transition-colors"
               >
-                <span>So funktioniert's</span>
+                <span>So funktioniert&apos;s</span>
               </a>
             </div>
 
@@ -542,7 +542,7 @@ export default function LandingPage() {
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-12 md:mb-16">
             <div className="max-w-2xl">
               <span className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#e20613]">
-                So funktioniert's
+                So funktioniert&apos;s
               </span>
               <h2 className="mt-3 text-[2rem] md:text-[2.75rem] font-bold tracking-tight leading-[1.1] text-[#1a1a1a]">
                 In drei Schritten zum passenden Speicher.

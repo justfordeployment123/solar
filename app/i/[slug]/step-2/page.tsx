@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Link from 'next/link';
 import { ProgressHeader } from '@/components/layout/progress-header';
@@ -11,22 +11,28 @@ import { useCalculatorStore } from '@/store/calculatorStore';
 import type { TechnicalInputs } from '@/types/calculator';
 import { ArrowLeft, ChevronRight, Zap, Database } from 'lucide-react';
 import { CsvUploader } from '@/components/forms/csv-uploader';
+import { useState } from 'react';
 
 export default function Step2Page() {
   const router = useRouter();
   const params = useParams() as { slug: string };
+  const [isMounted, setIsMounted] = useState(false);
 
-  const hasHydrated = useCalculatorStore((state) => state._hasHydrated);
+  useLayoutEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
+  }, []);
+
   const stepCompletion = useCalculatorStore((state) => state.stepCompletion);
   const markStepComplete = useCalculatorStore((state) => state.markStepComplete);
   const technical = useCalculatorStore((state) => state.technical);
   const setTechnicalInputs = useCalculatorStore((state) => state.setTechnicalInputs);
 
   useEffect(() => {
-    if (hasHydrated && !stepCompletion.step1) {
+    if (isMounted && !stepCompletion.step1) {
       router.replace(`/i/${params.slug}/step-1`);
     }
-  }, [hasHydrated, stepCompletion.step1, router, params.slug]);
+  }, [isMounted, stepCompletion.step1, router, params.slug]);
 
   const handleNext = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -52,7 +58,46 @@ export default function Step2Page() {
     });
   };
 
-  if (!hasHydrated || !stepCompletion.step1) return null;
+  if (!isMounted) {
+    return (
+      <div className="px-6 lg:px-12 pt-10 max-w-5xl mx-auto flex flex-col min-h-full">
+        <ProgressHeader
+          currentStep={2}
+          totalSteps={3}
+          title="Systemdetails"
+          description="Konfigurieren Sie die technischen Parameter Ihrer Photovoltaik-Anlage und Ihres Batteriespeichers."
+        />
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 mb-12 flex-grow">
+          <section className="bg-white border border-[#e5e5e5] p-8 relative">
+            <span className="absolute top-0 left-0 right-0 h-[3px] bg-[#e20613]" />
+            <div className="space-y-6">
+              {[...Array(10)].map((_, i) => (
+                <div key={i} className="h-12 bg-[#f4f4f4] animate-pulse rounded border border-[#e5e5e5]" />
+              ))}
+            </div>
+          </section>
+          <section className="bg-white border border-[#e5e5e5] p-8 relative">
+            <span className="absolute top-0 left-0 right-0 h-[3px] bg-[#d2d700]" />
+            <div className="h-64 bg-[#f4f4f4] animate-pulse rounded border border-[#e5e5e5]" />
+          </section>
+        </div>
+        <footer className="mt-auto pb-10 flex justify-between items-center py-6 border-t border-[#e5e5e5] w-full">
+          <Link
+            prefetch={false}
+            href={`/i/${params.slug}/step-1`}
+            className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#5a5859] flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" /> Zurück
+          </Link>
+          <Button variant="primary" disabled>
+            Nächster Schritt <ChevronRight className="w-5 h-5" />
+          </Button>
+        </footer>
+      </div>
+    );
+  }
+
+  if (!stepCompletion.step1) return null;
 
   return (
     <div className="px-6 lg:px-12 pt-10 max-w-5xl mx-auto flex flex-col min-h-full">

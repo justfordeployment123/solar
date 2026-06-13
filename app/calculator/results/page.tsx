@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useLayoutEffect, useRef } from "react";
 import { useCalculatorStore } from "@/store/calculatorStore";
 import { RevenuePie } from "@/components/charts/revenue-pie";
 import { ProjectionChart } from "@/components/charts/projection-chart";
@@ -67,7 +67,12 @@ function MetricCard({
 }
 
 export default function ResultsPage() {
-  const { technical, financial, derivedResults, setTechnicalInputs, setFinancialInputs, activeInstaller, _hasHydrated } = useCalculatorStore();
+  const { technical, financial, derivedResults, setTechnicalInputs, setFinancialInputs, activeInstaller } = useCalculatorStore();
+  const [isMounted, setIsMounted] = useState(false);
+
+  useLayoutEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const formatCurrency = (val: number) => 
     new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(val);
@@ -88,7 +93,7 @@ export default function ResultsPage() {
   // per session so it doesn't nag returning users; sessionStorage keys are
   // namespaced to keep dev vs. prod cleanly separated.
   useEffect(() => {
-    if (!derivedResults || !_hasHydrated) return;
+    if (!derivedResults || !isMounted) return;
 
     const battery = technical.currentBatteryCapacityKwh ?? 0;
     const pv = technical.pvSizeKwp ?? 0;
@@ -113,22 +118,73 @@ export default function ResultsPage() {
     technical.pvSizeKwp, 
     financial.evChargingEnabled, 
     financial.communityEnabled,
-    _hasHydrated
+    isMounted
   ]);
 
   const [initialCapacity, setInitialCapacity] = useState<number | null>(null);
 
   useEffect(() => {
-    // only lock the capacity once after zustand finishes hydrating
-    if (_hasHydrated && initialCapacity === null && (technical.currentBatteryCapacityKwh ?? 0) > 0) {
+    // only lock the capacity once after mount
+    if (isMounted && initialCapacity === null && (technical.currentBatteryCapacityKwh ?? 0) > 0) {
       setInitialCapacity(technical.currentBatteryCapacityKwh ?? 0);
     }
-  }, [_hasHydrated, initialCapacity, technical.currentBatteryCapacityKwh]);
+  }, [isMounted, initialCapacity, technical.currentBatteryCapacityKwh]);
+
+  if (!isMounted) {
+    return (
+      <div className="container mx-auto px-6 py-10 sm:px-8 space-y-10">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <div className="h-6 bg-[#f4f4f4] animate-pulse rounded w-48 mb-6" />
+            <div className="h-10 bg-[#f4f4f4] animate-pulse rounded w-72 mb-4" />
+            <div className="h-6 bg-[#f4f4f4] animate-pulse rounded w-96" />
+          </div>
+          <div className="bg-white border border-[#e5e5e5] p-6 min-w-[280px] relative mt-8 md:mt-0">
+            <div className="h-4 bg-[#f4f4f4] animate-pulse rounded w-full mb-4" />
+            <div className="h-4 bg-[#f4f4f4] animate-pulse rounded w-full mb-2" />
+            <div className="h-32 bg-[#f4f4f4] animate-pulse rounded w-full" />
+          </div>
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="bg-white border border-[#e5e5e5] p-6 relative">
+              <span className="absolute top-0 left-0 right-0 h-[3px] bg-[#f4f4f4] animate-pulse" />
+              <div className="h-4 bg-[#f4f4f4] animate-pulse rounded w-3/4 mb-2" />
+              <div className="h-8 bg-[#f4f4f4] animate-pulse rounded w-1/2 mb-2" />
+              <div className="h-4 bg-[#f4f4f4] animate-pulse rounded w-1/3" />
+            </div>
+          ))}
+        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2 bg-white border border-[#e5e5e5] p-8 relative">
+            <div className="h-[400px] bg-[#f4f4f4] animate-pulse rounded" />
+          </div>
+          <div className="bg-white border border-[#e5e5e5] p-8 flex flex-col relative">
+            <div className="h-[350px] bg-[#f4f4f4] animate-pulse rounded flex-grow" />
+            <div className="h-12 bg-[#f4f4f4] animate-pulse rounded w-full mt-8" />
+          </div>
+        </div>
+        <div className="h-64 bg-[#f4f4f4] animate-pulse rounded border border-[#e5e5e5] p-8" />
+        <div className="bg-[#f8fafc] border border-[#e5e5e5] p-8 md:p-12 text-center mt-4">
+          <div className="h-6 bg-[#f4f4f4] animate-pulse rounded w-64 mx-auto mb-3" />
+          <div className="h-4 bg-[#f4f4f4] animate-pulse rounded w-96 mx-auto mb-8" />
+          <div className="h-12 bg-[#f4f4f4] animate-pulse rounded w-48 mx-auto" />
+        </div>
+        <div className="relative bg-[#1a1a1a] text-white p-8 md:p-12 overflow-hidden mt-4">
+          <div className="h-8 bg-[#f4f4f4] animate-pulse rounded w-80 mb-3" />
+          <div className="h-10 bg-[#f4f4f4] animate-pulse rounded w-96 mb-3" />
+          <div className="h-6 bg-[#f4f4f4] animate-pulse rounded w-72" />
+        </div>
+      </div>
+    );
+  }
 
   // safely calculate max using the hydrated state
+// safely calculate max using the hydrated state
   const safeInitial = initialCapacity ?? 0;
-  const sliderMax = Math.max(100, safeInitial * 3, technical.currentBatteryCapacityKwh ?? 0);
-
+  const currentVal = Math.max(safeInitial, technical.currentBatteryCapacityKwh ?? 0);
+  const sliderMax = currentVal <= 50 ? 100 : currentVal <= 250 ? 500 : currentVal <= 500 ? 1000 : Math.ceil(currentVal / 500) * 500 + 500;
+  
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const val = parseFloat(e.target.value);
     if (Number.isFinite(val)) {

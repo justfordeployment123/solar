@@ -169,7 +169,7 @@ export default function InstallersPage() {
                     placeholder="Energy Solutions GmbH"
                     required
                     value={installerProfile.companyName}
-                    onChange={(e: any) => setInstallerProfile({ companyName: e.target.value })}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInstallerProfile({ companyName: e.target.value })}
                   />
 
                   <Input
@@ -179,7 +179,7 @@ export default function InstallersPage() {
                     placeholder="Erika Mustermann"
                     required
                     value={installerProfile.contactName}
-                    onChange={(e: any) => setInstallerProfile({ contactName: e.target.value })}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInstallerProfile({ contactName: e.target.value })}
                   />
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -190,7 +190,7 @@ export default function InstallersPage() {
                       placeholder="+49 ..."
                       type="tel"
                       value={installerProfile.phone}
-                      onChange={(e: any) => setInstallerProfile({ phone: e.target.value })}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInstallerProfile({ phone: e.target.value })}
                     />
                     <Input
                       label="E-Mail-Adresse"
@@ -200,7 +200,7 @@ export default function InstallersPage() {
                       type="email"
                       required
                       value={installerProfile.email}
-                      onChange={(e: any) => setInstallerProfile({ email: e.target.value })}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInstallerProfile({ email: e.target.value })}
                     />
                   </div>
 
@@ -211,7 +211,7 @@ export default function InstallersPage() {
                     placeholder="https://www.firma.de"
                     type="url"
                     value={installerProfile.websiteUrl || ""}
-                    onChange={(e: any) => setInstallerProfile({ websiteUrl: e.target.value })}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => setInstallerProfile({ websiteUrl: e.target.value })}
                   />
 
                   <div className="pt-2">

@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useCalculatorStore } from '@/store/calculatorStore';
 import { ProgressHeader } from '@/components/layout/progress-header';
-import { useState } from 'react';
+import { useState, useLayoutEffect } from 'react';
 import { Goal } from '@/types/calculator';
 import { RadioCard } from '@/components/ui/radio-card';
 import { Button } from '@/components/ui/button';
@@ -14,8 +14,13 @@ import { InfoModal } from '@/components/modals/info-modal';
 export default function Step1Page() {
   const router = useRouter();
   const [isRegelenergieModalOpen, setIsRegelenergieModalOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
 
-  const hasHydrated = useCalculatorStore((state) => state._hasHydrated);
+  useLayoutEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
+  }, []);
+
   const goals = useCalculatorStore((state) => state.goals);
   const setGoals = useCalculatorStore((state) => state.setGoals);
   const markStepComplete = useCalculatorStore((state) => state.markStepComplete);
@@ -74,7 +79,35 @@ export default function Step1Page() {
     router.push('/calculator/step-2');
   };
 
-  if (!hasHydrated) return null;
+  if (!isMounted) {
+    return (
+      <div className="px-6 lg:px-12 pt-10 max-w-4xl mx-auto flex flex-col min-h-full">
+        <ProgressHeader
+          currentStep={1}
+          totalSteps={3}
+          title="Was sind Ihre Ziele?"
+          description="Wählen Sie aus, wie Ihr zukünftiges Batteriesystem mit dem Stromnetz und Ihrem lokalen Energieverbrauchsnetz interagieren soll."
+        />
+        <div className="space-y-4 mb-12 flex-grow">
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="h-20 bg-[#f4f4f4] animate-pulse rounded-lg border border-[#e5e5e5]" />
+          ))}
+        </div>
+        <footer className="mt-auto pb-10 flex justify-between items-center py-6 border-t border-[#e5e5e5] w-full">
+          <Link
+            prefetch={false}
+            href="/"
+            className="text-[0.7rem] font-bold uppercase tracking-[0.2em] text-[#5a5859] flex items-center gap-2"
+          >
+            <ArrowLeft className="w-4 h-4" /> Zurück
+          </Link>
+          <Button variant="primary" disabled>
+            Nächster Schritt <ChevronRight className="w-5 h-5" />
+          </Button>
+        </footer>
+      </div>
+    );
+  }
 
   const selectedCount =
     (goals.primaryGoal ? 1 : 0) + goals.secondaryGoals.length;

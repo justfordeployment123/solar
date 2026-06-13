@@ -43,8 +43,8 @@ export function ReferralModal({ isOpen, onClose }: ReferralModalProps) {
         setFriendEmail("");
         onClose();
       }, 2500);
-    } catch (err: any) {
-      setError(err.message || "Ein unerwarteter Fehler ist aufgetreten.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Ein unerwarteter Fehler ist aufgetreten.");
     } finally {
       setIsSubmitting(false);
     }

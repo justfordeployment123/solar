@@ -53,8 +53,8 @@ export function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalProps) {
 
       if (!res.ok) throw new Error("Failed to submit request.");
       setSuccess(true);
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred.");
     } finally {
       setLoading(false);
     }
@@ -96,7 +96,7 @@ export function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalProps) {
                 type="text"
                 required
                 value={leadDraft.firstName}
-                onChange={(e: any) => setLeadDraft({ firstName: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLeadDraft({ firstName: e.target.value })}
               />
               <Input
                 label="Nachname"
@@ -104,7 +104,7 @@ export function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalProps) {
                 type="text"
                 required
                 value={leadDraft.lastName}
-                onChange={(e: any) => setLeadDraft({ lastName: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLeadDraft({ lastName: e.target.value })}
               />
             </div>
             
@@ -114,7 +114,7 @@ export function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalProps) {
               type="email"
               required
               value={leadDraft.email}
-              onChange={(e: any) => setLeadDraft({ email: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLeadDraft({ email: e.target.value })}
             />
             
             <Input
@@ -122,7 +122,7 @@ export function LeadCaptureModal({ isOpen, onClose }: LeadCaptureModalProps) {
               id="phone"
               type="tel"
               value={leadDraft.phone || ''}
-              onChange={(e: any) => setLeadDraft({ phone: e.target.value })}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setLeadDraft({ phone: e.target.value })}
             />
             
             {error && <p className="text-red-500 text-sm font-medium">{error}</p>}

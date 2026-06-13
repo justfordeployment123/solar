@@ -24,19 +24,21 @@ const COLORS = [
 ];
 
 export function RevenuePie({ data }: RevenuePieProps) {
-  const option = useMemo(() => {
-    const chartData = [
-      { name: "Eigenverbrauch", value: data.selfConsumption },
-      { name: "PRL", value: data.prl },
-      { name: "SRL/aFRR", value: data.srlAfrr },
-      { name: "EPEX Arbitrage", value: data.epexArbitrage },
-      { name: "Peak Shaving", value: data.peakShaving },
-      { name: "Load Shifting", value: data.loadShifting },
-      { name: "EV-Laden", value: data.evCharging },
-      { name: "Energy Community", value: data.communitySupply },
-      { name: "VPP", value: data.vppParticipation },
-    ].filter(item => item.value > 0);
+  // Derive chartData outside useMemo so we can guard early and avoid
+  // accessing option.series[0].data on a potentially empty/stub object.
+  const chartData = [
+    { name: "Eigenverbrauch", value: data.selfConsumption },
+    { name: "PRL", value: data.prl },
+    { name: "SRL/aFRR", value: data.srlAfrr },
+    { name: "EPEX Arbitrage", value: data.epexArbitrage },
+    { name: "Peak Shaving", value: data.peakShaving },
+    { name: "Load Shifting", value: data.loadShifting },
+    { name: "EV-Laden", value: data.evCharging },
+    { name: "Energy Community", value: data.communitySupply },
+    { name: "VPP", value: data.vppParticipation },
+  ].filter(item => item.value > 0);
 
+  const option = useMemo(() => {
     return {
       tooltip: {
         trigger: 'item',
@@ -99,9 +101,11 @@ export function RevenuePie({ data }: RevenuePieProps) {
         }
       ]
     };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
-  if (option.series[0].data.length === 0) {
+  // Guard AFTER useMemo so hooks order is stable, but before rendering the chart.
+  if (chartData.length === 0) {
     return <div className="flex items-center justify-center h-full text-[#565656] font-medium">Keine Einnahmedaten verfügbar</div>;
   }
 

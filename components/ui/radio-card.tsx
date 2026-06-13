@@ -59,7 +59,7 @@ export function RadioCard({ option, checked, onChange, className }: RadioCardPro
                 if (e.key === 'Enter' || e.key === ' ') {
                   e.preventDefault();
                   e.stopPropagation();
-                  option.onInfoClick!(e as any);
+                  option.onInfoClick!(e as unknown as React.MouseEvent);
                 }
               }}
               className="p-1 text-gray-400 hover:text-[#e20613] transition-colors cursor-pointer"

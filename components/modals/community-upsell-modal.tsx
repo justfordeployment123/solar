@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useLayoutEffect } from "react";
 import { X, Users } from "lucide-react";
 import { useCalculatorStore } from "@/store/calculatorStore";
 
@@ -12,12 +12,50 @@ interface CommunityUpsellModalProps {
 export function CommunityUpsellModal({ isOpen, onClose }: CommunityUpsellModalProps) {
   const setFinancialInputs = useCalculatorStore((s) => s.setFinancialInputs);
   const financial = useCalculatorStore((s) => s.financial);
+  const [isMounted, setIsMounted] = useState(false);
 
-  const [parties, setParties] = useState<string>(financial.communityNumParties?.toString() ?? "5");
-  const [kwhPerParty, setKwhPerParty] = useState<string>(financial.communityKwhPerParty?.toString() ?? "3500");
-  const [sellPrice, setSellPrice] = useState<string>(financial.communitySellPriceCentsKwh?.toString() ?? "30");
+  useLayoutEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setIsMounted(true);
+  }, []);
+
+  const [parties, setParties] = useState<string>("5");
+  const [kwhPerParty, setKwhPerParty] = useState<string>("3500");
+  const [sellPrice, setSellPrice] = useState<string>("30");
+
+  useEffect(() => {
+    if (isMounted && isOpen) {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setParties(financial.communityNumParties?.toString() ?? "5");
+      setKwhPerParty(financial.communityKwhPerParty?.toString() ?? "3500");
+      setSellPrice(financial.communitySellPriceCentsKwh?.toString() ?? "30");
+    }
+  }, [isMounted, isOpen, financial]);
 
   if (!isOpen) return null;
+
+  if (!isMounted) {
+    return (
+      <div
+        className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-[#363636]/60 backdrop-blur-sm"
+        role="dialog"
+        aria-modal="true"
+      >
+        <div className="relative w-full max-w-xl bg-white shadow-2xl border border-[#dfdfdf] max-h-[90vh] overflow-y-auto">
+          <div className="p-8 space-y-4">
+            <div className="h-8 bg-[#f4f4f4] animate-pulse rounded w-1/3" />
+            <div className="h-4 bg-[#f4f4f4] animate-pulse rounded w-1/2" />
+            <div className="h-4 bg-[#f4f4f4] animate-pulse rounded w-3/4" />
+            <div className="grid grid-cols-2 gap-4">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="h-24 bg-[#f4f4f4] animate-pulse rounded border border-[#e5e5e5]" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   // FIX (Com2): parseFloat("3,5") returns 3 (stops at the comma). Apply the
   // same German decimal-comma swap the rest of the form uses so "3,5" reads
